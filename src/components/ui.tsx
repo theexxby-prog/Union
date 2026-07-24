@@ -134,10 +134,18 @@ export function ProgressRule({ value }: { value: number }) {
 }
 
 /* ---- Phase strip (workflow stages in the progress-rule slot) ---------- */
-export function PhaseStrip({ phase, needsClient }: { phase: number; needsClient: boolean }) {
+export function PhaseStrip({
+  phase,
+  needsClient,
+  labels = PHASES,
+}: {
+  phase: number;
+  needsClient: boolean;
+  labels?: readonly string[];
+}) {
   return (
     <div className="flex gap-[7px]">
-      {PHASES.map((label, i) => {
+      {labels.map((label, i) => {
         const done = i < phase;
         const current = i === phase;
         const currentIsAction = current && needsClient;

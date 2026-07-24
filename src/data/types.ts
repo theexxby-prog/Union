@@ -3,7 +3,7 @@
 // in the same shape. The types below encode that, plus the workflow-shaped
 // objects (documents, invoices) that are deliberately NOT campaign-shaped.
 
-export type ServiceId = 'idata' | 'cleanrich' | 'programmatic' | 'leads';
+export type ServiceId = 'idata' | 'cleanrich' | 'programmatic' | 'leads' | 'fa' | 'research';
 
 /** The closed set of four status states (docs/02). Never invent a fifth. */
 export type StatusState = 'good' | 'needsYou' | 'action' | 'neutral';
@@ -14,6 +14,8 @@ export type ScreenKey =
   | 'data'
   | 'media'
   | 'leads'
+  | 'finance'
+  | 'research'
   | 'documents'
   | 'invoices'
   | 'support';
@@ -179,6 +181,29 @@ export interface Contact {
   role: string;
 }
 
+/** A Finance & Accounting workstream (AP, AR, close, cleanup — not campaign-shaped). */
+export interface FaWorkstream {
+  id: string;
+  name: string;
+  detail: string;
+  status: StatusState;
+  statusLabel: string;
+}
+
+export const RESEARCH_STAGES = ['Scoped', 'Fieldwork', 'Analysis', 'Report'] as const;
+
+/** A market-research study; progresses through RESEARCH_STAGES. */
+export interface ResearchStudy {
+  id: string;
+  name: string;
+  geo: string;
+  method: string;
+  /** Index into RESEARCH_STAGES; the final stage means the report is delivered. */
+  stage: 0 | 1 | 2 | 3;
+  detail: string;
+  due: string;
+}
+
 export interface TeamMember {
   name: string;
   email: string;
@@ -239,6 +264,8 @@ export interface Account {
   leads: Lead[];
   batches: Batch[];
   media?: MediaData;
+  faWorkstreams?: FaWorkstream[];
+  studies?: ResearchStudy[];
   documents: DocumentRecord[];
   invoices: Invoice[];
   tickets: Ticket[];

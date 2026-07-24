@@ -14,8 +14,8 @@ import { path } from '@/lib/nav';
 import type { Account, Campaign, ServiceId } from '@/data/types';
 
 /** The chain argument, phrased per entitlement (docs/01) — shown when the account
- *  runs more than one link of the chain. */
-const CHAIN_PHRASES: Record<ServiceId, string> = {
+ *  runs more than one link of the chain. F&A and research sit outside the chain. */
+const CHAIN_PHRASES: Partial<Record<ServiceId, string>> = {
   idata: 'iData builds the universe',
   cleanrich: 'CleanRich enriches it',
   programmatic: 'programmatic runs against it',
@@ -165,7 +165,16 @@ export default function Overview() {
       <Eyebrow className="mb-[12px]">Services</Eyebrow>
       <div className={`grid gap-px overflow-hidden rounded-card border border-hairline bg-hairline ${colClass}`}>
         {account.services.map((s) => {
-          const target = s.id === 'idata' || s.id === 'cleanrich' ? 'data' : s.id === 'programmatic' ? 'media' : 'leads';
+          const target =
+            s.id === 'idata' || s.id === 'cleanrich'
+              ? 'data'
+              : s.id === 'programmatic'
+                ? 'media'
+                : s.id === 'fa'
+                  ? 'finance'
+                  : s.id === 'research'
+                    ? 'research'
+                    : 'leads';
           return (
             <Link key={s.id} to={path(account.id, target)} className="group block !text-body" title={`Open ${s.name}`}>
               <ServiceCard s={s} className="h-full transition-colors duration-150 ease-standard group-hover:bg-[#fafbfd]" />

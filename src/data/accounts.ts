@@ -287,6 +287,7 @@ function buildAcme(): Account {
       { name: 'Rebecca Lyle', email: 'rebecca.lyle@acmecorp.example', role: 'Billing' },
       { name: 'Sam Okafor', email: 'sam.okafor@acmecorp.example', role: 'Campaign viewer' },
     ],
+    lockedNote: 'Finance & Accounting and B2B market research are available on your account.',
     invested,
     dueNow,
     heroes: {
@@ -554,14 +555,20 @@ function buildCalderwood(): Account {
   const services: Service[] = [
     { id: 'idata', name: 'iData', unit: 'records delivered', received: 24000, target: 30000, qualityLine: 'Field fill 91% · Match 68%' },
     { id: 'cleanrich', name: 'CleanRich', unit: 'records processed', received: 28500, target: 30000, qualityLine: 'Corrected 15% · Deduped 9%' },
+    // Onboarded this quarter; billed quarterly — first F&A invoice issues 1 Sep,
+    // so the invested/due figures are untouched.
+    { id: 'fa', name: 'Finance & Accounting', unit: 'invoices processed', received: 1240, target: 1800, qualityLine: 'Accuracy 99.2% · Turnaround 1.8d' },
   ];
-  const recordsDelivered = sum(services.map((s) => s.received)); // 52,500
+  // Records figure is the two data services only — F&A counts invoices, not records.
+  const recordsDelivered = sum(
+    services.filter((s) => s.id === 'idata' || s.id === 'cleanrich').map((s) => s.received),
+  ); // 52,500
 
   return {
     id: 'calderwood',
     name: ACCOUNT_NAMES.calderwood,
-    descriptor: 'Data services',
-    entitlements: ['idata', 'cleanrich'],
+    descriptor: 'Data & finance services',
+    entitlements: ['idata', 'cleanrich', 'fa'],
     user: { name: 'Alan Weir', initials: 'AW' },
     overviewKind: 'services',
     services,
@@ -574,6 +581,12 @@ function buildCalderwood(): Account {
       { id: 'b3', serviceId: 'idata', name: 'Q3 universe build — batch 3', records: 6000, date: '4 Aug', status: 'neutral', statusLabel: 'Scheduled' },
       { id: 'b4', serviceId: 'cleanrich', name: 'Enrichment pass — batch 1', records: 14500, date: '12 Jul', status: 'good', statusLabel: 'Delivered' },
       { id: 'b5', serviceId: 'cleanrich', name: 'Enrichment pass — batch 2', records: 14000, date: '24 Jul', status: 'good', statusLabel: 'Delivered' },
+    ],
+    faWorkstreams: [
+      { id: 'f1', name: 'AP invoice processing', detail: '1,240 invoices processed this quarter · 3-way match', status: 'neutral', statusLabel: 'Active' },
+      { id: 'f2', name: 'AR & collections support', detail: 'Ledger current · next statement run 1 August', status: 'good', statusLabel: 'Current' },
+      { id: 'f3', name: 'Month-end close — July', detail: 'Draft close pack ready for your review', status: 'needsYou', statusLabel: 'Your sign-off' },
+      { id: 'f4', name: 'Vendor master cleanup', detail: 'Duplicates merged and banking details verified', status: 'good', statusLabel: 'Completed' },
     ],
     documents: [
       { id: 'JD-4012', title: 'Q4 data build scope, global', kind: 'Job card', type: 'client_signature', value: 12600, date: '20 Jul', phase: 3, scopeSummary: '30,000 records at $0.42 · $12,600 · scope agreed 20 July' },
@@ -614,6 +627,15 @@ function buildCalderwood(): Account {
         actions: [
           { label: 'Download data report', kind: 'cta', to: 'report' },
           { label: '4 batches delivered', kind: 'pill' },
+        ],
+      },
+      finance: {
+        eyebrow: 'Finance & Accounting · Q3 2026',
+        headline: 'One close pack needs your sign-off',
+        subhead: 'Four workstreams running at 99.2% accuracy. First F&A invoice issues 1 September.',
+        actions: [
+          { label: 'Review July close', kind: 'cta' },
+          { label: 'Download F&A report', kind: 'pill', to: 'report' },
         ],
       },
       documents: {
@@ -886,13 +908,15 @@ function buildHarbor(): Account {
     { id: 'idata', name: 'iData', unit: 'records delivered', received: 18000, target: 24000, qualityLine: 'Field fill 90% · Match 66%' },
     { id: 'cleanrich', name: 'CleanRich', unit: 'records processed', received: 21000, target: 24000, qualityLine: 'Corrected 14% · Deduped 8%' },
     leadsCard(leads),
+    // Billed quarterly — first research invoice issues 1 Sep; money math untouched.
+    { id: 'research', name: 'B2B Market Research', unit: 'studies delivered', received: 2, target: 3, qualityLine: '640 respondents · 87% completion' },
   ];
 
   return {
     id: 'harbor',
     name: ACCOUNT_NAMES.harbor,
-    descriptor: 'Data & content syndication',
-    entitlements: ['idata', 'cleanrich', 'leads'],
+    descriptor: 'Data, syndication & research',
+    entitlements: ['idata', 'cleanrich', 'leads', 'research'],
     user: { name: 'Nina Alvarez', initials: 'NA' },
     overviewKind: 'services',
     services,
@@ -914,6 +938,11 @@ function buildHarbor(): Account {
       { id: 'b3', serviceId: 'idata', name: 'Account universe — batch 3', records: 6000, date: '5 Aug', status: 'neutral', statusLabel: 'Scheduled' },
       { id: 'b4', serviceId: 'cleanrich', name: 'Enrichment pass — batch 1', records: 11000, date: '10 Jul', status: 'good', statusLabel: 'Delivered' },
       { id: 'b5', serviceId: 'cleanrich', name: 'Enrichment pass — batch 2', records: 10000, date: '24 Jul', status: 'good', statusLabel: 'Delivered' },
+    ],
+    studies: [
+      { id: 's1', name: 'Manufacturing buyer sentiment', geo: 'NAM', method: 'Online survey · n=320', stage: 3, detail: '320 respondents · 91% completion', due: 'Delivered 30 Jun' },
+      { id: 's2', name: 'Industrial automation adoption', geo: 'EMEA', method: 'CATI interviews · n=200', stage: 3, detail: '200 respondents · 88% completion', due: 'Delivered 15 Jul' },
+      { id: 's3', name: 'Plant digitisation outlook', geo: 'Global', method: 'Mixed mode · n=300 target', stage: 1, detail: '120 of 300 respondents to date', due: 'Report due 12 Sep' },
     ],
     documents: [
       { id: 'JH-5120', title: 'Manufacturing IT buyers, NAM', kind: 'Job card', type: 'client_signature', value: 7200, date: '18 Jul', phase: 4 },
@@ -965,6 +994,15 @@ function buildHarbor(): Account {
           { label: `Review ${leadsInReview} leads`, kind: 'cta', to: 'leads?review=1' },
           { label: 'Download CSV', kind: 'pill' },
           { label: 'Push to HubSpot', kind: 'pill' },
+        ],
+      },
+      research: {
+        eyebrow: 'B2B Market Research · Q3 2026',
+        headline: 'Two of three studies delivered',
+        subhead: 'Plant digitisation outlook is in field. Billed quarterly — next invoice 1 September.',
+        actions: [
+          { label: 'Download latest report', kind: 'cta' },
+          { label: 'View programme report', kind: 'pill', to: 'report' },
         ],
       },
       documents: {

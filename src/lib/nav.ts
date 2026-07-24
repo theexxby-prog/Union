@@ -15,6 +15,8 @@ export const TABS: TabDef[] = [
   { key: 'data', label: 'Data', segment: 'data', needs: ['idata', 'cleanrich'] },
   { key: 'media', label: 'Media', segment: 'media', needs: ['programmatic'] },
   { key: 'leads', label: 'Leads', segment: 'leads', needs: ['leads'] },
+  { key: 'finance', label: 'F&A', segment: 'finance', needs: ['fa'] },
+  { key: 'research', label: 'Research', segment: 'research', needs: ['research'] },
   { key: 'documents', label: 'Documents', segment: 'documents' },
   { key: 'invoices', label: 'Invoices', segment: 'invoices' },
   { key: 'support', label: 'Support', segment: 'support' },
