@@ -2,7 +2,7 @@
 // names are generic categories, never real publisher names (docs/03).
 import { Navigate } from 'react-router-dom';
 import { useAccount } from '@/components/AppLayout';
-import { Eyebrow, Hero, MetricStrip } from '@/components/ui';
+import { Eyebrow, Hero, MetricStrip, PaceBars } from '@/components/ui';
 import { int } from '@/data/format';
 import { hasService, path } from '@/lib/nav';
 
@@ -23,16 +23,7 @@ export default function Media() {
       </div>
 
       <Eyebrow className="mb-[14px]">Weekly delivery</Eyebrow>
-      <div className="flex h-[88px] items-end gap-[8px]">
-        {media.weeklyBars.map((h, i) => (
-          <div
-            key={i}
-            className={`flex-1 rounded-t-[2px] ${i === lastBar ? 'bg-[#dde4ee]' : 'bg-accent'}`}
-            style={{ height: `${h}%` }}
-            title={i === lastBar ? 'In progress' : undefined}
-          />
-        ))}
-      </div>
+      <PaceBars bars={media.weeklyBars.map((h, i) => ({ height: h, muted: i === lastBar }))} />
       <div className="mb-[28px] mt-[10px] flex justify-between text-[11.5px] text-muted">
         <span>Week 1</span>
         <span>This week</span>

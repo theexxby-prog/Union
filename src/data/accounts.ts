@@ -10,9 +10,12 @@ import { int, money, pct } from './format';
 import type {
   Account,
   Campaign,
+  DeliveryDrop,
+  DeliveryTimelineEntry,
   Invoice,
   LeadsSummary,
   Service,
+  StatusState,
 } from './types';
 
 /** Display names in one place, per docs/04 — rename an account in a single edit. */
@@ -20,6 +23,8 @@ export const ACCOUNT_NAMES = {
   acme: 'Acme Corp',
   northwind: 'Northwind Trading',
   calderwood: 'Calderwood Group',
+  vantage: 'Vantage Analytics',
+  harbor: 'Harbor Point Group',
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -38,6 +43,29 @@ const investedOf = (invoices: Invoice[]): number => sum(invoices.map(invoiceTota
 const dueOf = (invoices: Invoice[]): number =>
   sum(invoices.filter((i) => i.status !== 'paid').map(invoiceTotal));
 
+/** Concise delivery-drop constructor. */
+const drop = (
+  date: string,
+  sortKey: number,
+  leads: number,
+  status: DeliveryDrop['status'],
+): DeliveryDrop => ({ date, sortKey, leads, status });
+
+/** Merge every campaign's drops into one date-sorted timeline for the Leads view. */
+const buildTimeline = (campaigns: Campaign[]): DeliveryTimelineEntry[] =>
+  campaigns
+    .flatMap((c) =>
+      c.schedule.map((d) => ({
+        date: d.date,
+        sortKey: d.sortKey,
+        campaign: c.name,
+        geo: c.geo,
+        leads: d.leads,
+        status: d.status,
+      })),
+    )
+    .sort((a, b) => a.sortKey - b.sortKey);
+
 /** Leads figures, computed once from campaigns. */
 const leadsFromCampaigns = (campaigns: Campaign[], costPerLead: number): LeadsSummary => {
   const billable = sum(campaigns.map((c) => c.accepted));
@@ -46,16 +74,16 @@ const leadsFromCampaigns = (campaigns: Campaign[], costPerLead: number): LeadsSu
   return { billable, delivered, target, acceptRate: pct(billable, delivered), costPerLead };
 };
 
-/** Synthesise the Overview leads card from the derived summary. */
-const leadsCard = (s: LeadsSummary): Service => ({
+/** Synthesise the Overview leads card from the derived summary.
+ *  Pass a status only when the leads need attention; otherwise the card shows pace %. */
+const leadsCard = (s: LeadsSummary, status?: StatusState, statusLabel?: string): Service => ({
   id: 'leads',
   name: 'Lead generation',
   unit: 'billable leads',
   received: s.billable,
   target: s.target,
   qualityLine: `${int(s.delivered)} delivered · Accept ${s.acceptRate}`,
-  status: 'action',
-  statusLabel: 'Behind pace',
+  ...(status ? { status, statusLabel } : {}),
   delivered: s.delivered,
   costPerLead: s.costPerLead,
 });
@@ -75,9 +103,37 @@ function buildAcme(): Account {
   const cpl = 45;
 
   const campaigns: Campaign[] = [
-    { id: 'cs', name: 'Cloud security', geo: 'NAM', accepted: 41, target: 210, delivered: 68 },
-    { id: 'dp', name: 'Data platform guide', geo: 'EMEA', accepted: 34, target: 180, delivered: 61 },
-    { id: 'is', name: 'Infrastructure survey', geo: 'APAC', accepted: 21, target: 110, delivered: 36 },
+    {
+      id: 'cs', name: 'Cloud security', geo: 'NAM', accepted: 41, target: 210, delivered: 68,
+      status: 'active', budget: 42000, startDate: 'Jan 15, 2026', endDate: 'Apr 15, 2026',
+      deliveryDays: ['Monday', 'Thursday'], leadsPerDelivery: 34,
+      schedule: [
+        drop('20 Jan', 20260120, 34, 'delivered'),
+        drop('23 Jan', 20260123, 34, 'delivered'),
+        drop('17 Mar', 20260317, 34, 'upcoming'),
+        drop('20 Mar', 20260320, 34, 'upcoming'),
+      ],
+    },
+    {
+      id: 'dp', name: 'Data platform guide', geo: 'EMEA', accepted: 34, target: 180, delivered: 61,
+      status: 'active', budget: 30000, startDate: 'Feb 1, 2026', endDate: 'May 15, 2026',
+      deliveryDays: ['Tuesday'], leadsPerDelivery: 31,
+      schedule: [
+        drop('21 Jan', 20260121, 31, 'delivered'),
+        drop('4 Feb', 20260204, 30, 'delivered'),
+        drop('18 Mar', 20260318, 30, 'upcoming'),
+      ],
+    },
+    {
+      id: 'is', name: 'Infrastructure survey', geo: 'APAC', accepted: 21, target: 110, delivered: 36,
+      status: 'active', budget: 18000, startDate: 'Feb 10, 2026', endDate: 'May 31, 2026',
+      deliveryDays: ['Wednesday'], leadsPerDelivery: 18,
+      schedule: [
+        drop('22 Jan', 20260122, 18, 'delivered'),
+        drop('5 Feb', 20260205, 18, 'delivered'),
+        drop('19 Mar', 20260319, 18, 'upcoming'),
+      ],
+    },
   ];
   const leads = leadsFromCampaigns(campaigns, cpl); // billable 96 · delivered 165 · target 500
   const leadsInReview = 12;
@@ -160,7 +216,7 @@ function buildAcme(): Account {
       subline: `${money(spend)} of ${money(budget)} spent`,
       qualityLine: 'Viewability 68% · CTR 0.34%',
     },
-    leadsCard(leads),
+    leadsCard(leads, 'action', 'Behind pace'),
   ];
 
   return {
@@ -174,6 +230,7 @@ function buildAcme(): Account {
     leadsSummary: leads,
     leadsMetrics: leadsMetrics(leads),
     campaigns,
+    deliveryTimeline: buildTimeline(campaigns),
     leads: [
       { id: 'l1', name: 'Marcus Reeve', title: 'VP Infrastructure', company: 'Halden Logistics', campaignId: 'cs', date: '22 Jul', status: 'accepted' },
       { id: 'l2', name: 'Priya Nandakumar', title: 'Head of Data', company: 'Corvus Retail Group', campaignId: 'dp', date: '22 Jul', status: 'accepted' },
@@ -308,9 +365,39 @@ function buildAcme(): Account {
 function buildNorthwind(): Account {
   const cpl = 45;
   const campaigns: Campaign[] = [
-    { id: 'cs', name: 'Cloud security whitepaper', geo: 'NAM', accepted: 148, target: 180, delivered: 214 },
-    { id: 'dp', name: 'Data platform buyers guide', geo: 'EMEA', accepted: 109, target: 140, delivered: 168 },
-    { id: 'is', name: 'Infrastructure survey', geo: 'APAC', accepted: 55, target: 80, delivered: 91 },
+    {
+      id: 'cs', name: 'Cloud security whitepaper', geo: 'NAM', accepted: 148, target: 180, delivered: 214,
+      status: 'active', budget: 8100, startDate: 'Jan 5, 2026', endDate: 'Mar 31, 2026',
+      deliveryDays: ['Monday', 'Thursday'], leadsPerDelivery: 54,
+      schedule: [
+        drop('6 Jan', 20260106, 54, 'delivered'),
+        drop('9 Jan', 20260109, 54, 'delivered'),
+        drop('13 Jan', 20260113, 53, 'delivered'),
+        drop('16 Jan', 20260116, 53, 'delivered'),
+        drop('16 Mar', 20260316, 54, 'upcoming'),
+      ],
+    },
+    {
+      id: 'dp', name: 'Data platform buyers guide', geo: 'EMEA', accepted: 109, target: 140, delivered: 168,
+      status: 'active', budget: 6300, startDate: 'Jan 7, 2026', endDate: 'Apr 15, 2026',
+      deliveryDays: ['Wednesday'], leadsPerDelivery: 56,
+      schedule: [
+        drop('7 Jan', 20260107, 56, 'delivered'),
+        drop('21 Jan', 20260121, 56, 'delivered'),
+        drop('4 Feb', 20260204, 56, 'delivered'),
+        drop('18 Mar', 20260318, 56, 'upcoming'),
+      ],
+    },
+    {
+      id: 'is', name: 'Infrastructure survey', geo: 'APAC', accepted: 55, target: 80, delivered: 91,
+      status: 'active', budget: 3600, startDate: 'Jan 9, 2026', endDate: 'Apr 30, 2026',
+      deliveryDays: ['Friday'], leadsPerDelivery: 46,
+      schedule: [
+        drop('9 Jan', 20260109, 46, 'delivered'),
+        drop('23 Jan', 20260123, 45, 'delivered'),
+        drop('20 Mar', 20260320, 45, 'upcoming'),
+      ],
+    },
   ];
   const leads = leadsFromCampaigns(campaigns, cpl); // billable 312 · delivered 473 · target 400
   const leadsInReview = 9;
@@ -347,6 +434,7 @@ function buildNorthwind(): Account {
       { label: 'Days remaining', value: '50' },
     ],
     campaigns,
+    deliveryTimeline: buildTimeline(campaigns),
     leads: [
       { id: 'l1', name: 'Helena Frost', title: 'Procurement Lead', company: 'Aldwych Systems', campaignId: 'cs', date: '22 Jul', status: 'accepted' },
       { id: 'l2', name: 'Rafael Mendez', title: 'Network Architect', company: 'Sierra Freight', campaignId: 'is', date: '21 Jul', status: 'accepted' },
@@ -475,6 +563,7 @@ function buildCalderwood(): Account {
     overviewKind: 'services',
     services,
     campaigns: [],
+    deliveryTimeline: [],
     leads: [],
     batches: [
       { id: 'b1', serviceId: 'idata', name: 'Q3 universe build — batch 1', records: 12000, date: '10 Jul', status: 'good', statusLabel: 'Delivered' },
@@ -560,7 +649,348 @@ function buildCalderwood(): Account {
 // Public API
 // ---------------------------------------------------------------------------
 
-export const accounts: Account[] = [buildAcme(), buildNorthwind(), buildCalderwood()];
+// ===========================================================================
+// Account 4 — Vantage Analytics · content syndication (leads only, richer cadence)
+// ===========================================================================
+
+function buildVantage(): Account {
+  const cpl = 45;
+  const campaigns: Campaign[] = [
+    {
+      id: 'ci', name: 'Cloud infrastructure guide', geo: 'NAM', accepted: 132, target: 200, delivered: 190,
+      status: 'active', budget: 9000, startDate: 'Jan 12, 2026', endDate: 'Apr 12, 2026',
+      deliveryDays: ['Monday', 'Thursday'], leadsPerDelivery: 48,
+      schedule: [
+        drop('19 Jan', 20260119, 48, 'delivered'),
+        drop('22 Jan', 20260122, 48, 'delivered'),
+        drop('26 Jan', 20260126, 47, 'delivered'),
+        drop('29 Jan', 20260129, 47, 'delivered'),
+        drop('16 Mar', 20260316, 48, 'upcoming'),
+      ],
+    },
+    {
+      id: 'db', name: 'DevOps benchmark report', geo: 'EMEA', accepted: 88, target: 150, delivered: 121,
+      status: 'active', budget: 6750, startDate: 'Jan 20, 2026', endDate: 'May 1, 2026',
+      deliveryDays: ['Tuesday'], leadsPerDelivery: 40,
+      schedule: [
+        drop('20 Jan', 20260120, 41, 'delivered'),
+        drop('3 Feb', 20260203, 40, 'delivered'),
+        drop('17 Feb', 20260217, 40, 'delivered'),
+        drop('17 Mar', 20260317, 40, 'upcoming'),
+      ],
+    },
+    {
+      id: 'zt', name: 'Zero-trust security survey', geo: 'APAC', accepted: 61, target: 90, delivered: 84,
+      status: 'active', budget: 4050, startDate: 'Jan 21, 2026', endDate: 'Apr 21, 2026',
+      deliveryDays: ['Wednesday'], leadsPerDelivery: 28,
+      schedule: [
+        drop('21 Jan', 20260121, 28, 'delivered'),
+        drop('4 Feb', 20260204, 28, 'delivered'),
+        drop('18 Feb', 20260218, 28, 'delivered'),
+        drop('18 Mar', 20260318, 28, 'upcoming'),
+      ],
+    },
+    {
+      id: 'ai', name: 'AI operations leaders', geo: 'NAM', accepted: 0, target: 120, delivered: 0,
+      status: 'pendingApproval', budget: 5400, startDate: 'Apr 1, 2026', endDate: 'Jun 30, 2026',
+      deliveryDays: ['Monday'], leadsPerDelivery: 30, schedule: [],
+    },
+  ];
+  const leads = leadsFromCampaigns(campaigns, cpl); // billable 281 · delivered 395 · target 560
+  const leadsInReview = 14;
+
+  const invoices: Invoice[] = [
+    {
+      id: 'INV-V204', period: 'Q2 2026', issued: '1 Jun', due: '21 Jun', terms: 'Net 20', status: 'paid',
+      lines: [
+        { serviceId: 'leads', description: 'Lead generation · billable leads', basis: '170 billable of 240 delivered, at $45', amount: 7650 },
+      ],
+    },
+    {
+      id: 'INV-V211', period: 'Q3 2026', issued: '1 Jul', due: '21 Jul', terms: 'Net 20', status: 'open',
+      lines: [
+        { serviceId: 'leads', description: 'Lead generation · billable leads', basis: '111 billable of 155 delivered, at $45', amount: 4995 },
+      ],
+    },
+  ];
+  const invested = investedOf(invoices); // 12,645
+  const dueNow = dueOf(invoices); // 4,995
+
+  return {
+    id: 'vantage',
+    name: ACCOUNT_NAMES.vantage,
+    descriptor: 'Content syndication',
+    entitlements: ['leads'],
+    user: { name: 'Priya Anand', initials: 'PA' },
+    overviewKind: 'campaigns',
+    services: [],
+    leadsSummary: leads,
+    leadsMetrics: leadsMetrics(leads),
+    overviewMetrics: [
+      { label: 'Accept rate', value: leads.acceptRate, positive: true },
+      { label: 'Cost per lead', value: money(cpl) },
+      { label: 'Days remaining', value: '68' },
+    ],
+    campaigns,
+    deliveryTimeline: buildTimeline(campaigns),
+    leads: [
+      { id: 'l1', name: 'Nadia Chowdhury', title: 'VP Engineering', company: 'Lumen Freight', campaignId: 'ci', date: '22 Jul', status: 'accepted' },
+      { id: 'l2', name: 'Erik Lindqvist', title: 'Platform Lead', company: 'Aurora Retail', campaignId: 'db', date: '22 Jul', status: 'accepted' },
+      { id: 'l3', name: 'Ravi Menon', title: 'Security Director', company: 'Copperline Energy', campaignId: 'zt', date: '21 Jul', status: 'review' },
+      { id: 'l4', name: 'Chloe Fontaine', title: 'Head of DevOps', company: 'Marisol Foods', campaignId: 'ci', date: '21 Jul', status: 'accepted' },
+      { id: 'l5', name: 'Andre Silva', title: 'IT Manager', company: 'Beacon Health Systems', campaignId: 'db', date: '20 Jul', status: 'review' },
+    ],
+    batches: [],
+    documents: [
+      { id: 'JV-4210', title: 'AI operations leaders, NAM', kind: 'Job card', type: 'client_signature', value: 5400, date: '20 Jul', phase: 3, scopeSummary: '120 leads at $45 · $5,400 · scope agreed 20 July' },
+      { id: 'JV-4188', title: 'Cloud infrastructure guide, NAM', kind: 'Job card', type: 'client_signature', value: 9000, date: '2 Jul', phase: 4 },
+      { id: 'JV-4155', title: 'DevOps benchmark report, EMEA', kind: 'Job card', type: 'msa_covered', value: 6750, date: '18 Jun', phase: 4 },
+      { id: 'MSA', title: 'Master services agreement', kind: 'Contract', kindDetail: 'Contract · expires Jan 2027', type: 'msa_covered', value: null, date: '10 Jan', phase: 4 },
+    ],
+    invoices,
+    tickets: [
+      { id: 't1', subject: 'Approve Q2 AI operations campaign scope', opened: '20 Jul', status: 'needsYou', statusLabel: 'Awaiting your reply' },
+      { id: 't2', subject: 'Add ABM account list to Cloud infrastructure', opened: '14 Jul', status: 'neutral', statusLabel: 'In progress' },
+    ],
+    contacts: [
+      { name: 'Laura Beckett', role: 'Account manager' },
+      { name: 'Sanjay Rao', role: 'Campaign manager' },
+    ],
+    team: [
+      { name: 'Priya Anand', email: 'priya.anand@vantage.example', role: 'Owner' },
+      { name: 'Greg Holloway', email: 'greg.holloway@vantage.example', role: 'Billing' },
+    ],
+    lockedNote: 'Programmatic and audience data are available on your account.',
+    invested,
+    dueNow,
+    heroes: {
+      overview: {
+        eyebrow: 'Content syndication · Q3 2026',
+        headline: `${int(leads.billable)} of ${int(leads.target)} leads accepted`,
+        subhead: 'Three campaigns delivering; one is awaiting your approval.',
+        actions: [
+          { label: 'Download leads', kind: 'cta' },
+          { label: '4 campaigns', kind: 'pill' },
+          { label: '1 awaiting approval', kind: 'pill' },
+        ],
+      },
+      leads: {
+        eyebrow: 'Lead generation · Q3 2026',
+        headline: `${int(leads.billable)} billable leads of ${int(leads.target)}`,
+        subhead: `${int(leads.delivered)} delivered to date. ${leadsInReview} are awaiting your review and may change this count.`,
+        actions: [
+          { label: `Review ${leadsInReview} leads`, kind: 'cta' },
+          { label: 'Download CSV', kind: 'pill' },
+          { label: 'Push to Salesforce', kind: 'pill' },
+        ],
+      },
+      documents: {
+        eyebrow: 'Documents',
+        headline: 'One document needs your signature',
+        subhead: 'Everything else on your account is signed and current.',
+        actions: [
+          { label: 'Sign JV-4210', kind: 'cta' },
+          { label: 'Download archive', kind: 'pill' },
+        ],
+      },
+      invoices: {
+        eyebrow: 'Accounts payable',
+        headline: `${money(dueNow)} due`,
+        subhead: 'One invoice open, due 21 July. Net 20 terms.',
+        actions: [
+          { label: 'Pay invoice', kind: 'cta' },
+          { label: 'Download PDF', kind: 'pill' },
+          { label: 'Payment history', kind: 'pill' },
+        ],
+      },
+      support: {
+        eyebrow: 'Support',
+        headline: 'How can we help?',
+        subhead: 'Your DBSL team typically replies within one business day.',
+        actions: [
+          { label: 'Raise a request', kind: 'cta' },
+          { label: 'View past requests', kind: 'pill' },
+        ],
+      },
+    },
+  };
+}
+
+// ===========================================================================
+// Account 5 — Harbor Point Group · data + content syndication (leads + data)
+// ===========================================================================
+
+function buildHarbor(): Account {
+  const cpl = 45;
+  const campaigns: Campaign[] = [
+    {
+      id: 'mi', name: 'Manufacturing IT buyers', geo: 'NAM', accepted: 96, target: 160, delivered: 138,
+      status: 'active', budget: 7200, startDate: 'Jan 18, 2026', endDate: 'Apr 30, 2026',
+      deliveryDays: ['Monday', 'Thursday'], leadsPerDelivery: 35,
+      schedule: [
+        drop('19 Jan', 20260119, 35, 'delivered'),
+        drop('22 Jan', 20260122, 35, 'delivered'),
+        drop('26 Jan', 20260126, 34, 'delivered'),
+        drop('29 Jan', 20260129, 34, 'delivered'),
+        drop('16 Mar', 20260316, 35, 'upcoming'),
+      ],
+    },
+    {
+      id: 'ia', name: 'Industrial automation leads', geo: 'EMEA', accepted: 54, target: 100, delivered: 79,
+      status: 'active', budget: 4500, startDate: 'Feb 1, 2026', endDate: 'May 15, 2026',
+      deliveryDays: ['Wednesday'], leadsPerDelivery: 26,
+      schedule: [
+        drop('21 Jan', 20260121, 27, 'delivered'),
+        drop('4 Feb', 20260204, 26, 'delivered'),
+        drop('18 Feb', 20260218, 26, 'delivered'),
+        drop('18 Mar', 20260318, 26, 'upcoming'),
+      ],
+    },
+  ];
+  const leads = leadsFromCampaigns(campaigns, cpl); // billable 150 · delivered 217 · target 260
+  const leadsInReview = 7;
+
+  const invoices: Invoice[] = [
+    {
+      id: 'INV-H301', period: 'June 2026', issued: '12 Jun', due: '2 Jul', terms: 'Net 20', status: 'paid',
+      lines: [
+        { serviceId: 'idata', description: 'iData · records delivered', basis: '10,000 records at $0.42', amount: 4200 },
+        { serviceId: 'cleanrich', description: 'CleanRich · records processed', basis: '11,000 records at $0.11', amount: 1210 },
+        { serviceId: 'leads', description: 'Lead generation · billable leads', basis: '80 billable of 116 delivered, at $45', amount: 3600 },
+      ],
+    },
+    {
+      id: 'INV-H312', period: 'July 2026', issued: '10 Jul', due: '30 Jul', terms: 'Net 20', status: 'open',
+      lines: [
+        { serviceId: 'idata', description: 'iData · records delivered', basis: '8,000 records at $0.42', amount: 3360 },
+        { serviceId: 'cleanrich', description: 'CleanRich · records processed', basis: '10,000 records at $0.11', amount: 1100 },
+        { serviceId: 'leads', description: 'Lead generation · billable leads', basis: '70 billable of 101 delivered, at $45', amount: 3150 },
+      ],
+    },
+  ];
+  const invested = investedOf(invoices); // 16,620
+  const dueNow = dueOf(invoices); // 7,610
+
+  const services: Service[] = [
+    { id: 'idata', name: 'iData', unit: 'records delivered', received: 18000, target: 24000, qualityLine: 'Field fill 90% · Match 66%' },
+    { id: 'cleanrich', name: 'CleanRich', unit: 'records processed', received: 21000, target: 24000, qualityLine: 'Corrected 14% · Deduped 8%' },
+    leadsCard(leads),
+  ];
+
+  return {
+    id: 'harbor',
+    name: ACCOUNT_NAMES.harbor,
+    descriptor: 'Data & content syndication',
+    entitlements: ['idata', 'cleanrich', 'leads'],
+    user: { name: 'Nina Alvarez', initials: 'NA' },
+    overviewKind: 'services',
+    services,
+    leadsSummary: leads,
+    leadsMetrics: leadsMetrics(leads),
+    campaigns,
+    deliveryTimeline: buildTimeline(campaigns),
+    leads: [
+      { id: 'l1', name: 'Gordon Fraser', title: 'Plant IT Lead', company: 'Ironside Components', campaignId: 'mi', date: '22 Jul', status: 'accepted' },
+      { id: 'l2', name: 'Mei Ling Tan', title: 'Automation Engineer', company: 'Delta Works', campaignId: 'ia', date: '22 Jul', status: 'accepted' },
+      { id: 'l3', name: 'Paulo Cardoso', title: 'Operations Director', company: 'Veranova Steel', campaignId: 'mi', date: '21 Jul', status: 'review' },
+      { id: 'l4', name: 'Ingrid Halvorsen', title: 'Head of Engineering', company: 'Nordkraft Industrial', campaignId: 'ia', date: '20 Jul', status: 'accepted' },
+      { id: 'l5', name: 'Dev Sharma', title: 'IT Procurement', company: 'Cascade Manufacturing', campaignId: 'mi', date: '19 Jul', status: 'review' },
+    ],
+    batches: [
+      { id: 'b1', serviceId: 'idata', name: 'Account universe — batch 1', records: 9000, date: '8 Jul', status: 'good', statusLabel: 'Delivered' },
+      { id: 'b2', serviceId: 'idata', name: 'Account universe — batch 2', records: 9000, date: '22 Jul', status: 'good', statusLabel: 'Delivered' },
+      { id: 'b3', serviceId: 'idata', name: 'Account universe — batch 3', records: 6000, date: '5 Aug', status: 'neutral', statusLabel: 'Scheduled' },
+      { id: 'b4', serviceId: 'cleanrich', name: 'Enrichment pass — batch 1', records: 11000, date: '10 Jul', status: 'good', statusLabel: 'Delivered' },
+      { id: 'b5', serviceId: 'cleanrich', name: 'Enrichment pass — batch 2', records: 10000, date: '24 Jul', status: 'good', statusLabel: 'Delivered' },
+    ],
+    documents: [
+      { id: 'JH-5120', title: 'Manufacturing IT buyers, NAM', kind: 'Job card', type: 'client_signature', value: 7200, date: '18 Jul', phase: 4 },
+      { id: 'JH-5088', title: 'Q3 data build, global', kind: 'Job card', type: 'client_signature', value: 9000, date: '3 Jul', phase: 4 },
+      { id: 'JH-5044', title: 'Industrial automation, EMEA', kind: 'Job card', type: 'msa_covered', value: 4500, date: '20 Jun', phase: 4 },
+      { id: 'MSA', title: 'Master services agreement', kind: 'Contract', kindDetail: 'Contract · expires Feb 2027', type: 'msa_covered', value: null, date: '5 Feb', phase: 4 },
+    ],
+    invoices,
+    tickets: [
+      { id: 't1', subject: 'Confirm target industries for batch 3', opened: '21 Jul', status: 'needsYou', statusLabel: 'Awaiting your reply' },
+      { id: 't2', subject: 'Weekly delivery report cadence', opened: '13 Jul', status: 'good', statusLabel: 'Resolved' },
+    ],
+    contacts: [
+      { name: 'Owen Pryce', role: 'Account manager' },
+      { name: 'Fatima Noor', role: 'Campaign manager' },
+    ],
+    team: [
+      { name: 'Nina Alvarez', email: 'nina.alvarez@harborpoint.example', role: 'Owner' },
+      { name: 'Ben Whitaker', email: 'ben.whitaker@harborpoint.example', role: 'Billing' },
+    ],
+    lockedNote: 'Programmatic advertising is available on your account.',
+    invested,
+    dueNow,
+    heroes: {
+      overview: {
+        eyebrow: 'Data & syndication · Q3 2026',
+        headline: `${money(invested)} invested, tracking to plan`,
+        subhead: 'Data services and lead generation running together.',
+        actions: [
+          { label: 'View report', kind: 'cta' },
+          { label: '1 invoice open', kind: 'pill' },
+          { label: '2 campaigns live', kind: 'pill' },
+        ],
+      },
+      data: {
+        eyebrow: 'Data services · Q3 2026',
+        headline: `${int(18000 + 21000)} records delivered across two services`,
+        subhead: 'iData and CleanRich feeding your syndication campaigns.',
+        actions: [
+          { label: 'Download data report', kind: 'cta' },
+          { label: '4 batches delivered', kind: 'pill' },
+        ],
+      },
+      leads: {
+        eyebrow: 'Lead generation · Q3 2026',
+        headline: `${int(leads.billable)} billable leads of ${int(leads.target)}`,
+        subhead: `${int(leads.delivered)} delivered to date. ${leadsInReview} are awaiting your review and may change this count.`,
+        actions: [
+          { label: `Review ${leadsInReview} leads`, kind: 'cta' },
+          { label: 'Download CSV', kind: 'pill' },
+          { label: 'Push to HubSpot', kind: 'pill' },
+        ],
+      },
+      documents: {
+        eyebrow: 'Documents',
+        headline: 'All documents are signed and current',
+        subhead: 'Nothing needs your signature right now.',
+        actions: [{ label: 'Download archive', kind: 'pill' }],
+      },
+      invoices: {
+        eyebrow: 'Accounts payable',
+        headline: `${money(dueNow)} due`,
+        subhead: 'One invoice open, due 30 July. Net 20 terms.',
+        actions: [
+          { label: 'Pay invoice', kind: 'cta' },
+          { label: 'Download PDF', kind: 'pill' },
+          { label: 'Payment history', kind: 'pill' },
+        ],
+      },
+      support: {
+        eyebrow: 'Support',
+        headline: 'How can we help?',
+        subhead: 'Your DBSL team typically replies within one business day.',
+        actions: [
+          { label: 'Raise a request', kind: 'cta' },
+          { label: 'View past requests', kind: 'pill' },
+        ],
+      },
+    },
+  };
+}
+
+export const accounts: Account[] = [
+  buildAcme(),
+  buildNorthwind(),
+  buildCalderwood(),
+  buildVantage(),
+  buildHarbor(),
+];
 
 export const getAccount = (id: string | undefined): Account | undefined =>
   accounts.find((a) => a.id === id);

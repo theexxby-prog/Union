@@ -81,6 +81,21 @@ export function ServiceCard({ s }: { s: Service }) {
   );
 }
 
+/* ---- Pace bars (weekly media delivery + lead delivery cadence) -------- */
+export function PaceBars({ bars }: { bars: { height: number; muted?: boolean }[] }) {
+  return (
+    <div className="flex h-[88px] items-end gap-[6px]">
+      {bars.map((b, i) => (
+        <div
+          key={i}
+          className={`flex-1 rounded-t-[2px] ${b.muted ? 'bg-[#dde4ee]' : 'bg-accent'}`}
+          style={{ height: `${Math.max(4, Math.min(100, b.height))}%` }}
+        />
+      ))}
+    </div>
+  );
+}
+
 /* ---- Progress rule ---------------------------------------------------- */
 export function ProgressRule({ value }: { value: number }) {
   return (

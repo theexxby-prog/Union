@@ -1,26 +1,30 @@
 // Overview — the anchor screen. Two shapes share one hero + one card grammar:
 // a services grid (full programme / data only) or a campaigns list (syndication).
 import { useAccount } from '@/components/AppLayout';
+import StatusPill from '@/components/StatusPill';
 import { Eyebrow, Hero, LockedNote, MetricStrip, ProgressRule, ServiceCard } from '@/components/ui';
 import { int, pctValue } from '@/data/format';
+import { cadenceLine, campaignStatusMeta } from '@/lib/campaign';
 import type { Campaign } from '@/data/types';
 
 function CampaignRow({ c }: { c: Campaign }) {
   const pace = pctValue(c.accepted, c.target);
+  const status = campaignStatusMeta[c.status];
   return (
-    <div className="flex items-center gap-[16px] border-t border-hairline py-[13px]">
+    <div className="flex items-center gap-[14px] border-t border-hairline py-[13px]">
       <div className="min-w-0 flex-1">
         <p className="text-[13px] text-strong">
           {c.name} · {c.geo}
         </p>
         <p className="mt-[3px] text-[12px] text-muted">
-          {int(c.accepted)} of {int(c.target)} accepted · {int(c.delivered)} delivered
+          {int(c.accepted)} of {int(c.target)} accepted · {int(c.delivered)} delivered · {cadenceLine(c)}
         </p>
       </div>
-      <span className="w-[150px]">
+      <StatusPill state={status.state}>{status.label}</StatusPill>
+      <span className="w-[130px]">
         <ProgressRule value={pace} />
       </span>
-      <span className="w-[44px] text-right text-[12.5px] text-secondary">{pace}%</span>
+      <span className="w-[40px] text-right text-[12.5px] text-secondary">{pace}%</span>
     </div>
   );
 }

@@ -19,6 +19,8 @@ const ANCHORS: Record<string, { invested: number; dueNow: number }> = {
   acme: { invested: 58400, dueNow: 18420 },
   northwind: { invested: 14040, dueNow: 0 },
   calderwood: { invested: 13215, dueNow: 6580 },
+  vantage: { invested: 12645, dueNow: 4995 },
+  harbor: { invested: 16620, dueNow: 7610 },
 };
 
 for (const acc of accounts) {
@@ -47,6 +49,16 @@ for (const acc of accounts) {
     check('leads target = sum(campaign target)', ls.target === sum(acc.campaigns.map((c) => c.target)), `${ls.target}`);
     check('accept rate = round(billable/delivered)', ls.acceptRate === `${pctValue(ls.billable, ls.delivered)}%`, ls.acceptRate);
   }
+
+  // Delivery cadence: each campaign's delivered drops sum to its delivered total,
+  // and the merged timeline covers every drop.
+  for (const c of acc.campaigns) {
+    const deliveredDrops = sum(c.schedule.filter((d) => d.status === 'delivered').map((d) => d.leads));
+    check(`${c.id} delivered drops = delivered (${c.delivered})`, deliveredDrops === c.delivered, `${deliveredDrops}`);
+    check(`${c.id} budget > 0`, c.budget > 0, `${c.budget}`);
+  }
+  const totalDrops = sum(acc.campaigns.map((c) => c.schedule.length));
+  check('delivery timeline covers all drops', acc.deliveryTimeline.length === totalDrops, `${acc.deliveryTimeline.length}/${totalDrops}`);
 
   // Batches: delivered record counts per service == that service's received figure.
   for (const sid of ['idata', 'cleanrich'] as const) {

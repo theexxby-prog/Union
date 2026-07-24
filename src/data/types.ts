@@ -61,6 +61,29 @@ export interface MetricTile {
   positive?: boolean;
 }
 
+/** Client-facing campaign state. Internal pipeline stages never surface (docs/02). */
+export type CampaignStatus = 'active' | 'completed' | 'pendingApproval';
+
+/** One dated lead drop on a campaign's delivery cadence. */
+export interface DeliveryDrop {
+  /** Display date, e.g. '20 Jan'. */
+  date: string;
+  /** Sort key (e.g. 20260120) — deterministic ordering without Date parsing. */
+  sortKey: number;
+  leads: number;
+  status: 'delivered' | 'upcoming';
+}
+
+/** A drop merged across all of an account's campaigns, for the Leads schedule view. */
+export interface DeliveryTimelineEntry {
+  date: string;
+  sortKey: number;
+  campaign: string;
+  geo: string;
+  leads: number;
+  status: 'delivered' | 'upcoming';
+}
+
 export interface Campaign {
   id: string;
   name: string;
@@ -68,6 +91,16 @@ export interface Campaign {
   accepted: number;
   target: number;
   delivered: number;
+  status: CampaignStatus;
+  /** Contracted budget in whole dollars. */
+  budget: number;
+  startDate: string; // 'Jan 15, 2026'
+  endDate: string;
+  /** Cadence: which weekdays leads land, and how many per drop. */
+  deliveryDays: string[]; // ['Monday', 'Thursday']
+  leadsPerDelivery: number;
+  /** Dated drops; delivered drops sum to `delivered` (enforced by the verifier). */
+  schedule: DeliveryDrop[];
 }
 
 export interface Lead {
@@ -193,6 +226,8 @@ export interface Account {
   leadsSummary?: LeadsSummary;
 
   campaigns: Campaign[];
+  /** Derived: every campaign's drops merged and sorted, for the Leads schedule. */
+  deliveryTimeline: DeliveryTimelineEntry[];
   leads: Lead[];
   batches: Batch[];
   media?: MediaData;
