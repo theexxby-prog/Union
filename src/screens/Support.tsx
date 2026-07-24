@@ -1,5 +1,7 @@
-// Support — the simplest screen. Tickets, then the client's named DBSL contacts.
-// Fictional names only (brand rules).
+// Support — tickets expand to their latest message; the client's named DBSL
+// contacts sit below. Fictional names only (brand rules).
+import { useState } from 'react';
+import { IconChevronDown } from '@tabler/icons-react';
 import { useAccount } from '@/components/AppLayout';
 import StatusPill from '@/components/StatusPill';
 import { Cell, Eyebrow, EmptyLine, HairGrid, Hero } from '@/components/ui';
@@ -13,6 +15,7 @@ const initials = (name: string): string =>
 
 export default function Support() {
   const account = useAccount();
+  const [expanded, setExpanded] = useState<string | null>(null);
 
   return (
     <>
@@ -28,15 +31,42 @@ export default function Support() {
         {account.tickets.length === 0 ? (
           <EmptyLine>Requests you raise will appear here with their status.</EmptyLine>
         ) : (
-          account.tickets.map((t) => (
-            <div key={t.id} className="flex items-center border-t border-hairline py-[13px]">
-              <span className="min-w-0 flex-1 text-[13px] text-strong">{t.subject}</span>
-              <span className="w-[100px] text-[12.5px] text-muted">{t.opened}</span>
-              <span className="w-[150px] text-right">
-                <StatusPill state={t.status}>{t.statusLabel}</StatusPill>
-              </span>
-            </div>
-          ))
+          account.tickets.map((t) => {
+            const isOpen = expanded === t.id;
+            return (
+              <div key={t.id} className="border-t border-hairline">
+                <button
+                  onClick={() => setExpanded(isOpen ? null : t.id)}
+                  aria-expanded={isOpen}
+                  className="flex w-full items-center py-[13px] text-left transition-colors duration-150 ease-standard hover:bg-[#fafbfd]"
+                  title="Show the latest reply"
+                >
+                  <span className="flex min-w-0 flex-1 items-center gap-[6px] text-[13px] text-strong">
+                    {t.subject}
+                    <IconChevronDown
+                      size={12}
+                      stroke={2}
+                      className={`text-muted transition-transform duration-150 ease-standard ${isOpen ? 'rotate-180' : ''}`}
+                    />
+                  </span>
+                  <span className="w-[100px] text-[12.5px] text-muted">{t.opened}</span>
+                  <span className="w-[150px] text-right">
+                    <StatusPill state={t.status}>{t.statusLabel}</StatusPill>
+                  </span>
+                </button>
+                {isOpen && t.lastMessage && (
+                  <div className="mb-[14px] rounded-card border border-hairline bg-[#fafbfd] px-[16px] py-[13px]">
+                    <p className="m-0 text-[12.5px] leading-[1.5] text-secondary">{t.lastMessage}</p>
+                    {t.status === 'needsYou' && (
+                      <button className="mt-[10px] rounded-full bg-cta px-[14px] py-[6px] text-[11.5px] font-semibold text-white transition-[filter] duration-150 ease-standard hover:brightness-[1.08]">
+                        Reply
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })
         )}
       </div>
 
@@ -48,10 +78,13 @@ export default function Support() {
               <span className="flex h-[34px] w-[34px] items-center justify-center rounded-full bg-[#F4F7FB] text-[11.5px] font-semibold text-secondary">
                 {initials(c.name)}
               </span>
-              <span>
+              <span className="min-w-0 flex-1">
                 <span className="block text-[13px] font-medium text-strong">{c.name}</span>
                 <span className="mt-[1px] block text-[12px] text-muted">{c.role}</span>
               </span>
+              <button className="rounded-full border border-hairline bg-white px-[13px] py-[6px] text-[11.5px] text-accent transition-colors duration-150 ease-standard hover:bg-page">
+                Book a call
+              </button>
             </div>
           </Cell>
         ))}

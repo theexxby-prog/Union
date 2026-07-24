@@ -1,11 +1,26 @@
 // Account picker (/) — the entry screen. Makes the multi-account story the first
 // thing anyone sees. A viewing-as picker, not a login: no password, no fake auth.
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { IconArrowRight } from '@tabler/icons-react';
 import { accounts } from '@/data/accounts';
+import { int, money } from '@/data/format';
 import { Eyebrow } from '@/components/ui';
+import type { Account } from '@/data/types';
+
+/** One derived line that lands the multi-account story before a single click. */
+const pickerStat = (a: Account): string => {
+  if (a.overviewKind === 'campaigns' && a.leadsSummary) {
+    const ls = a.leadsSummary;
+    return `${int(ls.billable)} of ${int(ls.target)} leads accepted · ${money(a.invested)} invested`;
+  }
+  return `${int(a.entitlements.length)} services · ${money(a.invested)} invested`;
+};
 
 export default function Picker() {
+  useEffect(() => {
+    document.title = 'Union · Datamatics Business Solutions';
+  }, []);
   return (
     <div className="flex min-h-full items-center justify-center bg-[#f6f8fb] px-[24px] py-[64px]">
       <div className="w-full max-w-[520px]">
@@ -39,6 +54,7 @@ export default function Picker() {
               <span className="min-w-0 flex-1">
                 <span className="block text-[14px] font-medium text-strong">{a.name}</span>
                 <span className="mt-[2px] block text-[12px] text-muted">{a.descriptor}</span>
+                <span className="mt-[3px] block text-[11.5px] text-secondary">{pickerStat(a)}</span>
               </span>
               <IconArrowRight
                 size={17}

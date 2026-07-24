@@ -1,12 +1,23 @@
-// Data — iData + CleanRich on one screen. Batches, not campaigns: no pacing curve,
-// a batch drop and a match rate. Exists partly to prove the platform is not
-// campaign-shaped (docs/03).
+// Data — iData + CleanRich on one screen. Batches, not campaigns: no pacing
+// curve, a batch drop and a match rate. Exists partly to prove the platform is
+// not campaign-shaped (docs/03).
 import { Navigate } from 'react-router-dom';
 import { useAccount } from '@/components/AppLayout';
 import StatusPill from '@/components/StatusPill';
-import { Eyebrow, Hero, ServiceCard } from '@/components/ui';
+import { Eyebrow, Hero, MetricStrip, ServiceCard } from '@/components/ui';
 import { int } from '@/data/format';
 import { hasService, path } from '@/lib/nav';
+import type { MetricTile, Service } from '@/data/types';
+
+/** "Field fill 94% · Match 71%" → quality tiles. The line is the single source;
+ *  the tiles are a projection of it, so the two can never disagree. */
+const qualityTiles = (services: Service[]): MetricTile[] =>
+  services.flatMap((s) =>
+    s.qualityLine.split(' · ').map((part) => {
+      const cut = part.lastIndexOf(' ');
+      return { label: part.slice(0, cut), value: part.slice(cut + 1) };
+    }),
+  );
 
 export default function Data() {
   const account = useAccount();
@@ -14,6 +25,7 @@ export default function Data() {
 
   const dataServices = account.services.filter((s) => s.id === 'idata' || s.id === 'cleanrich');
   const serviceName = new Map(dataServices.map((s) => [s.id, s.name]));
+  const nextBatch = account.batches.find((b) => b.status === 'neutral');
 
   return (
     <>
@@ -25,6 +37,31 @@ export default function Data() {
           <ServiceCard key={s.id} s={s} />
         ))}
       </div>
+
+      <Eyebrow className="mb-[12px] mt-[28px]">Quality</Eyebrow>
+      <MetricStrip metrics={qualityTiles(dataServices)} />
+
+      <Eyebrow className="mb-[14px] mt-[28px]">Batch timeline</Eyebrow>
+      <div className="flex gap-[7px]">
+        {account.batches.map((b) => {
+          const delivered = b.status === 'good';
+          return (
+            <div key={b.id} className="flex-1" title={`${b.name} · ${int(b.records)} records · ${b.statusLabel}`}>
+              <div className={`mb-[8px] h-[2px] ${delivered ? 'bg-accent' : 'bg-hairline'}`} />
+              <span className={`block text-[11.5px] ${delivered ? 'text-strong' : 'text-muted'}`}>{b.date}</span>
+              <span className="block text-[11px] text-muted">{int(b.records)}</span>
+            </div>
+          );
+        })}
+      </div>
+      {nextBatch && (
+        <div className="mt-[14px] flex items-center gap-[10px] rounded-card border border-hairline bg-[#fafbfd] px-[16px] py-[11px]">
+          <StatusPill state="neutral">Scheduled</StatusPill>
+          <p className="m-0 flex-1 text-[12.5px] text-secondary">
+            Next batch — {nextBatch.name} · {int(nextBatch.records)} records · lands {nextBatch.date}.
+          </p>
+        </div>
+      )}
 
       <Eyebrow className="mb-[2px] mt-[28px]">Batch deliveries</Eyebrow>
       <div>
