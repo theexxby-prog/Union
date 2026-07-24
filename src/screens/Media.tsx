@@ -1,0 +1,58 @@
+// Media — programmatic. Weekly delivery is plain divs, no charting library. Placement
+// names are generic categories, never real publisher names (docs/03).
+import { Navigate } from 'react-router-dom';
+import { useAccount } from '@/components/AppLayout';
+import { Eyebrow, Hero, MetricStrip } from '@/components/ui';
+import { int } from '@/data/format';
+import { hasService, path } from '@/lib/nav';
+
+export default function Media() {
+  const account = useAccount();
+  if (!hasService(account, 'programmatic') || !account.media)
+    return <Navigate to={path(account.id, '')} replace />;
+
+  const media = account.media;
+  const lastBar = media.weeklyBars.length - 1;
+
+  return (
+    <>
+      <Hero hero={account.heroes.media!} />
+
+      <div className="mb-[28px]">
+        <MetricStrip metrics={media.metrics} />
+      </div>
+
+      <Eyebrow className="mb-[14px]">Weekly delivery</Eyebrow>
+      <div className="flex h-[88px] items-end gap-[8px]">
+        {media.weeklyBars.map((h, i) => (
+          <div
+            key={i}
+            className={`flex-1 rounded-t-[2px] ${i === lastBar ? 'bg-[#dde4ee]' : 'bg-accent'}`}
+            style={{ height: `${h}%` }}
+            title={i === lastBar ? 'In progress' : undefined}
+          />
+        ))}
+      </div>
+      <div className="mb-[28px] mt-[10px] flex justify-between text-[11.5px] text-muted">
+        <span>Week 1</span>
+        <span>This week</span>
+      </div>
+
+      <Eyebrow className="mb-[2px]">Top placements</Eyebrow>
+      <div>
+        <div className="flex items-center py-[13px]">
+          <Eyebrow className="flex-1">Placement</Eyebrow>
+          <Eyebrow className="w-[130px] text-right">Impressions</Eyebrow>
+          <Eyebrow className="w-[80px] text-right">CTR</Eyebrow>
+        </div>
+        {media.placements.map((p) => (
+          <div key={p.name} className="flex items-center border-t border-hairline py-[13px]">
+            <span className="min-w-0 flex-1 text-[13px] text-strong">{p.name}</span>
+            <span className="w-[130px] text-right text-[12.5px] text-secondary">{int(p.impressions)}</span>
+            <span className="w-[80px] text-right text-[12.5px] text-muted">{p.ctr}</span>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}

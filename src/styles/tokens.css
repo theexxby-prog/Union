@@ -100,47 +100,52 @@
 }
 
 /* ---------------------------------------------------------------------------
-   App root defaults.
+   App root defaults. These live in @layer base so Tailwind utilities (which sit
+   in a later cascade layer) can override them — e.g. a `text-muted` link beats
+   the base `a { color }`. Unlayered rules would win over utilities and break
+   per-element colours.
    --------------------------------------------------------------------------- */
-html,
-body,
-#root {
-  height: 100%;
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: #f6f8fb; /* the frame around the app card */
+    color: var(--u-text-body);
+    font-family: var(--font-body);
+    font-size: 13px;
+    line-height: 1.5;
+    /* Numeric columns align — docs/02 typography. */
+    font-variant-numeric: tabular-nums;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Links are never browser-blue (brand rule 5). Utilities still override. */
+  a {
+    color: var(--u-accent);
+    text-decoration: none;
+  }
+  a:hover {
+    color: var(--u-accent-strong, #0f57c9);
+  }
+
+  /* Visible focus ring — Tech Blue with a soft halo (in-scope a11y). */
+  :focus-visible {
+    outline: 2px solid var(--u-accent);
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
 }
 
-body {
-  margin: 0;
-  background: #f6f8fb;                 /* the frame around the app card */
-  color: var(--u-text-body);
-  font-family: var(--font-body);
-  font-size: 13px;
-  line-height: 1.5;
-  /* Numeric columns align — docs/02 typography. */
-  font-variant-numeric: tabular-nums;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* Montserrat is for numbers and headlines only. */
+/* Montserrat is for numbers and headlines only. Unlayered so it always applies. */
 .font-display {
   font-family: var(--font-display);
   letter-spacing: -0.02em;
-}
-
-/* Links are never browser-blue (brand rule 5, setup checklist). */
-a {
-  color: var(--u-accent);
-  text-decoration: none;
-}
-a:hover {
-  color: var(--u-accent-strong, #0f57c9);
-}
-
-/* Visible focus ring — Tech Blue with a soft halo (in-scope a11y). */
-:focus-visible {
-  outline: 2px solid var(--u-accent);
-  outline-offset: 2px;
-  border-radius: 3px;
 }
 
 /* Respect reduced motion (docs/02 "Motion"). */
