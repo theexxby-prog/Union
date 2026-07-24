@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { IconArrowRight } from '@tabler/icons-react';
 import { accounts } from '@/data/accounts';
 import { int, money } from '@/data/format';
+import { DbslMark } from '@/components/BrandLogo';
 import { Eyebrow } from '@/components/ui';
 import type { Account } from '@/data/types';
 
@@ -24,10 +25,8 @@ export default function Picker() {
   return (
     <div className="flex min-h-full items-center justify-center bg-[#f6f8fb] px-[24px] py-[64px]">
       <div className="w-full max-w-[520px]">
-        <div className="mb-[26px] flex items-center gap-[10px]">
-          <span className="font-display flex h-[28px] w-[28px] items-center justify-center rounded-[6px] bg-cta text-[14px] font-bold text-white">
-            D
-          </span>
+        <div className="mb-[26px] flex items-center gap-[9px]">
+          <DbslMark className="h-[36px] w-auto" />
           <span className="font-display text-[20px] font-bold text-strong">Union</span>
         </div>
 

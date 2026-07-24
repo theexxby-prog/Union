@@ -17,6 +17,7 @@ import {
   IconLock,
   IconSettings,
 } from '@tabler/icons-react';
+import { DbslLockup, DbslMark } from '@/components/BrandLogo';
 import StatusPill from '@/components/StatusPill';
 import { accounts, getAccount } from '@/data/accounts';
 import { DemoStateProvider } from '@/lib/demo-state';
@@ -32,10 +33,9 @@ const dropdownClass =
 
 function Logo() {
   return (
-    <div className="flex items-center gap-[9px]">
-      <span className="font-display flex h-[22px] w-[22px] items-center justify-center rounded-[5px] bg-cta text-[11px] font-bold text-white">
-        D
-      </span>
+    <div className="flex items-center gap-[8px]">
+      {/* The official DBSL mark — used as-is, never redrawn (brand rules). */}
+      <DbslMark className="h-[28px] w-auto" />
       <span className="font-display text-[15px] font-bold text-strong">Union</span>
     </div>
   );
@@ -222,9 +222,10 @@ function SiteFooter() {
             href={CORP_URL}
             target="_blank"
             rel="noreferrer"
-            className="text-[11px] font-semibold !text-secondary hover:!text-accent"
+            title="Datamatics Business Solutions"
+            className="opacity-90 transition-opacity duration-150 ease-standard hover:opacity-100"
           >
-            Datamatics Business Solutions
+            <DbslLockup className="h-[26px] w-auto" />
           </a>
           {CORP_LINKS.map((label) => (
             <a
