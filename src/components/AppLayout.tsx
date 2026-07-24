@@ -208,6 +208,50 @@ function Tabs({ account }: { account: Account }) {
   );
 }
 
+/** Slim corporate footer — links out to the main Datamatics Business Solutions
+ *  site, NY office only, two compact rows. Closes every screen. */
+const CORP_URL = 'https://www.datamaticsbpm.com';
+const CORP_LINKS = ['About', 'Services', 'Case Studies', 'Careers', 'Contact'];
+
+function SiteFooter() {
+  return (
+    <footer className="border-t border-hairline px-[28px] py-[12px]">
+      <div className="flex flex-wrap items-center justify-between gap-x-[16px] gap-y-[6px]">
+        <div className="flex flex-wrap items-center gap-x-[14px] gap-y-[4px]">
+          <a
+            href={CORP_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="text-[11px] font-semibold !text-secondary hover:!text-accent"
+          >
+            Datamatics Business Solutions
+          </a>
+          {CORP_LINKS.map((label) => (
+            <a
+              key={label}
+              href={CORP_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="text-[11px] !text-muted hover:!text-accent"
+            >
+              {label}
+            </a>
+          ))}
+        </div>
+        <span className="text-[11px] text-muted">
+          146 West 29th Street, Ste 10W, New York, NY 10001 · +1-213-647-8029
+        </span>
+      </div>
+      <div className="mt-[6px] flex flex-wrap items-center justify-between gap-x-[16px] gap-y-[4px]">
+        <span className="text-[11px] text-faint">
+          © 2026 Datamatics Business Solutions Limited. All rights reserved.
+        </span>
+        <span className="text-[11px] text-faint">Union · Internal demo</span>
+      </div>
+    </footer>
+  );
+}
+
 const TITLE_BY_SEGMENT: Record<string, string> = Object.fromEntries(
   TABS.map((t) => [t.segment, t.label]),
 );
@@ -242,11 +286,7 @@ export default function AppLayout() {
             <div key={screenKey} className="animate-screen px-[28px] py-[26px]">
               <Outlet context={account} />
             </div>
-            {/* Closes the page so trailing whitespace reads intentional. */}
-            <div className="flex items-center justify-between border-t border-hairline px-[28px] py-[12px]">
-              <span className="text-[11px] text-muted">Union · A Datamatics Business Solutions product</span>
-              <span className="text-[11px] text-faint">Internal demo</span>
-            </div>
+            <SiteFooter />
           </div>
         </div>
       </div>
