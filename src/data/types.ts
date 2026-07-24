@@ -22,6 +22,9 @@ export interface HeroAction {
   label: string;
   /** Exactly one 'cta' (red) per hero, and only when there is something to act on. */
   kind: 'cta' | 'pill';
+  /** Route segment under /:accountId (may carry a query, e.g. 'leads?review=1').
+   *  Linked chips render with a chevron affix; plain chips stay static text. */
+  to?: string;
 }
 
 export interface Hero {
@@ -78,6 +81,7 @@ export interface DeliveryDrop {
 export interface DeliveryTimelineEntry {
   date: string;
   sortKey: number;
+  campaignId: string;
   campaign: string;
   geo: string;
   leads: number;
@@ -166,6 +170,8 @@ export interface Ticket {
   opened: string;
   status: StatusState;
   statusLabel: string;
+  /** Most recent message on the thread, shown when the row is expanded. */
+  lastMessage?: string;
 }
 
 export interface Contact {
@@ -224,6 +230,8 @@ export interface Account {
   /** Leads screen metric strip. */
   leadsMetrics?: MetricTile[];
   leadsSummary?: LeadsSummary;
+  /** Leads currently awaiting client review (also referenced by the leads hero copy). */
+  leadsInReview?: number;
 
   campaigns: Campaign[];
   /** Derived: every campaign's drops merged and sorted, for the Leads schedule. */

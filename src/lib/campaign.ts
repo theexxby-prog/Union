@@ -9,6 +9,10 @@ export const campaignStatusMeta: Record<Campaign['status'], { state: StatusState
   pendingApproval: { state: 'needsYou', label: 'Awaiting approval' },
 };
 
+/** Effective status once session-local approvals are applied (demo interaction). */
+export const effectiveStatus = (c: Campaign, approved: boolean): Campaign['status'] =>
+  c.status === 'pendingApproval' && approved ? 'active' : c.status;
+
 /** Accept rate for a single campaign; an em dash before any leads are delivered. */
 export const campaignAccept = (c: Campaign): string =>
   c.delivered > 0 ? pct(c.accepted, c.delivered) : '—';

@@ -1,8 +1,10 @@
 // Layout primitives — the shapes docs/02 defines. Every screen is built from these,
 // so the whole product reads as one surface rather than four stapled dashboards.
-import { IconLock } from '@tabler/icons-react';
+import { IconChevronRight, IconLock } from '@tabler/icons-react';
+import { Link, useParams } from 'react-router-dom';
 import StatusPill from '@/components/StatusPill';
 import { int, pctValue } from '@/data/format';
+import { path } from '@/lib/nav';
 import type { Hero as HeroData, MetricTile, Service } from '@/data/types';
 import { PHASES } from '@/data/types';
 
@@ -25,7 +27,15 @@ export function Eyebrow({
 }
 
 /* ---- Hero card -------------------------------------------------------- */
+/* Actions with a `to` navigate and carry a chevron affix; plain actions render
+   as static chips so clickable and non-clickable never look identical. */
 export function Hero({ hero }: { hero: HeroData }) {
+  const { accountId } = useParams();
+  const ctaClass =
+    'rounded-full bg-cta px-[17px] py-[7px] text-[12px] font-semibold text-white transition-[filter] duration-150 ease-standard hover:brightness-[1.08]';
+  const pillClass =
+    'rounded-full border border-hero-border bg-white px-[14px] py-[7px] text-[12px] text-body';
+
   return (
     <section className="mb-[26px] rounded-hero border border-hero-border bg-hero-fill px-[26px] py-[22px]">
       <Eyebrow tone="blue">{hero.eyebrow}</Eyebrow>
@@ -33,34 +43,45 @@ export function Hero({ hero }: { hero: HeroData }) {
         {hero.headline}
       </h1>
       <p className="mb-[17px] mt-[7px] text-[13.5px] text-secondary">{hero.subhead}</p>
-      <div className="flex flex-wrap gap-[9px]">
-        {hero.actions.map((a) =>
-          a.kind === 'cta' ? (
-            <button
+      <div className="flex flex-wrap items-center gap-[9px]">
+        {hero.actions.map((a) => {
+          const to = a.to !== undefined && accountId ? path(accountId, a.to) : undefined;
+          if (a.kind === 'cta') {
+            return to ? (
+              <Link key={a.label} to={to} className={`${ctaClass} inline-flex items-center gap-[5px] !text-white`}>
+                {a.label}
+              </Link>
+            ) : (
+              <button key={a.label} className={ctaClass}>
+                {a.label}
+              </button>
+            );
+          }
+          return to ? (
+            <Link
               key={a.label}
-              className="rounded-full bg-cta px-[17px] py-[7px] text-[12px] font-semibold text-white transition-[filter] duration-150 ease-standard hover:brightness-[1.08]"
+              to={to}
+              className={`${pillClass} inline-flex items-center gap-[5px] !text-body transition-colors duration-150 ease-standard hover:border-accent hover:!text-accent`}
             >
               {a.label}
-            </button>
+              <IconChevronRight size={12} stroke={2} className="text-muted" />
+            </Link>
           ) : (
-            <button
-              key={a.label}
-              className="rounded-full border border-hero-border bg-white px-[14px] py-[7px] text-[12px] text-body transition-colors duration-150 ease-standard hover:bg-hero-fill"
-            >
+            <span key={a.label} className={pillClass}>
               {a.label}
-            </button>
-          ),
-        )}
+            </span>
+          );
+        })}
       </div>
     </section>
   );
 }
 
 /* ---- Service card (shared by Overview + Data) ------------------------- */
-export function ServiceCard({ s }: { s: Service }) {
+export function ServiceCard({ s, className = '' }: { s: Service; className?: string }) {
   const pace = pctValue(s.received, s.target);
   return (
-    <div className="bg-white px-[18px] py-[16px]">
+    <div className={`bg-white px-[18px] py-[16px] ${className}`}>
       <div className="mb-[11px] flex items-center justify-between gap-[8px]">
         <span className="text-[13px] font-medium text-strong">{s.name}</span>
         {s.status ? (
@@ -82,12 +103,19 @@ export function ServiceCard({ s }: { s: Service }) {
 }
 
 /* ---- Pace bars (weekly media delivery + lead delivery cadence) -------- */
-export function PaceBars({ bars }: { bars: { height: number; muted?: boolean }[] }) {
+export function PaceBars({
+  bars,
+  height = 88,
+}: {
+  bars: { height: number; muted?: boolean; title?: string }[];
+  height?: number;
+}) {
   return (
-    <div className="flex h-[88px] items-end gap-[6px]">
+    <div className="flex items-end gap-[6px]" style={{ height }}>
       {bars.map((b, i) => (
         <div
           key={i}
+          title={b.title}
           className={`flex-1 rounded-t-[2px] ${b.muted ? 'bg-[#dde4ee]' : 'bg-accent'}`}
           style={{ height: `${Math.max(4, Math.min(100, b.height))}%` }}
         />

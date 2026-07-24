@@ -5,6 +5,8 @@ import Overview from '@/screens/Overview';
 import Data from '@/screens/Data';
 import Media from '@/screens/Media';
 import Leads from '@/screens/Leads';
+import CampaignDetail from '@/screens/CampaignDetail';
+import Report from '@/screens/Report';
 import Documents from '@/screens/Documents';
 import Invoices from '@/screens/Invoices';
 import Support from '@/screens/Support';
@@ -19,6 +21,8 @@ export default function App() {
         <Route path="data" element={<Data />} />
         <Route path="media" element={<Media />} />
         <Route path="leads" element={<Leads />} />
+        <Route path="leads/:campaignId" element={<CampaignDetail />} />
+        <Route path="report" element={<Report />} />
         <Route path="documents" element={<Documents />} />
         <Route path="invoices" element={<Invoices />} />
         <Route path="support" element={<Support />} />

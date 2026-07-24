@@ -29,3 +29,22 @@ export const hasService = (account: Account, ...ids: ServiceId[]): boolean =>
 
 export const path = (accountId: string, segment: string): string =>
   segment ? `/${accountId}/${segment}` : `/${accountId}`;
+
+/** First path segment under /:accountId for a location pathname ('' = overview). */
+export const currentSegment = (pathname: string): string => {
+  const parts = pathname.split('/').filter(Boolean);
+  return parts.length > 1 ? parts[1] : '';
+};
+
+/** Segments reachable on any account regardless of entitlements. */
+const ALWAYS_AVAILABLE = new Set(['documents', 'invoices', 'support', 'account', 'report', '']);
+
+/** Where to land when switching to another account: keep the current tab if the
+ *  target account can see it, otherwise fall back to its Overview. */
+export const switchTarget = (targetId: string, pathname: string, target: Account): string => {
+  const seg = currentSegment(pathname);
+  if (ALWAYS_AVAILABLE.has(seg)) return path(targetId, seg);
+  const tab = TABS.find((t) => t.segment === seg);
+  if (tab && isEntitled(tab, target)) return path(targetId, seg);
+  return path(targetId, '');
+};

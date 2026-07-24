@@ -58,6 +58,7 @@ const buildTimeline = (campaigns: Campaign[]): DeliveryTimelineEntry[] =>
       c.schedule.map((d) => ({
         date: d.date,
         sortKey: d.sortKey,
+        campaignId: c.id,
         campaign: c.name,
         geo: c.geo,
         leads: d.leads,
@@ -229,6 +230,7 @@ function buildAcme(): Account {
     services,
     leadsSummary: leads,
     leadsMetrics: leadsMetrics(leads),
+    leadsInReview,
     campaigns,
     deliveryTimeline: buildTimeline(campaigns),
     leads: [
@@ -272,9 +274,9 @@ function buildAcme(): Account {
     ],
     invoices,
     tickets: [
-      { id: 't1', subject: 'Update billing contact email', opened: '20 Jul', status: 'neutral', statusLabel: 'In progress' },
-      { id: 't2', subject: 'Clarify programmatic viewability methodology', opened: '15 Jul', status: 'good', statusLabel: 'Resolved' },
-      { id: 't3', subject: 'Request additional lead fields', opened: '12 Jul', status: 'needsYou', statusLabel: 'Awaiting your reply' },
+      { id: 't1', subject: 'Update billing contact email', opened: '20 Jul', status: 'neutral', statusLabel: 'In progress', lastMessage: 'DBSL · We have the new address on file and are updating the invoicing profile. No action needed from you.' },
+      { id: 't2', subject: 'Clarify programmatic viewability methodology', opened: '15 Jul', status: 'good', statusLabel: 'Resolved', lastMessage: 'DBSL · Viewability follows the MRC standard measured by our verification partner. A one-page summary is attached to this thread.' },
+      { id: 't3', subject: 'Request additional lead fields', opened: '12 Jul', status: 'needsYou', statusLabel: 'Awaiting your reply', lastMessage: 'DBSL · We can add two custom fields to the delivery template. Please confirm the exact field names you want and we will enable them on the next drop.' },
     ],
     contacts: [
       { name: 'Sarah Whitfield', role: 'Account manager' },
@@ -293,9 +295,9 @@ function buildAcme(): Account {
         headline: `${money(invested)} invested, tracking to plan`,
         subhead: 'Four services running. Lead generation is behind pace.',
         actions: [
-          { label: 'View report', kind: 'cta' },
-          { label: '2 invoices open', kind: 'pill' },
-          { label: '1 signature due', kind: 'pill' },
+          { label: 'View report', kind: 'cta', to: 'report' },
+          { label: '2 invoices open', kind: 'pill', to: 'invoices' },
+          { label: '1 signature due', kind: 'pill', to: 'documents' },
         ],
       },
       data: {
@@ -303,7 +305,7 @@ function buildAcme(): Account {
         headline: `${int(38400 + 47200)} records delivered across two services`,
         subhead: 'iData and CleanRich running against your account universe.',
         actions: [
-          { label: 'Download data report', kind: 'cta' },
+          { label: 'Download data report', kind: 'cta', to: 'report' },
           { label: '4 batches delivered', kind: 'pill' },
         ],
       },
@@ -312,7 +314,7 @@ function buildAcme(): Account {
         headline: `${int(impressions)} impressions`,
         subhead: `${money(spend)} of ${money(budget)} spent, flight ${pct(spend, budget)} complete.`,
         actions: [
-          { label: 'View media report', kind: 'cta' },
+          { label: 'View media report', kind: 'cta', to: 'report' },
           { label: 'Brand safe 99.4%', kind: 'pill' },
         ],
       },
@@ -321,7 +323,7 @@ function buildAcme(): Account {
         headline: `${int(leads.billable)} billable leads of ${int(leads.target)}`,
         subhead: `${int(leads.delivered)} delivered to date. ${leadsInReview} are awaiting your review and may change this count.`,
         actions: [
-          { label: `Review ${leadsInReview} leads`, kind: 'cta' },
+          { label: `Review ${leadsInReview} leads`, kind: 'cta', to: 'leads?review=1' },
           { label: 'Download CSV', kind: 'pill' },
           { label: 'Push to Salesforce', kind: 'pill' },
         ],
@@ -433,6 +435,7 @@ function buildNorthwind(): Account {
       { label: 'Cost per lead', value: money(cpl) },
       { label: 'Days remaining', value: '50' },
     ],
+    leadsInReview,
     campaigns,
     deliveryTimeline: buildTimeline(campaigns),
     leads: [
@@ -451,8 +454,8 @@ function buildNorthwind(): Account {
     ],
     invoices,
     tickets: [
-      { id: 't1', subject: 'Question about lead delivery pacing', opened: '18 Jul', status: 'good', statusLabel: 'Resolved' },
-      { id: 't2', subject: 'Request weekly delivery report', opened: '10 Jul', status: 'neutral', statusLabel: 'In progress' },
+      { id: 't1', subject: 'Question about lead delivery pacing', opened: '18 Jul', status: 'good', statusLabel: 'Resolved', lastMessage: 'DBSL · Pacing is on track to complete by 12 September. The APAC survey closes last; everything else lands earlier.' },
+      { id: 't2', subject: 'Request weekly delivery report', opened: '10 Jul', status: 'neutral', statusLabel: 'In progress', lastMessage: 'DBSL · A weekly summary is being set up for Monday mornings to your team address. First one arrives next week.' },
     ],
     contacts: [
       { name: 'Elena Marsh', role: 'Account manager' },
@@ -472,8 +475,8 @@ function buildNorthwind(): Account {
         subhead: 'On pace to complete by 12 September.',
         actions: [
           { label: 'Download leads', kind: 'cta' },
-          { label: '3 campaigns live', kind: 'pill' },
-          { label: 'All invoices settled', kind: 'pill' },
+          { label: '3 campaigns live', kind: 'pill', to: 'leads' },
+          { label: 'All invoices settled', kind: 'pill', to: 'invoices' },
         ],
       },
       leads: {
@@ -481,7 +484,7 @@ function buildNorthwind(): Account {
         headline: `${int(leads.billable)} billable leads of ${int(leads.target)}`,
         subhead: `${int(leads.delivered)} delivered to date. ${leadsInReview} are awaiting your review and may change this count.`,
         actions: [
-          { label: `Review ${leadsInReview} leads`, kind: 'cta' },
+          { label: `Review ${leadsInReview} leads`, kind: 'cta', to: 'leads?review=1' },
           { label: 'Download CSV', kind: 'pill' },
           { label: 'Push to HubSpot', kind: 'pill' },
         ],
@@ -579,8 +582,8 @@ function buildCalderwood(): Account {
     ],
     invoices,
     tickets: [
-      { id: 't1', subject: 'Confirm field mapping for batch 3', opened: '21 Jul', status: 'needsYou', statusLabel: 'Awaiting your reply' },
-      { id: 't2', subject: 'Request match-rate breakdown by region', opened: '14 Jul', status: 'good', statusLabel: 'Resolved' },
+      { id: 't1', subject: 'Confirm field mapping for batch 3', opened: '21 Jul', status: 'needsYou', statusLabel: 'Awaiting your reply', lastMessage: 'DBSL · Batch 3 is scheduled for 4 August. Please confirm the two custom field mappings so enrichment can run without a hold.' },
+      { id: 't2', subject: 'Request match-rate breakdown by region', opened: '14 Jul', status: 'good', statusLabel: 'Resolved', lastMessage: 'DBSL · Regional match-rate breakdown has been added to your data report. NAM and EMEA are broken out separately.' },
     ],
     contacts: [
       { name: 'Nadia Okafor', role: 'Account manager' },
@@ -599,9 +602,9 @@ function buildCalderwood(): Account {
         headline: `${int(recordsDelivered)} records delivered`,
         subhead: 'Two data services running. Next batch drops 4 August.',
         actions: [
-          { label: 'View data report', kind: 'cta' },
-          { label: '1 invoice open', kind: 'pill' },
-          { label: 'Next batch 4 Aug', kind: 'pill' },
+          { label: 'View data report', kind: 'cta', to: 'report' },
+          { label: '1 invoice open', kind: 'pill', to: 'invoices' },
+          { label: 'Next batch 4 Aug', kind: 'pill', to: 'data' },
         ],
       },
       data: {
@@ -609,7 +612,7 @@ function buildCalderwood(): Account {
         headline: `${int(recordsDelivered)} records delivered across two services`,
         subhead: 'iData and CleanRich running against your target universe.',
         actions: [
-          { label: 'Download data report', kind: 'cta' },
+          { label: 'Download data report', kind: 'cta', to: 'report' },
           { label: '4 batches delivered', kind: 'pill' },
         ],
       },
@@ -693,7 +696,14 @@ function buildVantage(): Account {
     {
       id: 'ai', name: 'AI operations leaders', geo: 'NAM', accepted: 0, target: 120, delivered: 0,
       status: 'pendingApproval', budget: 5400, startDate: 'Apr 1, 2026', endDate: 'Jun 30, 2026',
-      deliveryDays: ['Monday'], leadsPerDelivery: 30, schedule: [],
+      deliveryDays: ['Monday'], leadsPerDelivery: 30,
+      // All upcoming — surfaces on the schedule only once the client approves the campaign.
+      schedule: [
+        drop('6 Apr', 20260406, 30, 'upcoming'),
+        drop('20 Apr', 20260420, 30, 'upcoming'),
+        drop('4 May', 20260504, 30, 'upcoming'),
+        drop('18 May', 20260518, 30, 'upcoming'),
+      ],
     },
   ];
   const leads = leadsFromCampaigns(campaigns, cpl); // billable 281 · delivered 395 · target 560
@@ -731,6 +741,7 @@ function buildVantage(): Account {
       { label: 'Cost per lead', value: money(cpl) },
       { label: 'Days remaining', value: '68' },
     ],
+    leadsInReview,
     campaigns,
     deliveryTimeline: buildTimeline(campaigns),
     leads: [
@@ -749,8 +760,8 @@ function buildVantage(): Account {
     ],
     invoices,
     tickets: [
-      { id: 't1', subject: 'Approve Q2 AI operations campaign scope', opened: '20 Jul', status: 'needsYou', statusLabel: 'Awaiting your reply' },
-      { id: 't2', subject: 'Add ABM account list to Cloud infrastructure', opened: '14 Jul', status: 'neutral', statusLabel: 'In progress' },
+      { id: 't1', subject: 'Approve Q2 AI operations campaign scope', opened: '20 Jul', status: 'needsYou', statusLabel: 'Awaiting your reply', lastMessage: 'DBSL · The scope document JV-4210 is ready for signature. Once approved, delivery starts the first Monday of April.' },
+      { id: 't2', subject: 'Add ABM account list to Cloud infrastructure', opened: '14 Jul', status: 'neutral', statusLabel: 'In progress', lastMessage: 'DBSL · Your account list has been received and is being matched against the campaign audience. Matching completes this week.' },
     ],
     contacts: [
       { name: 'Laura Beckett', role: 'Account manager' },
@@ -770,8 +781,8 @@ function buildVantage(): Account {
         subhead: 'Three campaigns delivering; one is awaiting your approval.',
         actions: [
           { label: 'Download leads', kind: 'cta' },
-          { label: '4 campaigns', kind: 'pill' },
-          { label: '1 awaiting approval', kind: 'pill' },
+          { label: '4 campaigns', kind: 'pill', to: 'leads' },
+          { label: '1 awaiting approval', kind: 'pill', to: 'documents' },
         ],
       },
       leads: {
@@ -779,7 +790,7 @@ function buildVantage(): Account {
         headline: `${int(leads.billable)} billable leads of ${int(leads.target)}`,
         subhead: `${int(leads.delivered)} delivered to date. ${leadsInReview} are awaiting your review and may change this count.`,
         actions: [
-          { label: `Review ${leadsInReview} leads`, kind: 'cta' },
+          { label: `Review ${leadsInReview} leads`, kind: 'cta', to: 'leads?review=1' },
           { label: 'Download CSV', kind: 'pill' },
           { label: 'Push to Salesforce', kind: 'pill' },
         ],
@@ -887,6 +898,7 @@ function buildHarbor(): Account {
     services,
     leadsSummary: leads,
     leadsMetrics: leadsMetrics(leads),
+    leadsInReview,
     campaigns,
     deliveryTimeline: buildTimeline(campaigns),
     leads: [
@@ -911,8 +923,8 @@ function buildHarbor(): Account {
     ],
     invoices,
     tickets: [
-      { id: 't1', subject: 'Confirm target industries for batch 3', opened: '21 Jul', status: 'needsYou', statusLabel: 'Awaiting your reply' },
-      { id: 't2', subject: 'Weekly delivery report cadence', opened: '13 Jul', status: 'good', statusLabel: 'Resolved' },
+      { id: 't1', subject: 'Confirm target industries for batch 3', opened: '21 Jul', status: 'needsYou', statusLabel: 'Awaiting your reply', lastMessage: 'DBSL · Batch 3 targets are drafted from your current universe. Please confirm the two additional industries before 1 August.' },
+      { id: 't2', subject: 'Weekly delivery report cadence', opened: '13 Jul', status: 'good', statusLabel: 'Resolved', lastMessage: 'DBSL · Weekly reports now go out every Friday afternoon covering both data batches and lead drops.' },
     ],
     contacts: [
       { name: 'Owen Pryce', role: 'Account manager' },
@@ -931,9 +943,9 @@ function buildHarbor(): Account {
         headline: `${money(invested)} invested, tracking to plan`,
         subhead: 'Data services and lead generation running together.',
         actions: [
-          { label: 'View report', kind: 'cta' },
-          { label: '1 invoice open', kind: 'pill' },
-          { label: '2 campaigns live', kind: 'pill' },
+          { label: 'View report', kind: 'cta', to: 'report' },
+          { label: '1 invoice open', kind: 'pill', to: 'invoices' },
+          { label: '2 campaigns live', kind: 'pill', to: 'leads' },
         ],
       },
       data: {
@@ -941,7 +953,7 @@ function buildHarbor(): Account {
         headline: `${int(18000 + 21000)} records delivered across two services`,
         subhead: 'iData and CleanRich feeding your syndication campaigns.',
         actions: [
-          { label: 'Download data report', kind: 'cta' },
+          { label: 'Download data report', kind: 'cta', to: 'report' },
           { label: '4 batches delivered', kind: 'pill' },
         ],
       },
@@ -950,7 +962,7 @@ function buildHarbor(): Account {
         headline: `${int(leads.billable)} billable leads of ${int(leads.target)}`,
         subhead: `${int(leads.delivered)} delivered to date. ${leadsInReview} are awaiting your review and may change this count.`,
         actions: [
-          { label: `Review ${leadsInReview} leads`, kind: 'cta' },
+          { label: `Review ${leadsInReview} leads`, kind: 'cta', to: 'leads?review=1' },
           { label: 'Download CSV', kind: 'pill' },
           { label: 'Push to HubSpot', kind: 'pill' },
         ],
