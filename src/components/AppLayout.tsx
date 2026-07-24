@@ -171,7 +171,7 @@ function Chrome({ account }: { account: Account }) {
 function Tabs({ account }: { account: Account }) {
   const navigate = useNavigate();
   return (
-    <nav className="flex gap-[26px] border-b border-hairline px-[28px] pt-[13px]">
+    <nav className="flex gap-[36px] border-b border-hairline px-[28px] pt-[15px]">
       {TABS.map((tab) => {
         const entitled = isEntitled(tab, account);
         if (!entitled) {
@@ -179,11 +179,11 @@ function Tabs({ account }: { account: Account }) {
             <button
               key={tab.key}
               onClick={() => navigate(path(account.id, ''))}
-              className="flex items-center gap-[4px] border-b-2 border-transparent pb-[11px] text-[13px] text-faint"
+              className="flex items-center gap-[5px] border-b-2 border-transparent pb-[13px] text-[13.5px] text-faint"
               title={`${tab.label} is available on your account — see Overview`}
             >
               {tab.label}
-              <IconLock size={11} stroke={2} />
+              <IconLock size={12} stroke={2} />
             </button>
           );
         }
@@ -193,10 +193,10 @@ function Tabs({ account }: { account: Account }) {
             to={path(account.id, tab.segment)}
             end={tab.segment === ''}
             className={({ isActive }) =>
-              `border-b-2 pb-[11px] text-[13px] transition-colors duration-150 ease-standard ${
+              `border-b-2 pb-[13px] text-[13.5px] transition-colors duration-150 ease-standard ${
                 isActive
-                  ? 'border-accent font-medium text-strong'
-                  : 'border-transparent text-muted hover:text-secondary'
+                  ? 'border-accent font-semibold text-strong'
+                  : 'border-transparent font-medium text-secondary hover:text-strong'
               }`
             }
           >
