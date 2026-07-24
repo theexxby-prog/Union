@@ -37,7 +37,7 @@ export function Hero({ hero }: { hero: HeroData }) {
     'rounded-full border border-hero-border bg-white px-[14px] py-[7px] text-[12px] text-body';
 
   return (
-    <section className="mb-[26px] rounded-hero border border-hero-border bg-hero-fill px-[26px] py-[22px]">
+    <section className="mb-[22px] rounded-hero border border-hero-border bg-hero-fill px-[26px] py-[22px]">
       <Eyebrow tone="blue">{hero.eyebrow}</Eyebrow>
       <h1 className="font-display mt-[10px] text-[29px] font-bold leading-[1.15] text-strong">
         {hero.headline}
@@ -191,11 +191,12 @@ export function Cell({ className = '', children }: { className?: string; childre
 }
 
 /* ---- Metric strip ----------------------------------------------------- */
+/* Tiles carry the brand Soft Grey fill so they read as tiles, not blank page. */
 export function MetricStrip({ metrics }: { metrics: MetricTile[] }) {
   return (
     <HairGrid cols={metrics.length}>
       {metrics.map((m) => (
-        <Cell key={m.label}>
+        <div key={m.label} className="bg-[#F4F7FB] px-[18px] py-[15px]">
           <Eyebrow>{m.label}</Eyebrow>
           <p
             className={`font-display mt-[7px] text-[22px] font-bold leading-none ${
@@ -204,9 +205,18 @@ export function MetricStrip({ metrics }: { metrics: MetricTile[] }) {
           >
             {m.value}
           </p>
-        </Cell>
+        </div>
       ))}
     </HairGrid>
+  );
+}
+
+/* ---- Panel — quiet surface for charts and timelines ------------------- */
+export function Panel({ className = '', children }: { className?: string; children: React.ReactNode }) {
+  return (
+    <div className={`rounded-card border border-hairline bg-[#fafbfd] px-[18px] py-[15px] ${className}`}>
+      {children}
+    </div>
   );
 }
 

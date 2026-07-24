@@ -242,6 +242,11 @@ export default function AppLayout() {
             <div key={screenKey} className="animate-screen px-[28px] py-[26px]">
               <Outlet context={account} />
             </div>
+            {/* Closes the page so trailing whitespace reads intentional. */}
+            <div className="flex items-center justify-between border-t border-hairline px-[28px] py-[12px]">
+              <span className="text-[11px] text-muted">Union · A Datamatics Business Solutions product</span>
+              <span className="text-[11px] text-faint">Internal demo</span>
+            </div>
           </div>
         </div>
       </div>

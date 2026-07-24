@@ -5,7 +5,7 @@ import { Link, Navigate, useParams } from 'react-router-dom';
 import { IconArrowLeft } from '@tabler/icons-react';
 import { useAccount } from '@/components/AppLayout';
 import StatusPill from '@/components/StatusPill';
-import { Eyebrow, EmptyLine, MetricStrip, PaceBars, ProgressRule } from '@/components/ui';
+import { Eyebrow, EmptyLine, MetricStrip, PaceBars, Panel, ProgressRule } from '@/components/ui';
 import { int, money, pctValue } from '@/data/format';
 import { campaignAccept, cadenceLine, campaignStatusMeta, effectiveStatus } from '@/lib/campaign';
 import { demoKey, useDemoState } from '@/lib/demo-state';
@@ -77,7 +77,7 @@ export default function CampaignDetail() {
         <span className="text-[12px] text-secondary">{pace}% of target</span>
       </div>
 
-      <div className="mb-[28px] mt-[18px]">
+      <div className="mb-[22px] mt-[18px]">
         <MetricStrip
           metrics={[
             { label: 'Accepted', value: int(campaign.accepted) },
@@ -93,19 +93,21 @@ export default function CampaignDetail() {
         <EmptyLine>Drops will be scheduled once the campaign starts delivering.</EmptyLine>
       ) : (
         <>
-          <PaceBars
-            bars={campaign.schedule.map((d) => ({
-              height: (d.leads / maxLeads) * 100,
-              muted: d.status === 'upcoming',
-              title: `${d.date} · ${int(d.leads)} leads`,
-            }))}
-            height={72}
-          />
-          <div className="mt-[8px] flex justify-between text-[11.5px] text-muted">
-            <span>{campaign.schedule[0].date}</span>
-            <span>{campaign.schedule[campaign.schedule.length - 1].date}</span>
-          </div>
-          <div className="mb-[28px] mt-[10px]">
+          <Panel>
+            <PaceBars
+              bars={campaign.schedule.map((d) => ({
+                height: (d.leads / maxLeads) * 100,
+                muted: d.status === 'upcoming',
+                title: `${d.date} · ${int(d.leads)} leads`,
+              }))}
+              height={72}
+            />
+            <div className="mt-[8px] flex justify-between text-[11.5px] text-muted">
+              <span>{campaign.schedule[0].date}</span>
+              <span>{campaign.schedule[campaign.schedule.length - 1].date}</span>
+            </div>
+          </Panel>
+          <div className="mb-[22px] mt-[10px]">
             {campaign.schedule.map((d, i) => (
               <div key={i} className="flex items-center border-t border-hairline py-[11px]">
                 <span className="w-[80px] text-[12.5px] text-muted">{d.date}</span>
@@ -131,7 +133,7 @@ export default function CampaignDetail() {
           <EmptyLine>Leads will appear here as drops are delivered.</EmptyLine>
         ) : (
           leads.map((l) => (
-            <div key={l.id} className="flex items-center border-t border-hairline py-[13px]">
+            <div key={l.id} className="flex items-center border-t border-hairline py-[12px]">
               <div className="min-w-0 flex-1">
                 <p className="text-[13px] text-strong">{l.name}</p>
                 <p className="mt-[3px] text-[12px] text-muted">

@@ -37,7 +37,7 @@ function CampaignRow({ c, approved }: { c: Campaign; approved: boolean }) {
   const pace = pctValue(c.accepted, c.target);
   const status = campaignStatusMeta[effectiveStatus(c, approved)];
   return (
-    <div className="flex items-center gap-[14px] border-t border-hairline py-[13px]">
+    <div className="flex items-center gap-[14px] border-t border-hairline py-[12px]">
       <div className="min-w-0 flex-1">
         <p className="text-[13px] text-strong">
           {c.name} · {c.geo}
@@ -66,9 +66,9 @@ function ApprovalsBlock({ account }: { account: Account }) {
 
   return (
     <>
-      <Eyebrow className="mb-[10px] mt-[28px]">Awaiting your approval</Eyebrow>
+      <Eyebrow className="mb-[10px] mt-[22px]">Awaiting your approval</Eyebrow>
       {pending.map((c) => (
-        <div key={c.id} className="rounded-card border border-hairline px-[20px] py-[18px]">
+        <div key={c.id} className="rounded-card border border-hero-border bg-hero-fill px-[20px] py-[18px]">
           <div className="flex items-start justify-between gap-[14px]">
             <div>
               <p className="m-0 text-[14px] font-medium text-strong">
@@ -90,7 +90,7 @@ function ApprovalsBlock({ account }: { account: Account }) {
             </button>
             <Link
               to={path(account.id, 'documents')}
-              className="rounded-full border border-hairline bg-white px-[13px] py-[6px] text-[11.5px] !text-body transition-colors duration-150 ease-standard hover:bg-page"
+              className="rounded-full border border-hero-border bg-white px-[13px] py-[6px] text-[11.5px] !text-body transition-colors duration-150 ease-standard hover:bg-page"
             >
               View scope document
             </Link>
@@ -108,7 +108,7 @@ function AttentionStrip({ account }: { account: Account }) {
   if (notices.length === 0) return null;
   return (
     <>
-      <Eyebrow className="mb-[2px] mt-[28px]">Needs your attention</Eyebrow>
+      <Eyebrow className="mb-[2px] mt-[22px]">Needs your attention</Eyebrow>
       <div>
         {notices.map((n) => (
           <Link
@@ -139,7 +139,7 @@ export default function Overview() {
       <>
         <Hero hero={account.heroes.overview!} />
         {account.overviewMetrics && (
-          <div className="mb-[28px]">
+          <div className="mb-[22px]">
             <MetricStrip metrics={account.overviewMetrics} />
           </div>
         )}

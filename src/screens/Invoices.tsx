@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { IconChevronDown } from '@tabler/icons-react';
 import { useAccount } from '@/components/AppLayout';
 import StatusPill from '@/components/StatusPill';
-import { Eyebrow, EmptyLine, Hero, PaceBars } from '@/components/ui';
+import { Eyebrow, EmptyLine, Hero, PaceBars, Panel } from '@/components/ui';
 import { invoiceTotal } from '@/data/accounts';
 import { money } from '@/data/format';
 import type { Invoice } from '@/data/types';
@@ -39,7 +39,7 @@ function InvoiceLines({ inv }: { inv: Invoice }) {
   return (
     <>
       {inv.lines.map((line) => (
-        <div key={line.serviceId + line.amount} className="flex items-center border-t border-hairline py-[13px]">
+        <div key={line.serviceId + line.amount} className="flex items-center border-t border-hairline py-[12px]">
           <div className="min-w-0 flex-1">
             <p className="text-[13px] text-strong">{line.description}</p>
             <p className="mt-[3px] text-[12px] text-muted">{line.basis}</p>
@@ -85,14 +85,14 @@ export default function Invoices() {
         · {current.terms}
       </p>
 
-      <div className="mb-[30px]">
+      <div className="mb-[24px]">
         <InvoiceLines inv={current} />
       </div>
 
       {account.invoices.length > 1 && (
         <>
-          <Eyebrow className="mb-[14px]">Billing history</Eyebrow>
-          <div className="mb-[6px] max-w-[360px]">
+          <Eyebrow className="mb-[12px]">Billing history</Eyebrow>
+          <Panel className="mb-[6px] max-w-[400px]">
             <PaceBars
               height={64}
               bars={account.invoices.map((inv) => ({
@@ -108,7 +108,7 @@ export default function Invoices() {
                 </span>
               ))}
             </div>
-          </div>
+          </Panel>
         </>
       )}
 
@@ -124,7 +124,7 @@ export default function Invoices() {
                 <button
                   onClick={() => setExpanded(isOpen ? null : inv.id)}
                   aria-expanded={isOpen}
-                  className="flex w-full items-center py-[13px] text-left transition-colors duration-150 ease-standard hover:bg-[#fafbfd]"
+                  className="flex w-full items-center py-[12px] text-left transition-colors duration-150 ease-standard hover:bg-[#fafbfd]"
                   title="Show line items"
                 >
                   <span className="flex min-w-0 flex-1 items-center gap-[6px] text-[12.5px] text-secondary">

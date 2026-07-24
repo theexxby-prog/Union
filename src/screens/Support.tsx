@@ -22,8 +22,8 @@ export default function Support() {
       <Hero hero={account.heroes.support!} />
 
       <Eyebrow className="mb-[2px]">Requests</Eyebrow>
-      <div className="mb-[30px]">
-        <div className="flex items-center py-[13px]">
+      <div className="mb-[24px]">
+        <div className="flex items-center py-[12px]">
           <Eyebrow className="flex-1">Subject</Eyebrow>
           <Eyebrow className="w-[100px]">Opened</Eyebrow>
           <Eyebrow className="w-[150px] text-right">Status</Eyebrow>
@@ -38,7 +38,7 @@ export default function Support() {
                 <button
                   onClick={() => setExpanded(isOpen ? null : t.id)}
                   aria-expanded={isOpen}
-                  className="flex w-full items-center py-[13px] text-left transition-colors duration-150 ease-standard hover:bg-[#fafbfd]"
+                  className="flex w-full items-center py-[12px] text-left transition-colors duration-150 ease-standard hover:bg-[#fafbfd]"
                   title="Show the latest reply"
                 >
                   <span className="flex min-w-0 flex-1 items-center gap-[6px] text-[13px] text-strong">
@@ -55,7 +55,7 @@ export default function Support() {
                   </span>
                 </button>
                 {isOpen && t.lastMessage && (
-                  <div className="mb-[14px] rounded-card border border-hairline bg-[#fafbfd] px-[16px] py-[13px]">
+                  <div className="mb-[14px] rounded-card border border-hairline bg-[#fafbfd] px-[16px] py-[12px]">
                     <p className="m-0 text-[12.5px] leading-[1.5] text-secondary">{t.lastMessage}</p>
                     {t.status === 'needsYou' && (
                       <button className="mt-[10px] rounded-full bg-cta px-[14px] py-[6px] text-[11.5px] font-semibold text-white transition-[filter] duration-150 ease-standard hover:brightness-[1.08]">

@@ -37,10 +37,10 @@ export default function AccountSettings() {
       <h1 className="font-display mt-[8px] text-[25px] font-bold leading-[1.15] text-strong">
         {account.name}
       </h1>
-      <p className="mb-[28px] mt-[6px] text-[13px] text-secondary">{account.descriptor}</p>
+      <p className="mb-[22px] mt-[6px] text-[13px] text-secondary">{account.descriptor}</p>
 
       <Eyebrow className="mb-[12px]">Company</Eyebrow>
-      <HairGrid cols={3} className="mb-[30px]">
+      <HairGrid cols={3} className="mb-[24px]">
         <Cell>
           <Eyebrow>Company name</Eyebrow>
           <p className="mt-[6px] text-[13.5px] text-strong">{account.name}</p>
@@ -56,14 +56,14 @@ export default function AccountSettings() {
       </HairGrid>
 
       <Eyebrow className="mb-[2px]">People</Eyebrow>
-      <div className="mb-[30px]">
-        <div className="flex items-center py-[13px]">
+      <div className="mb-[24px]">
+        <div className="flex items-center py-[12px]">
           <Eyebrow className="flex-1">Name</Eyebrow>
           <Eyebrow className="w-[280px]">Email</Eyebrow>
           <Eyebrow className="w-[140px] text-right">Role</Eyebrow>
         </div>
         {account.team.map((m) => (
-          <div key={m.email} className="flex items-center border-t border-hairline py-[13px]">
+          <div key={m.email} className="flex items-center border-t border-hairline py-[12px]">
             <span className="min-w-0 flex-1 text-[13px] text-strong">{m.name}</span>
             <span className="w-[280px] text-[12.5px] text-secondary">{m.email}</span>
             <span className="w-[140px] text-right text-[12.5px] text-muted">{m.role}</span>

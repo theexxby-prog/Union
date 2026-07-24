@@ -26,7 +26,12 @@ function DocCard({ doc, eyebrow }: { doc: DocumentRecord; eyebrow: string }) {
   return (
     <>
       <Eyebrow className="mb-[10px]">{eyebrow}</Eyebrow>
-      <div className="mb-[28px] rounded-card border border-hairline px-[20px] py-[18px]">
+      {/* Needs-you cards take the hero fill so the page's attention anchor is tonal, not just a border. */}
+      <div
+        className={`mb-[22px] rounded-card border px-[20px] py-[18px] ${
+          awaiting ? 'border-hero-border bg-hero-fill' : 'border-hairline bg-white'
+        }`}
+      >
         <div className="mb-[18px] flex items-start justify-between gap-[14px]">
           <div>
             <p className="m-0 text-[14px] font-medium text-strong">
@@ -64,7 +69,7 @@ export default function Documents() {
 
       <Eyebrow className="mb-[2px]">All documents</Eyebrow>
       <div>
-        <div className="flex items-center py-[13px]">
+        <div className="flex items-center py-[12px]">
           <Eyebrow className="flex-1">Document</Eyebrow>
           <Eyebrow className="w-[100px]">Value</Eyebrow>
           <Eyebrow className="w-[80px]">Date</Eyebrow>
@@ -78,7 +83,7 @@ export default function Documents() {
               <button
                 onClick={() => setExpanded(isOpen ? null : d.id)}
                 aria-expanded={isOpen}
-                className="flex w-full items-center py-[13px] text-left transition-colors duration-150 ease-standard hover:bg-[#fafbfd]"
+                className="flex w-full items-center py-[12px] text-left transition-colors duration-150 ease-standard hover:bg-[#fafbfd]"
                 title="Show workflow status"
               >
                 <div className="min-w-0 flex-1">

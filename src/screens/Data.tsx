@@ -4,7 +4,7 @@
 import { Navigate } from 'react-router-dom';
 import { useAccount } from '@/components/AppLayout';
 import StatusPill from '@/components/StatusPill';
-import { Eyebrow, Hero, MetricStrip, ServiceCard } from '@/components/ui';
+import { Eyebrow, Hero, MetricStrip, Panel, ServiceCard } from '@/components/ui';
 import { int } from '@/data/format';
 import { hasService, path } from '@/lib/nav';
 import type { MetricTile, Service } from '@/data/types';
@@ -38,22 +38,24 @@ export default function Data() {
         ))}
       </div>
 
-      <Eyebrow className="mb-[12px] mt-[28px]">Quality</Eyebrow>
+      <Eyebrow className="mb-[12px] mt-[22px]">Quality</Eyebrow>
       <MetricStrip metrics={qualityTiles(dataServices)} />
 
-      <Eyebrow className="mb-[14px] mt-[28px]">Batch timeline</Eyebrow>
-      <div className="flex gap-[7px]">
-        {account.batches.map((b) => {
-          const delivered = b.status === 'good';
-          return (
-            <div key={b.id} className="flex-1" title={`${b.name} · ${int(b.records)} records · ${b.statusLabel}`}>
-              <div className={`mb-[8px] h-[2px] ${delivered ? 'bg-accent' : 'bg-hairline'}`} />
-              <span className={`block text-[11.5px] ${delivered ? 'text-strong' : 'text-muted'}`}>{b.date}</span>
-              <span className="block text-[11px] text-muted">{int(b.records)}</span>
-            </div>
-          );
-        })}
-      </div>
+      <Eyebrow className="mb-[12px] mt-[22px]">Batch timeline</Eyebrow>
+      <Panel>
+        <div className="flex gap-[7px]">
+          {account.batches.map((b) => {
+            const delivered = b.status === 'good';
+            return (
+              <div key={b.id} className="flex-1" title={`${b.name} · ${int(b.records)} records · ${b.statusLabel}`}>
+                <div className={`mb-[8px] h-[3px] ${delivered ? 'bg-accent' : 'bg-[#d6deea]'}`} />
+                <span className={`block text-[11.5px] ${delivered ? 'text-strong' : 'text-secondary'}`}>{b.date}</span>
+                <span className="block text-[11px] text-muted">{int(b.records)}</span>
+              </div>
+            );
+          })}
+        </div>
+      </Panel>
       {nextBatch && (
         <div className="mt-[14px] flex items-center gap-[10px] rounded-card border border-hairline bg-[#fafbfd] px-[16px] py-[11px]">
           <StatusPill state="neutral">Scheduled</StatusPill>
@@ -63,16 +65,16 @@ export default function Data() {
         </div>
       )}
 
-      <Eyebrow className="mb-[2px] mt-[28px]">Batch deliveries</Eyebrow>
+      <Eyebrow className="mb-[2px] mt-[22px]">Batch deliveries</Eyebrow>
       <div>
-        <div className="flex items-center py-[13px]">
+        <div className="flex items-center py-[12px]">
           <Eyebrow className="flex-1">Batch</Eyebrow>
           <Eyebrow className="w-[110px] text-right">Records</Eyebrow>
           <Eyebrow className="w-[80px] pl-[16px]">Date</Eyebrow>
           <Eyebrow className="w-[110px] text-right">Status</Eyebrow>
         </div>
         {account.batches.map((b) => (
-          <div key={b.id} className="flex items-center border-t border-hairline py-[13px]">
+          <div key={b.id} className="flex items-center border-t border-hairline py-[12px]">
             <div className="min-w-0 flex-1">
               <p className="text-[13px] text-strong">{b.name}</p>
               <p className="mt-[3px] text-[12px] text-muted">{serviceName.get(b.serviceId)}</p>

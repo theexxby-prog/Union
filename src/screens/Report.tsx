@@ -45,7 +45,7 @@ export default function Report() {
       </p>
 
       <Eyebrow className="mb-[12px]">Commercial summary</Eyebrow>
-      <div className="mb-[30px]">
+      <div className="mb-[24px]">
         <MetricStrip
           metrics={[
             { label: 'Invested to date', value: money(account.invested) },
@@ -60,7 +60,7 @@ export default function Report() {
         <>
           <Eyebrow className="mb-[12px]">Services</Eyebrow>
           <div
-            className="mb-[30px] grid gap-px overflow-hidden rounded-card border border-hairline bg-hairline"
+            className="mb-[24px] grid gap-px overflow-hidden rounded-card border border-hairline bg-hairline"
             style={{ gridTemplateColumns: `repeat(${Math.min(account.services.length, 4)}, minmax(0, 1fr))` }}
           >
             {account.services.map((s) => (
@@ -73,7 +73,7 @@ export default function Report() {
       {hasService(account, 'leads') && account.campaigns.length > 0 && (
         <>
           <Eyebrow className="mb-[2px]">Lead generation · campaigns</Eyebrow>
-          <div className="mb-[30px]">
+          <div className="mb-[24px]">
             {account.campaigns.map((c) => (
               <div key={c.id} className="flex items-center gap-[14px] border-t border-hairline py-[12px]">
                 <div className="min-w-0 flex-1">
@@ -98,7 +98,7 @@ export default function Report() {
       {hasService(account, 'programmatic') && account.media && (
         <>
           <Eyebrow className="mb-[12px]">Programmatic</Eyebrow>
-          <div className="mb-[30px]">
+          <div className="mb-[24px]">
             <MetricStrip
               metrics={[
                 { label: 'Impressions', value: int(account.media.impressions) },
@@ -114,7 +114,7 @@ export default function Report() {
       {dataServices.length > 0 && account.batches.length > 0 && (
         <>
           <Eyebrow className="mb-[2px]">Data · batch deliveries</Eyebrow>
-          <div className="mb-[30px]">
+          <div className="mb-[24px]">
             {account.batches.map((b) => (
               <div key={b.id} className="flex items-center border-t border-hairline py-[12px]">
                 <span className="min-w-0 flex-1 text-[13px] text-strong">{b.name}</span>

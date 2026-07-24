@@ -7,7 +7,7 @@ import { Link, Navigate, useSearchParams } from 'react-router-dom';
 import { IconChevronDown, IconChevronRight } from '@tabler/icons-react';
 import { useAccount } from '@/components/AppLayout';
 import StatusPill from '@/components/StatusPill';
-import { Eyebrow, EmptyLine, Hero, MetricStrip, PaceBars, ProgressRule } from '@/components/ui';
+import { Eyebrow, EmptyLine, Hero, MetricStrip, PaceBars, Panel, ProgressRule } from '@/components/ui';
 import { int, money, pct, pctValue } from '@/data/format';
 import { campaignAccept, cadenceLine, campaignStatusMeta, effectiveStatus } from '@/lib/campaign';
 import { demoKey, useDemoState } from '@/lib/demo-state';
@@ -84,27 +84,29 @@ function DeliverySchedule({ filter }: { filter: string }) {
   const upcoming = timeline.filter((d) => d.status === 'upcoming');
 
   return (
-    <div className="mb-[30px]">
-      <Eyebrow className="mb-[14px]">Delivery schedule</Eyebrow>
-      <PaceBars
-        bars={timeline.map((d) => ({
-          height: (d.leads / maxLeads) * 100,
-          muted: d.status === 'upcoming',
-          title: `${d.date} · ${d.campaign} · ${int(d.leads)} leads`,
-        }))}
-      />
-      <div className="mt-[8px] flex justify-between text-[11.5px] text-muted">
-        <span>{timeline[0].date}</span>
-        <span>{timeline[timeline.length - 1].date}</span>
-      </div>
-      <div className="mt-[8px] flex gap-[16px] text-[11.5px] text-muted">
-        <span className="flex items-center gap-[6px]">
-          <span className="inline-block h-[8px] w-[8px] rounded-[2px] bg-accent" /> Delivered
-        </span>
-        <span className="flex items-center gap-[6px]">
-          <span className="inline-block h-[8px] w-[8px] rounded-[2px] bg-[#dde4ee]" /> Upcoming
-        </span>
-      </div>
+    <div className="mb-[24px]">
+      <Eyebrow className="mb-[12px]">Delivery schedule</Eyebrow>
+      <Panel>
+        <PaceBars
+          bars={timeline.map((d) => ({
+            height: (d.leads / maxLeads) * 100,
+            muted: d.status === 'upcoming',
+            title: `${d.date} · ${d.campaign} · ${int(d.leads)} leads`,
+          }))}
+        />
+        <div className="mt-[8px] flex justify-between text-[11.5px] text-muted">
+          <span>{timeline[0].date}</span>
+          <span>{timeline[timeline.length - 1].date}</span>
+        </div>
+        <div className="mt-[8px] flex gap-[16px] text-[11.5px] text-muted">
+          <span className="flex items-center gap-[6px]">
+            <span className="inline-block h-[8px] w-[8px] rounded-[2px] bg-accent" /> Delivered
+          </span>
+          <span className="flex items-center gap-[6px]">
+            <span className="inline-block h-[8px] w-[8px] rounded-[2px] bg-[#dde4ee]" /> Upcoming
+          </span>
+        </div>
+      </Panel>
 
       <p className="mb-[2px] mt-[18px] text-[11.5px] font-medium text-secondary">Next drops</p>
       {upcoming.length === 0 ? (
@@ -178,12 +180,12 @@ export default function Leads() {
     <>
       <Hero hero={account.heroes.leads!} />
 
-      <div className="mb-[28px]">
+      <div className="mb-[22px]">
         <MetricStrip metrics={liveMetrics} />
       </div>
 
       <Eyebrow className="mb-[2px]">Campaigns</Eyebrow>
-      <div className="mb-[30px]">
+      <div className="mb-[24px]">
         {account.campaigns.map((c) => (
           <CampaignRow
             key={c.id}
@@ -241,7 +243,7 @@ export default function Leads() {
       </div>
 
       <div>
-        <div className="flex items-center py-[13px]">
+        <div className="flex items-center py-[12px]">
           <Eyebrow className="flex-1">Contact</Eyebrow>
           <Eyebrow className="w-[200px]">Campaign</Eyebrow>
           <Eyebrow className="w-[80px]">Date</Eyebrow>
@@ -272,7 +274,7 @@ export default function Leads() {
                         }
                       : undefined
                   }
-                  className={`flex items-center py-[13px] ${
+                  className={`flex items-center py-[12px] ${
                     reviewable
                       ? 'cursor-pointer transition-colors duration-150 ease-standard hover:bg-[#fafbfd]'
                       : ''
@@ -298,7 +300,7 @@ export default function Leads() {
                   </span>
                 </div>
                 {expanded && reviewable && (
-                  <div className="mb-[13px] rounded-card border border-hairline bg-[#fafbfd] px-[16px] py-[13px]">
+                  <div className="mb-[13px] rounded-card border border-hairline bg-[#fafbfd] px-[16px] py-[12px]">
                     <p className="m-0 text-[12.5px] text-secondary">
                       {l.title} at {l.company}, delivered {l.date} from {campaignById.get(l.campaignId)?.name}.
                       Accepting adds this lead to your billable count.
