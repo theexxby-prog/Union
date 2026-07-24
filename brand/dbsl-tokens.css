@@ -1,0 +1,195 @@
+/* DBSL Design System — design tokens (self-contained).
+   Fonts: <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+*/
+
+/* ===== tokens/colors.css ===== */
+/* DBSL Color System — from Brand Communication Playbook (Section 13) */
+:root{
+  /* ---- Brand base palette (exact playbook hexes) ---- */
+  --dbsl-navy:#07111F;        /* Deep Tech Navy — foundation, enterprise trust */
+  --dbsl-blue:#146EF5;        /* Tech Blue — digital transformation */
+  --dbsl-cyan:#00FFF7;        /* Electric Cyan — AI / data energy */
+  --dbsl-teal:#34A49E;        /* Tech Teal — transformation, clarity */
+  --dbsl-red:#B20101;         /* DBSL Red — action, brand recognition */
+  --dbsl-yellow:#FFFC00;      /* Electric Yellow — high-visibility accent */
+  --dbsl-grey-soft:#F4F7FB;   /* Soft Grey — surfaces, breathing space */
+  --dbsl-grey-cloud:#C5CDD8;  /* Cloud Grey — supporting neutral */
+
+  /* ---- Derived tints & shades (harmonic, for states & depth) ---- */
+  --navy-950:#040A12;
+  --navy-900:#07111F;
+  --navy-800:#0D1E33;
+  --navy-700:#122a49;
+  --blue-600:#0f57c9;
+  --blue-500:#146EF5;
+  --blue-400:#4a90ff;
+  --blue-300:#8fb9ff;
+  --teal-600:#2a847f;
+  --teal-500:#34A49E;
+  --teal-400:#5cc0ba;
+  --cyan-400:#00FFF7;
+  --cyan-300:#66fffb;
+  --red-700:#8f0101;
+  --red-600:#B20101;
+  --red-500:#d11414;
+  --yellow-400:#FFFC00;
+  --white:#ffffff;
+  --grey-50:#F4F7FB;
+  --grey-100:#e7edf5;
+  --grey-200:#d6deea;
+  --grey-300:#C5CDD8;
+  --grey-500:#8a96a6;
+  --grey-700:#4a5563;
+  --grey-900:#1b2634;
+
+  /* ---- Semantic surface aliases ---- */
+  --surface-page:var(--grey-50);        /* default light page */
+  --surface-card:var(--white);
+  --surface-muted:var(--grey-100);
+  --surface-dark:var(--navy-900);       /* hero / cover backgrounds */
+  --surface-dark-2:var(--navy-800);
+
+  /* ---- Semantic text aliases ---- */
+  --text-strong:var(--navy-900);        /* headings on light */
+  --text-body:#2b3644;                  /* body copy on light */
+  --text-muted:var(--grey-700);
+  --text-on-dark:var(--white);
+  --text-on-dark-muted:#b9c6d8;
+  --text-accent:var(--blue-500);        /* headings on light, links */
+  --text-highlight:var(--cyan-400);     /* headings on dark */
+
+  /* ---- Brand roles ---- */
+  --brand-primary:var(--red-600);       /* CTAs, brand recall */
+  --brand-secondary:var(--blue-500);    /* system / tech */
+  --brand-highlight:var(--cyan-400);    /* AI / data energy */
+  --brand-support:var(--teal-500);
+  --brand-attention:var(--yellow-400);  /* eyebrows, campaign accents */
+
+  /* ---- Borders & lines ---- */
+  --border-subtle:var(--grey-200);
+  --border-strong:var(--grey-300);
+  --border-on-dark:rgba(255,255,255,.14);
+
+  /* ---- Focus ---- */
+  --focus-ring:var(--blue-500);
+
+  /* ---- Signature gradients ---- */
+  --gradient-navy-blue:linear-gradient(160deg,#07111F 0%,#0d2a52 55%,#146EF5 130%); /* @kind color */
+  --gradient-navy-teal:linear-gradient(165deg,#07111F 0%,#0f3b3a 60%,#34A49E 125%); /* @kind color */
+  --gradient-navy-red:linear-gradient(160deg,#07111F 0%,#3a0606 55%,#B20101 125%); /* @kind color */
+  --gradient-cyan-teal:linear-gradient(120deg,#00FFF7 0%,#34A49E 100%); /* @kind color */
+
+  /* ---- Links ---- */
+  --link:var(--blue-500);
+  --link-hover:var(--blue-600);
+}
+
+
+/* ===== tokens/typography.css ===== */
+/* DBSL Typography System (Section 14) */
+:root{
+  /* Families */
+  --font-display:'Montserrat', system-ui, sans-serif;  /* H1 / hero messaging */
+  --font-heading:'Sora', system-ui, sans-serif;         /* H2 / subheadings */
+  --font-body:'Sora', system-ui, sans-serif;            /* body / informational */
+  --font-mono:ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  /* Weights */
+  --fw-light:300;      /* @kind font */
+  --fw-regular:400;    /* @kind font */
+  --fw-medium:500;     /* @kind font */
+  --fw-semibold:600;   /* @kind font */
+  --fw-bold:700;       /* @kind font */
+  --fw-extrabold:800;  /* @kind font */
+
+  /* Type scale (rem) */
+  --fs-display:4.5rem;   /* 72 — hero */
+  --fs-h1:3rem;          /* 48 */
+  --fs-h2:2.25rem;       /* 36 */
+  --fs-h3:1.625rem;      /* 26 */
+  --fs-h4:1.25rem;       /* 20 */
+  --fs-lead:1.25rem;     /* 20 — intro/lead paragraph */
+  --fs-body:1rem;        /* 16 */
+  --fs-sm:0.875rem;      /* 14 */
+  --fs-xs:0.75rem;       /* 12 — eyebrows, captions */
+
+  /* Line heights */
+  --lh-tight:1.05;     /* @kind font */
+  --lh-heading:1.15;   /* @kind font */
+  --lh-snug:1.3;       /* @kind font */
+  --lh-body:1.6;       /* @kind font */
+
+  /* Letter spacing */
+  --ls-tight:-0.02em;    /* @kind font */
+  --ls-normal:0;         /* @kind font */
+  --ls-eyebrow:0.14em;   /* @kind font */
+}
+
+/* Base element defaults consumers inherit */
+:root{
+  color:var(--text-body);
+  font-family:var(--font-body);
+  font-size:var(--fs-body);
+  line-height:var(--lh-body);
+}
+
+
+/* ===== tokens/spacing.css ===== */
+/* DBSL Spacing & Layout scale — 4px base grid */
+:root{
+  --space-0:0;
+  --space-1:4px;
+  --space-2:8px;
+  --space-3:12px;
+  --space-4:16px;
+  --space-5:20px;
+  --space-6:24px;
+  --space-8:32px;
+  --space-10:40px;
+  --space-12:48px;
+  --space-16:64px;
+  --space-20:80px;
+  --space-24:96px;
+
+  /* Content widths */
+  --container-narrow:720px;
+  --container:1040px;
+  --container-wide:1280px;
+
+  /* Section rhythm */
+  --section-y:var(--space-24);
+  --gutter:var(--space-6);
+}
+
+
+/* ===== tokens/effects.css ===== */
+/* DBSL Effects — radii, shadows, borders, motion */
+:root{
+  /* Corner radii — buttons & chips are pills; cards & callouts lightly rounded */
+  --radius-none:0;
+  --radius-sm:6px;
+  --radius-md:10px;      /* cards, inputs */
+  --radius-lg:16px;      /* callout boxes, large cards */
+  --radius-xl:24px;
+  --radius-pill:999px;   /* buttons, chips, tags */
+
+  /* Elevation — soft, cool-tinted (navy shadow) */
+  --shadow-xs:0 1px 2px rgba(7,17,31,.06);
+  --shadow-sm:0 2px 8px rgba(7,17,31,.08);
+  --shadow-md:0 8px 24px rgba(7,17,31,.10);
+  --shadow-lg:0 20px 48px rgba(7,17,31,.16);
+  --shadow-glow-cyan:0 0 32px rgba(0,255,247,.35);
+  --shadow-glow-blue:0 8px 28px rgba(20,110,245,.35);
+
+  /* Borders */
+  --border-width:1px;                              /* @kind other */
+  --border-hair:1px solid var(--border-subtle);    /* @kind other */
+
+  /* Motion — restrained, professional (no bounce) */
+  --ease-standard:cubic-bezier(.2,0,.2,1);  /* @kind other */
+  --ease-out:cubic-bezier(.16,1,.3,1);      /* @kind other */
+  --dur-fast:120ms;                          /* @kind other */
+  --dur:200ms;                               /* @kind other */
+  --dur-slow:320ms;                          /* @kind other */
+}
+

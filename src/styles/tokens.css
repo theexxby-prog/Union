@@ -1,0 +1,154 @@
+/* Union — token layer
+   ---------------------------------------------------------------------------
+   Layering, from the bottom up:
+     1. Tailwind CSS 4 (the `@theme` block below is the whole config)
+     2. brand/dbsl-tokens.css — the client's official design tokens (binding)
+     3. Product UI extension — the playbook's palette + typefaces at PRODUCT scale,
+        plus the semantic states a data-dense portal needs and marketing does not.
+
+   Where this file and the playbook differ on SCALE, this file wins.
+   Where they differ on PALETTE, TYPEFACE, or NAMING, the playbook wins.
+   See docs/02-design-system.md.
+   --------------------------------------------------------------------------- */
+
+@import 'tailwindcss';
+
+/* Self-hosted variable fonts — no runtime Google Fonts link (hard rule 3). */
+@import '@fontsource-variable/montserrat';
+@import '@fontsource-variable/sora';
+
+/* The client's official tokens. Imported, not restated. */
+@import '../../brand/dbsl-tokens.css';
+
+/* ---------------------------------------------------------------------------
+   Product surface variables — the subset Union uses, at product scale.
+   docs/02-design-system.md · "Colors actually used".
+   --------------------------------------------------------------------------- */
+:root {
+  /* Font families: fontsource-variable registers the "…Variable" family names.
+     Fall back to the playbook's family names, then system, per hard rule 3. */
+  --font-display: 'Montserrat Variable', 'Montserrat', system-ui, sans-serif;
+  --font-heading: 'Sora Variable', 'Sora', system-ui, sans-serif;
+  --font-body: 'Sora Variable', 'Sora', system-ui, sans-serif;
+
+  /* Product surfaces */
+  --u-page: #ffffff;              /* portal page background is white, not soft grey */
+  --u-hairline: var(--grey-100);  /* #e7edf5 — divider everywhere */
+  --u-hero-fill: #eaf0f9;         /* hero card fill (product-specific) */
+  --u-hero-border: #dbe4f0;       /* hero card border (product-specific) */
+
+  /* Product text ramp */
+  --u-text-strong: var(--dbsl-navy);  /* #07111F — headlines / primary */
+  --u-text-body: var(--text-body);    /* #2b3644 */
+  --u-text-secondary: var(--grey-700);/* #4a5563 */
+  --u-text-muted: var(--grey-500);    /* #8a96a6 — labels */
+
+  /* Product accents (marketing colors are scoped OUT — see below) */
+  --u-accent: var(--dbsl-blue);   /* #146EF5 — progress, active tab, eyebrow */
+  --u-cta: var(--dbsl-red);       /* #B20101 — the one red CTA, "act" only */
+  --u-positive: var(--teal-600);  /* #2a847f */
+
+  /* Status pill fills — the closed set of four (docs/02) */
+  --u-good-fg: #2a847f;   --u-good-bg: #e6f2f1;
+  --u-need-fg: #0f57c9;   --u-need-bg: #e8f0fe;
+  --u-act-fg: #B20101;    --u-act-bg: #fbeaea;
+  --u-neu-fg: #4a5563;    --u-neu-bg: #f1f4f9;
+
+  /* Shape */
+  --u-radius-hero: 14px;
+  --u-radius-card: 12px;
+  --u-radius-pill: 999px;
+
+  /* Motion (restrained — docs/02 "Motion") */
+  --u-ease: cubic-bezier(.2, 0, .2, 1);
+}
+
+/* ---------------------------------------------------------------------------
+   Tailwind 4 theme. Exposes the product tokens as utilities (text-strong,
+   bg-hero, border-hairline, font-display, etc.). No tailwind.config.js exists.
+   --------------------------------------------------------------------------- */
+@theme {
+  --color-page: #ffffff;
+  --color-hairline: #e7edf5;
+  --color-hero-fill: #eaf0f9;
+  --color-hero-border: #dbe4f0;
+
+  --color-navy: #07111F;
+  --color-strong: #07111F;
+  --color-body: #2b3644;
+  --color-secondary: #4a5563;
+  --color-muted: #8a96a6;
+  --color-faint: #b6bfcc;   /* locked / disabled */
+
+  --color-accent: #146EF5;
+  --color-accent-strong: #0f57c9;
+  --color-cta: #B20101;
+  --color-positive: #2a847f;
+
+  --color-good-fg: #2a847f;   --color-good-bg: #e6f2f1;
+  --color-need-fg: #0f57c9;   --color-need-bg: #e8f0fe;
+  --color-act-fg: #B20101;    --color-act-bg: #fbeaea;
+  --color-neu-fg: #4a5563;    --color-neu-bg: #f1f4f9;
+
+  --font-display: 'Montserrat Variable', 'Montserrat', system-ui, sans-serif;
+  --font-body: 'Sora Variable', 'Sora', system-ui, sans-serif;
+
+  --radius-hero: 14px;
+  --radius-card: 12px;
+
+  --ease-standard: cubic-bezier(.2, 0, .2, 1);
+}
+
+/* ---------------------------------------------------------------------------
+   App root defaults.
+   --------------------------------------------------------------------------- */
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: #f6f8fb;                 /* the frame around the app card */
+  color: var(--u-text-body);
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.5;
+  /* Numeric columns align — docs/02 typography. */
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Montserrat is for numbers and headlines only. */
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+/* Links are never browser-blue (brand rule 5, setup checklist). */
+a {
+  color: var(--u-accent);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--u-accent-strong, #0f57c9);
+}
+
+/* Visible focus ring — Tech Blue with a soft halo (in-scope a11y). */
+:focus-visible {
+  outline: 2px solid var(--u-accent);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* Respect reduced motion (docs/02 "Motion"). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}

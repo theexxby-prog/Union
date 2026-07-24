@@ -1,0 +1,83 @@
+# CLAUDE.md — Union
+
+Read this first, then `docs/01-brief.md` through `docs/05-deploy.md`, then open
+`reference/screens.html` in a browser. The reference file is the visual target.
+Prose describes intent; the HTML shows the answer. When they disagree, the HTML wins.
+
+## What this is
+
+**Union** is a client-facing portal for **Datamatics Business Solutions (DBSL)**.
+A client logs in and sees everything they are running with DBSL in one place —
+data services, programmatic media, lead generation, documents, invoices.
+
+This is an **internal demo artifact**. It exists to be walked through in a room with
+the Unit CEO and the product team so they can react to it. It is not a production
+system and is not on a path to becoming one.
+
+**Therefore:**
+
+- All data is mock. Fixtures in the repo. No backend, no database, no API calls.
+- No authentication. No login form. No user accounts. No sessions.
+- No environment variables. No API keys. No secrets. If you find yourself wanting
+  a `.env`, you have misunderstood the scope.
+- No analytics, no telemetry, no error reporting services.
+- It must build with `npm run build` and deploy as a static site with zero config.
+
+## Hard rules
+
+1. **Never write "Datamatics" alone.** It is "Datamatics Business Solutions" or
+   "DBSL". This is a binding brand rule from the client's playbook. Applies to UI
+   copy, comments, README, everything.
+2. **Do not touch or reference the existing Pulse app.** Different product,
+   different repo, different design language. Union is built fresh. Do not import
+   Pulse components, do not copy its patterns, do not mention it in the codebase.
+3. **Typefaces are Montserrat and Sora only.** Never Inter, Roboto, Arial, Poppins,
+   or system-ui as a primary. Self-host via `@fontsource-variable/montserrat` and
+   `@fontsource-variable/sora`. No Google Fonts `<link>` at runtime.
+4. **All displayed numbers come from one fixtures module.** Never hardcode a number
+   in a component. See `docs/04-data-model.md` — this is the single most important
+   structural rule in the build. Three accounts across seven screens must stay
+   numerically consistent, and the only way that holds is derivation from one source.
+5. **No gradients, no drop shadows, no glassmorphism** in the product UI.
+6. **Electric Cyan and Electric Yellow are banned from the product UI.** They are
+   marketing colors. See `docs/02-design-system.md`.
+
+## Stack
+
+React 18 · TypeScript · Vite 6 · Tailwind CSS 4 · React Router 7
+
+Tailwind 4 uses CSS `@theme` — there is no `tailwind.config.js`. Do not create one.
+
+Path alias `@` resolves to `src/`.
+
+## Build order
+
+Work in this sequence. Do not skip ahead to screens before the token layer and
+fixtures are done — everything downstream depends on them.
+
+1. Scaffold: Vite + React + TS, Tailwind 4, React Router 7, fontsource packages
+2. Token layer: `src/styles/` — import `dbsl-tokens.css`, add the product extension
+3. Types + fixtures: `src/data/` — three accounts, fully populated
+4. Shell: chrome, tabs, account switcher, entitlement gating
+5. Screens in order: Overview → Leads → Documents → Invoices → Data → Media → Support
+6. Account picker entry screen
+7. `npm run build` clean, `tsc --noEmit` clean
+
+## Verification before you call it done
+
+- `npm run build` succeeds with no errors
+- `npx tsc --noEmit` passes
+- Every account renders every entitled screen without a crash
+- Switching accounts changes nav, hero copy, and every number on screen
+- No number appears in any `.tsx` file — grep for digits in components and justify
+  every hit
+- No occurrence of the word "Datamatics" that is not followed by "Business Solutions"
+- No `.env`, no API call, no `fetch()` to anything
+
+## Things that are not in scope
+
+Dark mode. Mobile layouts below 768px (desktop-first, graceful is enough).
+Internationalisation. Accessibility beyond sane semantics, visible focus rings, and
+alt text. Tests. Storybook. A component library.
+
+Do not add these. If a screen would be better with one, note it and move on.

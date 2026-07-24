@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Union — visual reference</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Sora:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+:root{
+  --navy:#07111F; --blue:#146EF5; --red:#B20101; --teal:#2a847f;
+  --body:#2b3644; --sec:#4a5563; --muted:#8a96a6;
+  --hair:#e7edf5; --hero:#eaf0f9; --heroline:#dbe4f0;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#f6f8fb;font-family:'Sora',sans-serif;color:var(--body);
+     font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+.page{max-width:1200px;margin:0 auto;padding:40px 24px 80px}
+.caption{font-size:13px;color:var(--muted);margin:44px 0 10px;font-weight:500}
+.caption:first-child{margin-top:0}
+.app{background:#fff;border:1px solid var(--hair);border-radius:16px;overflow:hidden}
+
+.n{font-family:'Montserrat',sans-serif;font-weight:700;letter-spacing:-.02em;color:var(--navy);margin:0}
+.eb{margin:0;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase}
+.eb-m{color:var(--muted)} .eb-b{color:var(--blue)}
+
+.chrome{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;border-bottom:1px solid var(--hair)}
+.mark{width:22px;height:22px;border-radius:5px;background:var(--red);color:#fff;
+      font-family:'Montserrat',sans-serif;font-weight:700;font-size:11px;
+      display:flex;align-items:center;justify-content:center}
+.brandrow{display:flex;align-items:center;gap:9px}
+.ctrl{display:flex;align-items:center;gap:14px}
+.acct{font-size:12.5px;color:var(--body);border:1px solid var(--hair);border-radius:999px;padding:6px 13px}
+.ic{font-size:17px;color:var(--muted)}
+.av{width:25px;height:25px;border-radius:999px;background:#F4F7FB;color:var(--sec);
+    font-size:10.5px;font-weight:600;display:flex;align-items:center;justify-content:center}
+
+.tabs{display:flex;gap:26px;padding:13px 28px 0;border-bottom:1px solid var(--hair)}
+.tab{font-size:13px;color:var(--muted);padding:0 0 11px;border-bottom:2px solid transparent}
+.tab.on{color:var(--navy);font-weight:500;border-bottom-color:var(--blue)}
+.tab.lock{color:#b6bfcc}
+
+.main{padding:26px 28px 30px}
+.hero{background:var(--hero);border:1px solid var(--heroline);border-radius:14px;padding:22px 26px;margin-bottom:26px}
+.hero h1{margin:10px 0 0;font-family:'Montserrat',sans-serif;font-weight:700;
+         letter-spacing:-.02em;color:var(--navy);font-size:29px;line-height:1.15}
+.hero p{margin:7px 0 17px;font-size:13.5px;color:var(--sec)}
+.acts{display:flex;gap:9px}
+.cta{font-size:12px;font-weight:600;color:#fff;background:var(--red);border-radius:999px;padding:7px 17px}
+.pill{font-size:12px;color:var(--body);background:#fff;border:1px solid var(--heroline);border-radius:999px;padding:7px 14px}
+
+.grid{display:grid;gap:1px;background:var(--hair);border:1px solid var(--hair);border-radius:12px;overflow:hidden}
+.g4{grid-template-columns:repeat(4,1fr)} .g3{grid-template-columns:repeat(3,1fr)}
+.cell{background:#fff;padding:16px 18px}
+.cellhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px}
+.svc{font-size:13px;font-weight:500;color:var(--navy)}
+.pct{font-size:12px;color:var(--muted)}
+.big{font-size:26px;line-height:1.1}
+.sub{margin:4px 0 13px;font-size:12px;color:var(--muted)}
+.bar{height:2px;background:var(--hair)}
+.bar i{display:block;height:100%;background:var(--blue)}
+.qual{margin:11px 0 0;font-size:12px;color:var(--sec)}
+.met{font-size:22px;margin-top:7px}
+
+.st{font-size:11px;font-weight:600;border-radius:999px;padding:3px 10px;white-space:nowrap}
+.st.good{color:var(--teal);background:#e6f2f1}
+.st.need{color:#0f57c9;background:#e8f0fe}
+.st.act{color:var(--red);background:#fbeaea}
+.st.neu{color:var(--sec);background:#f1f4f9}
+
+.rows{margin-top:2px}
+.tr{display:flex;align-items:center;padding:13px 0;border-top:1px solid var(--hair)}
+.tr.head{border-top:none}
+.c-main{flex:1;min-width:0}
+.c-main p{margin:0;font-size:13px;color:var(--navy)}
+.c-main p+p{margin-top:3px;font-size:12px;color:var(--muted)}
+.cw{font-size:12.5px;color:var(--sec)}
+.sechead{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+
+.jc{border:1px solid var(--hair);border-radius:12px;padding:18px 20px;margin-bottom:28px}
+.jchead{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:18px}
+.phases{display:flex;gap:7px}
+.ph{flex:1}
+.ph i{display:block;height:2px;margin-bottom:8px;background:var(--hair)}
+.ph span{font-size:11.5px;color:var(--muted)}
+.ph.done i{background:var(--blue)} .ph.done span{color:var(--navy)}
+.ph.now i{background:var(--red)} .ph.now span{color:var(--red);font-weight:600}
+
+.chart{display:flex;align-items:flex-end;gap:8px;height:88px}
+.chart i{flex:1;background:var(--blue);border-radius:2px 2px 0 0}
+.chart i.part{background:#dde4ee}
+.axis{display:flex;justify-content:space-between;margin:10px 0 28px;font-size:12px;color:var(--muted)}
+
+.total{display:flex;align-items:center;padding:16px 0 0;border-top:1px solid var(--navy)}
+.locked{display:flex;align-items:center;gap:14px;margin-top:20px;padding-top:16px;border-top:1px solid var(--hair)}
+.locked p{margin:0;flex:1;font-size:12.5px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- ══════════════ 1 · OVERVIEW ══════════════ -->
+<p class="caption">1 · Overview — full programme account</p>
+<div class="app">
+  <div class="chrome">
+    <div class="brandrow"><span class="mark">D</span><span class="n" style="font-size:15px">Union</span></div>
+    <div class="ctrl">
+      <span class="acct">Acme Corp <i class="ti ti-chevron-down" style="font-size:12px;color:var(--muted)"></i></span>
+      <i class="ti ti-bell ic"></i><i class="ti ti-settings ic"></i><span class="av">JC</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <span class="tab on">Overview</span><span class="tab">Data</span><span class="tab">Media</span>
+    <span class="tab">Leads</span><span class="tab">Documents</span><span class="tab">Invoices</span><span class="tab">Support</span>
+  </div>
+  <div class="main">
+    <div class="hero">
+      <p class="eb eb-b">Your programme · Q3 2026</p>
+      <h1>$58,400 invested, tracking to plan</h1>
+      <p>Four services running. Lead generation is behind pace.</p>
+      <div class="acts"><span class="cta">View report</span><span class="pill">2 invoices open</span><span class="pill">1 signature due</span></div>
+    </div>
+
+    <p class="eb eb-m" style="margin-bottom:12px">Services</p>
+    <div class="grid g4">
+      <div class="cell">
+        <div class="cellhead"><span class="svc">iData</span><span class="pct">77%</span></div>
+        <p class="n big">38,400</p><p class="sub">of 50,000 records delivered</p>
+        <div class="bar"><i style="width:77%"></i></div>
+        <p class="qual">Field fill 94% · Match 71%</p>
+      </div>
+      <div class="cell">
+        <div class="cellhead"><span class="svc">CleanRich</span><span class="pct">94%</span></div>
+        <p class="n big">47,200</p><p class="sub">of 50,000 records processed</p>
+        <div class="bar"><i style="width:94%"></i></div>
+        <p class="qual">Corrected 12% · Deduped 6%</p>
+      </div>
+      <div class="cell">
+        <div class="cellhead"><span class="svc">Programmatic</span><span class="pct">52%</span></div>
+        <p class="n big">2.1M</p><p class="sub">$41,200 of $80,000 spent</p>
+        <div class="bar"><i style="width:52%"></i></div>
+        <p class="qual">Viewability 68% · CTR 0.34%</p>
+      </div>
+      <div class="cell">
+        <div class="cellhead"><span class="svc">Lead generation</span><span class="st act">Behind pace</span></div>
+        <p class="n big">96</p><p class="sub">of 500 billable leads</p>
+        <div class="bar"><i style="width:19%"></i></div>
+        <p class="qual">165 delivered · Accept 58%</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ 2 · LEADS ══════════════ -->
+<p class="caption">2 · Leads — data table screen</p>
+<div class="app">
+  <div class="chrome">
+    <div class="brandrow"><span class="mark">D</span><span class="n" style="font-size:15px">Union</span></div>
+    <div class="ctrl">
+      <span class="acct">Acme Corp <i class="ti ti-chevron-down" style="font-size:12px;color:var(--muted)"></i></span>
+      <i class="ti ti-bell ic"></i><i class="ti ti-settings ic"></i><span class="av">JC</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <span class="tab">Overview</span><span class="tab">Data</span><span class="tab">Media</span>
+    <span class="tab on">Leads</span><span class="tab">Documents</span><span class="tab">Invoices</span><span class="tab">Support</span>
+  </div>
+  <div class="main">
+    <div class="hero">
+      <p class="eb eb-b">Lead generation · Q3 2026</p>
+      <h1>96 billable leads of 500</h1>
+      <p>165 delivered to date. 12 are awaiting your review and may change this count.</p>
+      <div class="acts"><span class="cta">Review 12 leads</span><span class="pill">Download CSV</span><span class="pill">Push to Salesforce</span></div>
+    </div>
+
+    <div class="grid g4" style="margin-bottom:28px">
+      <div class="cell"><p class="eb eb-m">Delivered</p><p class="n met">165</p></div>
+      <div class="cell"><p class="eb eb-m">Billable</p><p class="n met">96</p></div>
+      <div class="cell"><p class="eb eb-m">Accept rate</p><p class="n met" style="color:var(--teal)">58%</p></div>
+      <div class="cell"><p class="eb eb-m">Cost per lead</p><p class="n met">$45</p></div>
+    </div>
+
+    <div class="sechead">
+      <p class="eb eb-m">Recent leads</p>
+      <span class="acct" style="font-size:12px">All campaigns <i class="ti ti-chevron-down" style="font-size:11px;color:var(--muted)"></i></span>
+    </div>
+    <div class="rows">
+      <div class="tr head">
+        <span class="eb eb-m c-main">Contact</span>
+        <span class="eb eb-m" style="width:200px">Campaign</span>
+        <span class="eb eb-m" style="width:80px">Date</span>
+        <span class="eb eb-m" style="width:110px;text-align:right">Status</span>
+      </div>
+      <div class="tr"><div class="c-main"><p>Marcus Reeve</p><p>VP Infrastructure · Halden Logistics</p></div>
+        <span class="cw" style="width:200px">Cloud security</span><span class="cw" style="width:80px;color:var(--muted)">22 Jul</span>
+        <span style="width:110px;text-align:right"><span class="st good">Accepted</span></span></div>
+      <div class="tr"><div class="c-main"><p>Priya Nandakumar</p><p>Head of Data · Corvus Retail Group</p></div>
+        <span class="cw" style="width:200px">Data platform guide</span><span class="cw" style="width:80px;color:var(--muted)">22 Jul</span>
+        <span style="width:110px;text-align:right"><span class="st good">Accepted</span></span></div>
+      <div class="tr"><div class="c-main"><p>Daniel Okonjo</p><p>IT Director · Meridian Health</p></div>
+        <span class="cw" style="width:200px">Cloud security</span><span class="cw" style="width:80px;color:var(--muted)">21 Jul</span>
+        <span style="width:110px;text-align:right"><span class="st need">Your review</span></span></div>
+      <div class="tr"><div class="c-main"><p>Sofia Bergqvist</p><p>CTO · Nordvik Manufacturing</p></div>
+        <span class="cw" style="width:200px">Infrastructure survey</span><span class="cw" style="width:80px;color:var(--muted)">21 Jul</span>
+        <span style="width:110px;text-align:right"><span class="st need">Your review</span></span></div>
+      <div class="tr"><div class="c-main"><p>Tom Alderidge</p><p>Ops Manager · Fenwick Supply</p></div>
+        <span class="cw" style="width:200px">Data platform guide</span><span class="cw" style="width:80px;color:var(--muted)">20 Jul</span>
+        <span style="width:110px;text-align:right"><span class="st good">Accepted</span></span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ 3 · DOCUMENTS ══════════════ -->
+<p class="caption">3 · Documents — workflow screen. Note the phase strip replacing the progress rule.</p>
+<div class="app">
+  <div class="chrome">
+    <div class="brandrow"><span class="mark">D</span><span class="n" style="font-size:15px">Union</span></div>
+    <div class="ctrl">
+      <span class="acct">Acme Corp <i class="ti ti-chevron-down" style="font-size:12px;color:var(--muted)"></i></span>
+      <i class="ti ti-bell ic"></i><i class="ti ti-settings ic"></i><span class="av">JC</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <span class="tab">Overview</span><span class="tab">Data</span><span class="tab">Media</span><span class="tab">Leads</span>
+    <span class="tab on">Documents</span><span class="tab">Invoices</span><span class="tab">Support</span>
+  </div>
+  <div class="main">
+    <div class="hero">
+      <p class="eb eb-b">Documents</p>
+      <h1>One document needs your signature</h1>
+      <p>Everything else on your account is signed and current.</p>
+      <div class="acts"><span class="cta">Sign JC-2841</span><span class="pill">Download archive</span></div>
+    </div>
+
+    <p class="eb eb-m" style="margin-bottom:10px">Awaiting you</p>
+    <div class="jc">
+      <div class="jchead">
+        <div>
+          <p style="margin:0;font-size:14px;font-weight:500;color:var(--navy)">JC-2841 · Cloud security syndication, NAM</p>
+          <p style="margin:4px 0 0;font-size:12.5px;color:var(--sec)">180 leads at $45 · $8,100 · scope agreed 18 July</p>
+        </div>
+        <span class="st act">Awaiting signature</span>
+      </div>
+      <div class="phases">
+        <div class="ph done"><i></i><span>Scoped</span></div>
+        <div class="ph done"><i></i><span>Verified</span></div>
+        <div class="ph done"><i></i><span>Confirmed</span></div>
+        <div class="ph now"><i></i><span>Signature</span></div>
+        <div class="ph"><i></i><span>Signed</span></div>
+      </div>
+    </div>
+
+    <p class="eb eb-m">All documents</p>
+    <div class="rows">
+      <div class="tr head">
+        <span class="eb eb-m c-main">Document</span>
+        <span class="eb eb-m" style="width:100px">Value</span>
+        <span class="eb eb-m" style="width:80px">Date</span>
+        <span class="eb eb-m" style="width:130px;text-align:right">Status</span>
+      </div>
+      <div class="tr"><div class="c-main"><p>JC-2841 · Cloud security, NAM</p><p>Job card</p></div>
+        <span class="cw" style="width:100px">$8,100</span><span class="cw" style="width:80px;color:var(--muted)">18 Jul</span>
+        <span style="width:130px;text-align:right"><span class="st act">Awaiting you</span></span></div>
+      <div class="tr"><div class="c-main"><p>JC-2798 · Data platform guide, EMEA</p><p>Job card</p></div>
+        <span class="cw" style="width:100px">$6,300</span><span class="cw" style="width:80px;color:var(--muted)">2 Jul</span>
+        <span style="width:130px;text-align:right"><span class="st good">Signed</span></span></div>
+      <div class="tr"><div class="c-main"><p>JC-2765 · Audience build, global</p><p>Job card</p></div>
+        <span class="cw" style="width:100px">$21,000</span><span class="cw" style="width:80px;color:var(--muted)">14 Jun</span>
+        <span style="width:130px;text-align:right"><span class="st neu">MSA covered</span></span></div>
+      <div class="tr"><div class="c-main"><p>Master services agreement</p><p>Contract · expires Mar 2027</p></div>
+        <span class="cw" style="width:100px;color:var(--muted)">—</span><span class="cw" style="width:80px;color:var(--muted)">3 Mar</span>
+        <span style="width:130px;text-align:right"><span class="st good">Signed</span></span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ 4 · INVOICES ══════════════ -->
+<p class="caption">4 · Invoices — one bill, one line per service</p>
+<div class="app">
+  <div class="chrome">
+    <div class="brandrow"><span class="mark">D</span><span class="n" style="font-size:15px">Union</span></div>
+    <div class="ctrl">
+      <span class="acct">Acme Corp <i class="ti ti-chevron-down" style="font-size:12px;color:var(--muted)"></i></span>
+      <i class="ti ti-bell ic"></i><i class="ti ti-settings ic"></i><span class="av">JC</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <span class="tab">Overview</span><span class="tab">Data</span><span class="tab">Media</span>
+    <span class="tab">Leads</span><span class="tab">Documents</span><span class="tab on">Invoices</span><span class="tab">Support</span>
+  </div>
+  <div class="main">
+    <div class="hero">
+      <p class="eb eb-b">Accounts payable</p>
+      <h1>$18,420 due</h1>
+      <p>One invoice overdue by four days. Next invoice issues 1 September.</p>
+      <div class="acts"><span class="cta">Pay invoice</span><span class="pill">Download PDF</span><span class="pill">Payment history</span></div>
+    </div>
+
+    <div class="sechead" style="margin-bottom:2px">
+      <p class="eb eb-m">INV-0192 · August 2026</p><span class="st act">Overdue</span>
+    </div>
+    <p style="margin:8px 0 4px;font-size:12px;color:var(--muted)">Issued 1 Aug · Due 20 Aug · Net 20</p>
+
+    <div class="rows" style="margin-bottom:30px">
+      <div class="tr"><div class="c-main"><p>iData · records delivered</p><p>12,400 records at $0.42</p></div>
+        <span style="font-size:13px;font-weight:500;color:var(--navy)">$5,208</span></div>
+      <div class="tr"><div class="c-main"><p>CleanRich · records processed</p><p>18,900 records at $0.11</p></div>
+        <span style="font-size:13px;font-weight:500;color:var(--navy)">$2,079</span></div>
+      <div class="tr"><div class="c-main"><p>Programmatic · media spend</p><p>742,000 impressions</p></div>
+        <span style="font-size:13px;font-weight:500;color:var(--navy)">$8,793</span></div>
+      <div class="tr"><div class="c-main"><p>Lead generation · billable leads</p><p>52 billable of 89 delivered, at $45</p></div>
+        <span style="font-size:13px;font-weight:500;color:var(--navy)">$2,340</span></div>
+      <div class="total"><span style="flex:1;font-size:13px;font-weight:500;color:var(--navy)">Total due</span>
+        <span class="n" style="font-size:23px">$18,420</span></div>
+    </div>
+
+    <p class="eb eb-m">History</p>
+    <div class="rows">
+      <div class="tr"><span class="cw c-main">INV-0181 · July 2026</span>
+        <span class="cw" style="width:110px;text-align:right;color:var(--navy)">$21,860</span>
+        <span class="cw" style="width:80px;text-align:right;color:var(--teal)">Paid</span></div>
+      <div class="tr"><span class="cw c-main">INV-0174 · June 2026</span>
+        <span class="cw" style="width:110px;text-align:right;color:var(--navy)">$18,120</span>
+        <span class="cw" style="width:80px;text-align:right;color:var(--teal)">Paid</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ 5 · DEGRADED SHELL ══════════════ -->
+<p class="caption">5 · Same shell, single-service account. Locked tabs, no holes left where services would be.</p>
+<div class="app">
+  <div class="chrome">
+    <div class="brandrow"><span class="mark">D</span><span class="n" style="font-size:15px">Union</span></div>
+    <div class="ctrl">
+      <span class="acct">Northwind Trading <i class="ti ti-chevron-down" style="font-size:12px;color:var(--muted)"></i></span>
+      <i class="ti ti-bell ic"></i><i class="ti ti-settings ic"></i><span class="av">RS</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <span class="tab on">Overview</span>
+    <span class="tab lock">Data <i class="ti ti-lock" style="font-size:11px"></i></span>
+    <span class="tab lock">Media <i class="ti ti-lock" style="font-size:11px"></i></span>
+    <span class="tab">Leads</span><span class="tab">Documents</span><span class="tab">Invoices</span><span class="tab">Support</span>
+  </div>
+  <div class="main">
+    <div class="hero">
+      <p class="eb eb-b">Content syndication · Q3 2026</p>
+      <h1>312 of 400 leads accepted</h1>
+      <p>On pace to complete by 12 September.</p>
+      <div class="acts"><span class="cta">Download leads</span><span class="pill">3 campaigns live</span><span class="pill">All invoices settled</span></div>
+    </div>
+
+    <div class="grid g3" style="margin-bottom:28px">
+      <div class="cell"><p class="eb eb-m">Accept rate</p><p class="n met" style="color:var(--teal)">66%</p></div>
+      <div class="cell"><p class="eb eb-m">Cost per lead</p><p class="n met">$45</p></div>
+      <div class="cell"><p class="eb eb-m">Days remaining</p><p class="n met">50</p></div>
+    </div>
+
+    <p class="eb eb-m" style="margin-bottom:2px">Campaigns</p>
+    <div class="rows">
+      <div class="tr"><div class="c-main"><p>Cloud security whitepaper · NAM</p><p>148 of 180 accepted · 214 delivered</p></div>
+        <span style="width:150px"><span class="bar"><i style="width:82%"></i></span></span>
+        <span class="cw" style="width:50px;text-align:right">82%</span></div>
+      <div class="tr"><div class="c-main"><p>Data platform buyers guide · EMEA</p><p>109 of 140 accepted · 168 delivered</p></div>
+        <span style="width:150px"><span class="bar"><i style="width:78%"></i></span></span>
+        <span class="cw" style="width:50px;text-align:right">78%</span></div>
+      <div class="tr"><div class="c-main"><p>Infrastructure survey · APAC</p><p>55 of 80 accepted · 91 delivered</p></div>
+        <span style="width:150px"><span class="bar"><i style="width:69%"></i></span></span>
+        <span class="cw" style="width:50px;text-align:right">69%</span></div>
+    </div>
+
+    <div class="locked">
+      <i class="ti ti-lock ic" style="font-size:15px"></i>
+      <p>Programmatic and audience data are available on your account.</p>
+      <span class="pill" style="color:var(--blue);border-color:var(--hair)">Learn more</span>
+    </div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>
