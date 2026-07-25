@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Bubbler</title>
+<style>
+  :root {
+    --bg: #101114;
+    --surface: #1a1c21;
+    --surface-2: #23262d;
+    --line: #2e323b;
+    --text: #e8e9ec;
+    --text-dim: #9aa0ab;
+    --film: linear-gradient(120deg, #7dd8ff, #b79bff 45%, #ff9ecf 80%, #ffd0a3);
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    height: 100dvh;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: calc(env(safe-area-inset-top) + 10px) 16px 10px;
+    flex: 0 0 auto;
+  }
+  .brand { display: flex; align-items: center; gap: 9px; font-weight: 700; letter-spacing: 0.2px; font-size: 17px; }
+  .brand .dot {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--film);
+    box-shadow: inset -2px -3px 5px rgba(0,0,0,.35), inset 2px 2px 4px rgba(255,255,255,.5);
+  }
+  .header-actions { display: flex; gap: 8px; }
+
+  button {
+    font: inherit;
+    color: var(--text);
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 9px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    transition: opacity .15s, transform .05s;
+  }
+  button:active { transform: scale(.97); }
+  button:disabled { opacity: .35; pointer-events: none; }
+  button.primary {
+    background: var(--film);
+    color: #14161a;
+    border: none;
+  }
+  button.ghost { background: transparent; border-color: transparent; color: var(--text-dim); }
+  button.danger { color: #ff8f8f; }
+
+  #stage {
+    flex: 1 1 auto;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 8px;
+    min-height: 0;
+  }
+  #canvas {
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 10px;
+    touch-action: none;
+    box-shadow: 0 6px 30px rgba(0,0,0,.45);
+    display: none;
+  }
+
+  /* Empty state */
+  #empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    text-align: center;
+    padding: 24px;
+  }
+  #empty .bubbles { display: flex; gap: 10px; }
+  #empty .bubbles span {
+    border-radius: 50%;
+    background: var(--film);
+    opacity: .9;
+    box-shadow: inset -3px -4px 8px rgba(0,0,0,.3), inset 3px 3px 6px rgba(255,255,255,.5);
+    animation: float 3.2s ease-in-out infinite;
+  }
+  #empty .bubbles span:nth-child(1) { width: 34px; height: 34px; }
+  #empty .bubbles span:nth-child(2) { width: 54px; height: 54px; animation-delay: .5s; }
+  #empty .bubbles span:nth-child(3) { width: 26px; height: 26px; animation-delay: 1s; }
+  @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+  @media (prefers-reduced-motion: reduce) { #empty .bubbles span { animation: none; } }
+  #empty h1 { font-size: 22px; font-weight: 700; }
+  #empty p { color: var(--text-dim); font-size: 14px; max-width: 300px; line-height: 1.5; }
+
+  /* Toolbar */
+  #toolbar {
+    flex: 0 0 auto;
+    background: var(--surface);
+    border-top: 1px solid var(--line);
+    padding: 12px 16px calc(env(safe-area-inset-bottom) + 12px);
+    display: none;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .row { display: flex; align-items: center; gap: 10px; }
+  .row.wrap { flex-wrap: wrap; }
+  .label { font-size: 12px; color: var(--text-dim); font-weight: 600; min-width: 52px; }
+
+  input[type="range"] {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--line);
+    outline: none;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: var(--film);
+    box-shadow: inset -2px -2px 4px rgba(0,0,0,.3), 0 1px 4px rgba(0,0,0,.4);
+    cursor: pointer;
+  }
+
+  .swatches { display: flex; gap: 8px; flex: 1; }
+  .swatch {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    border: 2px solid var(--line);
+    cursor: pointer;
+    flex: 0 0 auto;
+    position: relative;
+  }
+  .swatch.sel { border-color: #7dd8ff; box-shadow: 0 0 0 2px rgba(125,216,255,.35); }
+  .swatch[data-style="black"] { background: #000; }
+  .swatch[data-style="white"] { background: #fff; }
+  .swatch[data-style="blur"] {
+    background:
+      radial-gradient(circle at 30% 30%, #6b8, transparent 55%),
+      radial-gradient(circle at 70% 60%, #48c, transparent 55%),
+      radial-gradient(circle at 50% 80%, #c67, transparent 55%),
+      #333;
+    filter: blur(0px);
+  }
+  .swatch[data-style="blur"]::after {
+    content: "";
+    position: absolute; inset: 0;
+    border-radius: 50%;
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+  }
+  .swatch input { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+
+  #hint {
+    position: absolute;
+    left: 50%; top: 14px;
+    transform: translateX(-50%);
+    background: rgba(20,22,26,.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--line);
+    color: var(--text-dim);
+    font-size: 13px;
+    padding: 8px 14px;
+    border-radius: 20px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .3s;
+    white-space: nowrap;
+  }
+  #hint.show { opacity: 1; }
+
+  #fileInput { display: none; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand"><span class="dot"></span>Bubbler</div>
+  <div class="header-actions">
+    <button id="newBtn" class="ghost" style="display:none">New photo</button>
+    <button id="saveBtn" class="primary" style="display:none">Save image</button>
+  </div>
+</header>
+
+<div id="stage">
+  <div id="empty">
+    <div class="bubbles"><span></span><span></span><span></span></div>
+    <h1>Bubble a photo</h1>
+    <p>Pick a photo, cover it with a mask, then tap anywhere to punch see-through bubbles into it.</p>
+    <button class="primary" id="pickBtn">Choose photo</button>
+  </div>
+  <canvas id="canvas"></canvas>
+  <div id="hint"></div>
+</div>
+
+<div id="toolbar">
+  <div class="row">
+    <span class="label">Mask</span>
+    <div class="swatches">
+      <div class="swatch sel" data-style="black" title="Black"></div>
+      <div class="swatch" data-style="white" title="White"></div>
+      <div class="swatch" data-style="blur" title="Blur"></div>
+      <div class="swatch" data-style="custom" title="Custom color" style="background:#e63946">
+        <input type="color" id="customColor" value="#e63946">
+      </div>
+    </div>
+    <span class="label" style="min-width:auto">Opacity</span>
+    <input type="range" id="opacity" min="30" max="100" value="100" style="max-width:110px">
+  </div>
+  <div class="row">
+    <span class="label">Bubble</span>
+    <input type="range" id="size" min="2" max="30" value="9">
+    <button id="undoBtn" class="ghost">Undo</button>
+    <button id="deleteBtn" class="ghost danger" disabled>Delete</button>
+  </div>
+</div>
+
+<input type="file" id="fileInput" accept="image/*">
+
+<script>
+(() => {
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  const fileInput = document.getElementById('fileInput');
+  const stage = document.getElementById('stage');
+  const empty = document.getElementById('empty');
+  const toolbar = document.getElementById('toolbar');
+  const hint = document.getElementById('hint');
+
+  const pickBtn = document.getElementById('pickBtn');
+  const newBtn = document.getElementById('newBtn');
+  const saveBtn = document.getElementById('saveBtn');
+  const undoBtn = document.getElementById('undoBtn');
+  const deleteBtn = document.getElementById('deleteBtn');
+  const opacityEl = document.getElementById('opacity');
+  const sizeEl = document.getElementById('size');
+  const customColorEl = document.getElementById('customColor');
+
+  const MAX_DIM = 4096;
+
+  let img = null;              // HTMLImageElement, decoded
+  let iw = 0, ih = 0;          // working (image-space) dimensions
+  let circles = [];            // {x, y, r} in image space
+  let selected = -1;
+  let maskStyle = 'black';     // black | white | blur | custom
+  let customColor = '#e63946';
+  let maskOpacity = 1;
+  let history = [];
+  let blurCache = null;        // offscreen canvas of blurred image
+
+  // ---------- Load ----------
+  pickBtn.addEventListener('click', () => fileInput.click());
+  newBtn.addEventListener('click', () => fileInput.click());
+
+  fileInput.addEventListener('change', () => {
+    const file = fileInput.files && fileInput.files[0];
+    if (!file) return;
+
+    // Data URLs work everywhere, including sandboxed previews where
+    // blob: image sources are blocked by CSP.
+    const reader = new FileReader();
+    reader.onload = () => {
+      const el = new Image();
+      el.onload = () => setImage(el);
+      el.onerror = () => loadViaBlob(file); // fallback path
+      el.src = reader.result;
+    };
+    reader.onerror = () => loadViaBlob(file);
+    reader.readAsDataURL(file);
+    fileInput.value = '';
+  });
+
+  function loadViaBlob(file) {
+    const url = URL.createObjectURL(file);
+    const el = new Image();
+    el.onload = () => { URL.revokeObjectURL(url); setImage(el); };
+    el.onerror = () => {
+      URL.revokeObjectURL(url);
+      showHint("Couldn't decode that image — if it's HEIC, convert to JPG first");
+    };
+    el.src = url;
+  }
+
+  function setImage(el) {
+    img = el;
+    const scale = Math.min(1, MAX_DIM / Math.max(el.naturalWidth, el.naturalHeight));
+    iw = Math.round(el.naturalWidth * scale);
+    ih = Math.round(el.naturalHeight * scale);
+    canvas.width = iw;
+    canvas.height = ih;
+    circles = [];
+    selected = -1;
+    history = [];
+    blurCache = null;
+    empty.style.display = 'none';
+    canvas.style.display = 'block';
+    toolbar.style.display = 'flex';
+    newBtn.style.display = '';
+    saveBtn.style.display = '';
+    updateButtons();
+    draw();
+    showHint('Tap the photo to add a bubble');
+  }
+
+  // ---------- Drawing ----------
+  function getBlurred() {
+    if (blurCache) return blurCache;
+    const off = document.createElement('canvas');
+    off.width = iw; off.height = ih;
+    const octx = off.getContext('2d');
+    const blurPx = Math.max(12, Math.round(Math.max(iw, ih) / 45));
+
+    // ctx.filter isn't supported in older Safari — probe it
+    octx.filter = 'blur(1px)';
+    const filterOK = octx.filter === 'blur(1px)';
+    octx.filter = 'none';
+
+    if (filterOK) {
+      octx.filter = `blur(${blurPx}px)`;
+      const pad = blurPx * 2; // oversize to hide edge vignette
+      octx.drawImage(img, -pad, -pad, iw + pad * 2, ih + pad * 2);
+      octx.filter = 'none';
+    } else {
+      // Fallback: heavy downscale -> upscale approximates a blur
+      const tiny = document.createElement('canvas');
+      const f = 24;
+      tiny.width = Math.max(2, Math.round(iw / f));
+      tiny.height = Math.max(2, Math.round(ih / f));
+      const tctx = tiny.getContext('2d');
+      tctx.drawImage(img, 0, 0, tiny.width, tiny.height);
+      octx.imageSmoothingEnabled = true;
+      octx.imageSmoothingQuality = 'high';
+      octx.drawImage(tiny, 0, 0, iw, ih);
+    }
+    blurCache = off;
+    return off;
+  }
+
+  function draw(forExport = false) {
+    const c = forExport ? document.createElement('canvas') : canvas;
+    if (forExport) { c.width = iw; c.height = ih; }
+    const x = c.getContext('2d');
+
+    // 1. photo
+    x.clearRect(0, 0, iw, ih);
+    x.drawImage(img, 0, 0, iw, ih);
+
+    // 2. mask with bubble holes (even-odd fill punches the circles out)
+    x.save();
+    x.globalAlpha = maskOpacity;
+    const path = new Path2D();
+    path.rect(0, 0, iw, ih);
+    for (const b of circles) {
+      path.moveTo(b.x + b.r, b.y);
+      path.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+    }
+    if (maskStyle === 'blur') {
+      x.clip(path, 'evenodd');
+      x.drawImage(getBlurred(), 0, 0);
+    } else {
+      x.fillStyle = maskStyle === 'white' ? '#ffffff'
+                  : maskStyle === 'custom' ? customColor
+                  : '#000000';
+      x.fill(path, 'evenodd');
+    }
+    x.restore();
+
+    // 3. selection ring (screen only, never exported)
+    if (!forExport && selected >= 0 && circles[selected]) {
+      const b = circles[selected];
+      x.save();
+      x.strokeStyle = 'rgba(125,216,255,.95)';
+      x.setLineDash([8, 7]);
+      x.lineWidth = Math.max(2, iw / 400);
+      x.beginPath();
+      x.arc(b.x, b.y, b.r + x.lineWidth, 0, Math.PI * 2);
+      x.stroke();
+      x.restore();
+    }
+    return c;
+  }
+
+  // ---------- Coordinates ----------
+  function toImage(e) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: (e.clientX - rect.left) * (iw / rect.width),
+      y: (e.clientY - rect.top) * (ih / rect.height)
+    };
+  }
+  function hit(p) {
+    // topmost first
+    for (let i = circles.length - 1; i >= 0; i--) {
+      const b = circles[i];
+      const grab = Math.max(b.r, iw * 0.02); // easy to grab tiny bubbles
+      if (Math.hypot(p.x - b.x, p.y - b.y) <= grab) return i;
+    }
+    return -1;
+  }
+  function defaultRadius() {
+    return (parseInt(sizeEl.value, 10) / 100) * Math.min(iw, ih);
+  }
+
+  // ---------- History ----------
+  function snapshot() {
+    history.push(JSON.stringify(circles));
+    if (history.length > 60) history.shift();
+    updateButtons();
+  }
+  function undo() {
+    if (!history.length) return;
+    circles = JSON.parse(history.pop());
+    selected = -1;
+    updateButtons();
+    draw();
+  }
+  function updateButtons() {
+    undoBtn.disabled = history.length === 0;
+    deleteBtn.disabled = selected < 0;
+  }
+
+  // ---------- Pointer interaction ----------
+  const pointers = new Map(); // pointerId -> {x,y}
+  let dragIdx = -1;
+  let dragOff = { x: 0, y: 0 };
+  let moved = false;
+  let pinchStartDist = 0;
+  let pinchStartR = 0;
+  let pinchIdx = -1;
+  let snapTaken = false;
+
+  canvas.addEventListener('pointerdown', (e) => {
+    canvas.setPointerCapture(e.pointerId);
+    const p = toImage(e);
+    pointers.set(e.pointerId, p);
+    moved = false;
+    snapTaken = false;
+
+    if (pointers.size === 2) {
+      // pinch resize on the circle that pinch centers on (or the drag target / selected)
+      const pts = [...pointers.values()];
+      pinchStartDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+      const cx = (pts[0].x + pts[1].x) / 2, cy = (pts[0].y + pts[1].y) / 2;
+      pinchIdx = dragIdx >= 0 ? dragIdx : hit({ x: cx, y: cy });
+      if (pinchIdx < 0) pinchIdx = selected;
+      if (pinchIdx >= 0) {
+        pinchStartR = circles[pinchIdx].r;
+        if (!snapTaken) { snapshot(); snapTaken = true; }
+      }
+      dragIdx = -1;
+      return;
+    }
+
+    const i = hit(p);
+    if (i >= 0) {
+      dragIdx = i;
+      selected = i;
+      dragOff.x = circles[i].x - p.x;
+      dragOff.y = circles[i].y - p.y;
+    } else {
+      dragIdx = -1;
+    }
+    updateButtons();
+    draw();
+  });
+
+  canvas.addEventListener('pointermove', (e) => {
+    if (!pointers.has(e.pointerId)) return;
+    const p = toImage(e);
+    const prev = pointers.get(e.pointerId);
+    if (Math.hypot(p.x - prev.x, p.y - prev.y) > iw * 0.004) moved = true;
+    pointers.set(e.pointerId, p);
+
+    if (pointers.size === 2 && pinchIdx >= 0) {
+      const pts = [...pointers.values()];
+      const d = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+      const r = Math.max(iw * 0.008, pinchStartR * (d / pinchStartDist));
+      circles[pinchIdx].r = Math.min(r, Math.max(iw, ih));
+      selected = pinchIdx;
+      draw();
+      return;
+    }
+
+    if (dragIdx >= 0 && moved) {
+      if (!snapTaken) { snapshot(); snapTaken = true; }
+      circles[dragIdx].x = p.x + dragOff.x;
+      circles[dragIdx].y = p.y + dragOff.y;
+      draw();
+    }
+  });
+
+  function endPointer(e) {
+    if (!pointers.has(e.pointerId)) return;
+    const p = pointers.get(e.pointerId);
+    pointers.delete(e.pointerId);
+
+    if (pointers.size > 0) { pinchIdx = -1; return; }
+
+    if (pinchIdx >= 0) { pinchIdx = -1; return; }
+
+    if (dragIdx < 0 && !moved) {
+      // tap on empty area -> add bubble
+      snapshot();
+      circles.push({ x: p.x, y: p.y, r: defaultRadius() });
+      selected = circles.length - 1;
+      updateButtons();
+      draw();
+    }
+    dragIdx = -1;
+  }
+  canvas.addEventListener('pointerup', endPointer);
+  canvas.addEventListener('pointercancel', endPointer);
+
+  // ---------- Controls ----------
+  document.querySelectorAll('.swatch').forEach(sw => {
+    sw.addEventListener('click', () => {
+      document.querySelectorAll('.swatch').forEach(s => s.classList.remove('sel'));
+      sw.classList.add('sel');
+      maskStyle = sw.dataset.style;
+      draw();
+    });
+  });
+  customColorEl.addEventListener('input', (e) => {
+    customColor = e.target.value;
+    e.target.parentElement.style.background = customColor;
+    maskStyle = 'custom';
+    document.querySelectorAll('.swatch').forEach(s => s.classList.remove('sel'));
+    e.target.parentElement.classList.add('sel');
+    draw();
+  });
+
+  opacityEl.addEventListener('input', () => {
+    maskOpacity = parseInt(opacityEl.value, 10) / 100;
+    draw();
+  });
+
+  sizeEl.addEventListener('input', () => {
+    if (selected >= 0 && circles[selected]) {
+      circles[selected].r = defaultRadius();
+      draw();
+    }
+  });
+  sizeEl.addEventListener('pointerdown', () => {
+    if (selected >= 0) snapshot();
+  });
+
+  deleteBtn.addEventListener('click', () => {
+    if (selected < 0) return;
+    snapshot();
+    circles.splice(selected, 1);
+    selected = -1;
+    updateButtons();
+    draw();
+  });
+
+  undoBtn.addEventListener('click', undo);
+
+  window.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'z') { e.preventDefault(); undo(); }
+    if ((e.key === 'Backspace' || e.key === 'Delete') && selected >= 0) {
+      e.preventDefault();
+      deleteBtn.click();
+    }
+  });
+
+  // ---------- Save / Share ----------
+  saveBtn.addEventListener('click', async () => {
+    const wasSelected = selected;
+    selected = -1;
+    const out = draw(true);
+    selected = wasSelected;
+    draw();
+
+    out.toBlob(async (blob) => {
+      if (!blob) { showHint('Export failed — try a smaller photo'); return; }
+      const file = new File([blob], 'bubbled.png', { type: 'image/png' });
+      // Prefer the native share sheet on mobile so "Save Image" -> Photos works
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try { await navigator.share({ files: [file] }); return; }
+        catch (err) { if (err && err.name === 'AbortError') return; }
+      }
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'bubbled.png';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    }, 'image/png');
+  });
+
+  // ---------- Hint ----------
+  let hintTimer;
+  function showHint(msg) {
+    hint.textContent = msg;
+    hint.classList.add('show');
+    clearTimeout(hintTimer);
+    hintTimer = setTimeout(() => hint.classList.remove('show'), 2600);
+  }
+})();
+</script>
+</body>
+</html>
