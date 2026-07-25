@@ -81,3 +81,14 @@ Internationalisation. Accessibility beyond sane semantics, visible focus rings, 
 alt text. Tests. Storybook. A component library.
 
 Do not add these. If a screen would be better with one, note it and move on.
+
+## Queued for next build (user-approved, do not start unprompted)
+
+**Surface treatment "Option A — soft grey canvas", approved 24 Jul 2026:**
+apply across ALL screens: the main content area inside the app card moves from
+white to brand Soft Grey `#F4F7FB` (`--dbsl-grey-soft`); content sections sit on
+white surfaces — the services/hairline grids keep white cells, and loose
+row-lists (attention strip, tables like recent leads / documents / batch
+deliveries) get wrapped in white rounded-card containers so white reads as
+"content", not "background". Hero card, navy total rule, pills, and all other
+tokens unchanged. Chrome/tabs stay white (navy chrome Option B was NOT chosen).
