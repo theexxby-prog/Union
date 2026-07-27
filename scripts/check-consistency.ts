@@ -68,6 +68,26 @@ for (const acc of accounts) {
     check(`${sid} delivered batches = received (${svc.received})`, delivered === svc.received, `${delivered}`);
   }
 
+  // Every batch carries a sortKey, and a delivered batch never post-dates a
+  // scheduled one. The Data timeline sorts on this: fixtures group batches by
+  // service, so array order is not chronological and reading it as a timeline
+  // showed the dates running backwards.
+  if (acc.batches.length > 0) {
+    check(
+      'every batch has a sortKey',
+      acc.batches.every((b) => Number.isInteger(b.sortKey) && b.sortKey > 20000000),
+      `${acc.batches.length} batches`,
+    );
+    const chron = [...acc.batches].sort((a, b) => a.sortKey - b.sortKey);
+    const lastDelivered = chron.filter((b) => b.status === 'good').at(-1);
+    const firstScheduled = chron.find((b) => b.status === 'neutral');
+    check(
+      'delivered batches all precede scheduled ones',
+      !lastDelivered || !firstScheduled || lastDelivered.sortKey < firstScheduled.sortKey,
+      `${lastDelivered?.date} → ${firstScheduled?.date}`,
+    );
+  }
+
   // Media: daily rows and channel rows must both reconcile to the headline
   // figures — the same guarantee the live reporting API will have to meet.
   if (acc.media) {

@@ -87,7 +87,7 @@ export default function Media() {
             { label: 'Media investment', value: money(media.investment) },
             { label: 'Viewability', value: media.viewability },
             { label: 'Accounts reached', value: compact(media.accountsReached) },
-            { label: 'Accounts engaged', value: int(media.accountsEngaged), positive: true },
+            { label: 'Accounts engaged', value: int(media.accountsEngaged), positive: true, primary: true },
           ]}
         />
       </Section>
@@ -184,8 +184,8 @@ export default function Media() {
           <Section title="Channel mix" className="mb-0 lg:mb-0">
             <TableHead>
               <Eyebrow className="flex-1">Channel</Eyebrow>
-              <Eyebrow className="w-[220px]">Share of delivery</Eyebrow>
-              <Eyebrow className="w-[140px] text-right">Impressions</Eyebrow>
+              <Eyebrow className="w-[260px]">Share of delivery</Eyebrow>
+              <Eyebrow className="w-[180px] text-right">Impressions</Eyebrow>
             </TableHead>
             {media.channels.map((c) => {
               const share = pctValue(c.impressions, media.impressions);
@@ -193,13 +193,13 @@ export default function Media() {
               return (
                 <Row key={c.name}>
                   <span className="min-w-0 flex-1 text-[15.5px] text-strong">{c.name}</span>
-                  <span className="flex w-[220px] items-center gap-[12px]">
+                  <span className="flex w-[260px] items-center gap-[14px]">
                     <span className="flex-1">
                       <ProgressRule value={relative} />
                     </span>
-                    <span className="w-[42px] text-right text-[13.5px] text-muted">{share}%</span>
+                    <span className="w-[46px] text-right text-[13.5px] tabular-nums text-muted">{share}%</span>
                   </span>
-                  <span className="w-[140px] text-right text-[14.5px] text-secondary">{int(c.impressions)}</span>
+                  <span className="w-[180px] text-right text-[14.5px] text-secondary">{int(c.impressions)}</span>
                 </Row>
               );
             })}
@@ -226,9 +226,9 @@ export default function Media() {
       <Section title="Account engagement">
         <TableHead>
           <Eyebrow className="flex-1">Account</Eyebrow>
-          <Eyebrow className="w-[150px] text-right">Impressions</Eyebrow>
-          <Eyebrow className="w-[120px] pl-[20px]">Last seen</Eyebrow>
-          <Eyebrow className="w-[150px] text-right">Engagement</Eyebrow>
+          <Eyebrow className="w-[200px] text-right">Impressions</Eyebrow>
+          <Eyebrow className="w-[160px] pl-[24px]">Last seen</Eyebrow>
+          <Eyebrow className="w-[180px] text-right">Engagement</Eyebrow>
         </TableHead>
         {media.engagedAccounts.length === 0 ? (
           <EmptyLine>Engaged accounts will appear here as the flight delivers.</EmptyLine>
@@ -236,16 +236,19 @@ export default function Media() {
           media.engagedAccounts.map((a) => (
             <Row key={a.name}>
               <div className="min-w-0 flex-1">
-                <p className="text-[15.5px] text-strong">{a.name}</p>
+                <p className="max-w-[520px] text-[15.5px] text-strong">{a.name}</p>
                 <p className="mt-[5px] text-[13.5px] text-muted">
                   {a.industry}
                   {a.becameLead && ' · became a lead'}
                 </p>
               </div>
-              <span className="w-[150px] text-right text-[14.5px] text-secondary">{int(a.impressions)}</span>
-              <span className="w-[120px] pl-[20px] text-[14.5px] text-muted">{a.lastActivity}</span>
-              <span className="w-[150px] text-right">
-                <StatusPill state={LEVEL[a.level].state}>{LEVEL[a.level].label}</StatusPill>
+              <span className="w-[200px] text-right text-[14.5px] text-secondary">{int(a.impressions)}</span>
+              <span className="w-[160px] pl-[24px] text-[14.5px] text-muted">{a.lastActivity}</span>
+              <span className="w-[180px] text-right">
+                {/* Medium/low are the expected states; High is the news. */}
+                <StatusPill state={LEVEL[a.level].state} quiet={a.level !== 'high'}>
+                  {LEVEL[a.level].label}
+                </StatusPill>
               </span>
             </Row>
           ))

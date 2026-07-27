@@ -21,7 +21,10 @@ Import `brand/dbsl-tokens.css` and use its variables. This is the subset Union u
 
 | Purpose | Value | Token |
 |---|---|---|
-| Page background | `#ffffff` | — |
+| Page canvas | `#f4f7fb` | `--dbsl-grey-soft` |
+| Section card | `#ffffff` | — |
+| Row hover | `#eaeef6` | product-specific |
+| Table header band | `#e3e9f3` | product-specific |
 | Hairline / divider | `#e7edf5` | `--grey-100` |
 | Hero card fill | `#eaf0f9` | product-specific |
 | Hero card border | `#dbe4f0` | product-specific |
@@ -93,10 +96,45 @@ of these.
 | **Action** | Overdue, behind pace, at risk | `#B20101` | `#fbeaea` |
 | **Neutral** | Informational, no action implied | `#4a5563` | `#f1f4f9` |
 
-11px, weight 600, `border-radius: 999px`, padding `2px 9px`.
+13px, weight 600, `border-radius: 999px`, padding `5px 13px`.
 
 Implement as a single `<StatusPill state="good|needsYou|action|neutral">` component.
 Nothing else in the app renders a pill-shaped status.
+
+### The quiet variant
+
+`<StatusPill quiet>` drops the chip and keeps the colour. Use it for the
+**expected** state in a dense table: five identical "Delivered" chips in a column
+make the one "Scheduled" harder to find, not easier. The exception keeps its chip
+and wins the column outright. The closed set of four is unchanged — this is a
+rendering of a state, not a fifth state.
+
+In use: Data and report batch rows (Delivered quiet, Scheduled chipped), campaign
+drop schedules, and Media account engagement (Medium/Low quiet, High chipped).
+
+## Marks — one form per question
+
+Three marks look superficially similar and answer different questions. They must
+not be confusable.
+
+| Mark | Question | Form |
+|---|---|---|
+| `ProgressRule` | how full? | one continuous 3px track, accent blue on hairline |
+| `PhaseStrip` | which stage? | 7px capsules, 14px gaps; done = teal, current = blue, waiting on you = red |
+| `PaceBars` | how much, when? | column chart, muted fill for future periods |
+
+`ProgressRule` is deliberately the thinnest mark in the product: the number it
+sits under is the point, not the bar. On service cards the percentage sits beside
+the rule rather than in the card header — it gives the bar a value to be, and it
+keeps the header free so cards with a status pill and cards without still share
+a baseline.
+
+## Metric strip ranking
+
+A tile flagged `primary` takes the hero fill and a 40px number instead of 34px.
+Exactly one per strip, and only where the screen genuinely has a headline figure
+(Media → accounts engaged; Leads → billable). Without a rank, four tiles at
+identical weight shout equally and the eye has nowhere to land first.
 
 ## Shape
 
@@ -111,7 +149,9 @@ Amended 27 Jul 2026, replacing the original 1200px centred column.
 
 - **Chrome and tabs are full-bleed** and sticky: white bar, hairline underneath,
   spanning the whole viewport. Tabs sit at 16px with 40px gaps so the nav reads as
-  a row of destinations rather than a cluster.
+  a row of destinations rather than a cluster. **Locked tabs sort to the end** —
+  they are the upsell surface, and sitting mid-row they interrupted the scan
+  across the destinations you can actually reach.
 - **Content runs to `max-width: 1560px`** with 32px side padding, centred. On a
   1680px display this leaves a thin gutter instead of the dead third the old
   1200px column produced.
@@ -143,8 +183,10 @@ It carries no bottom border — the first row's own `border-t` supplies that. It
 assumes it is the first child of a Section body; its negative top margin cancels
 the card's padding.
 
-The band is lighter than the row hover tint (`#eaeef6`), so a header never reads
-as a hovered row.
+The band fill is **`#e3e9f3`, darker than both the canvas (`#f4f7fb`) and the row
+hover tint (`#eaeef6`)**. It has to be darker than the canvas: the band meets the
+card's top edge, so a fill at canvas value disappears into the grey immediately
+outside the card. Darker than the hover tint too, so the two never trade places.
 
 ## Layout primitives
 
@@ -249,6 +291,18 @@ Secondary surfaces (white pill buttons) hover to the page tint `#f4f7fb`
 Fades and short slides, 120–320ms, `cubic-bezier(.2,0,.2,1)`. No bounce, no spring.
 Used for tab changes, account switches, and hover tints. Respect
 `prefers-reduced-motion`.
+
+## Say it once
+
+The most common legibility failure in this product is not density, it is
+repetition. A hero that states a number, a metric strip that restates it, and a
+card that restates it again give the eye three equal candidates and no answer.
+
+The hero carries the **sentence**. Everything below it carries facts the sentence
+does not. Concretely: the Media hero no longer restates spend, budget or pace —
+the strip and the pacing card both carry those — and the Data service cards no
+longer carry a quality line, because the Quality strip directly beneath them is
+the same two figures at four times the size.
 
 ## Voice
 

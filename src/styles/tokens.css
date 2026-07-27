@@ -37,6 +37,7 @@
   --u-hero-fill: #eaf0f9;         /* hero card fill (product-specific) */
   --u-hero-border: #dbe4f0;       /* hero card border (product-specific) */
   --u-row-hover: #eaeef6;         /* pointer-over tint on rows and menu items */
+  --u-table-head: #e3e9f3;        /* column-header band — darker than canvas AND hover */
 
   /* Product text ramp */
   --u-text-strong: var(--dbsl-navy);  /* #07111F — headlines / primary */
@@ -76,6 +77,9 @@
   /* One hover tint for every pointer-over surface — rows, menu items, cards.
      It is a clear step down from white; the old #fafbfd was invisible. */
   --color-row-hover: #eaeef6;
+  /* Column-header band. Must be darker than BOTH the canvas (#f4f7fb) and the
+     hover tint, or the band disappears where it meets the grey behind the card. */
+  --color-table-head: #e3e9f3;
 
   --color-navy: #07111F;
   --color-strong: #07111F;

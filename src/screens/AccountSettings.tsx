@@ -61,14 +61,14 @@ export default function AccountSettings() {
       <Section title="People">
         <TableHead>
           <Eyebrow className="flex-1">Name</Eyebrow>
-          <Eyebrow className="w-[320px]">Email</Eyebrow>
-          <Eyebrow className="w-[180px] text-right">Role</Eyebrow>
+          <Eyebrow className="w-[420px]">Email</Eyebrow>
+          <Eyebrow className="w-[220px] text-right">Role</Eyebrow>
         </TableHead>
         {account.team.map((m) => (
           <Row key={m.email}>
             <span className="min-w-0 flex-1 text-[15.5px] text-strong">{m.name}</span>
-            <span className="w-[320px] text-[14.5px] text-secondary">{m.email}</span>
-            <span className="w-[180px] text-right text-[14.5px] text-muted">{m.role}</span>
+            <span className="w-[420px] text-[14.5px] text-secondary">{m.email}</span>
+            <span className="w-[220px] text-right text-[14.5px] text-muted">{m.role}</span>
           </Row>
         ))}
       </Section>

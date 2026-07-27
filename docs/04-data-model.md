@@ -65,9 +65,11 @@ export interface Lead {
 
 export interface Batch {
   id: string;
+  serviceId: 'idata' | 'cleanrich';
   name: string;
   records: number;
   date: string;
+  sortKey: number;         // 20260702 — see note below
   status: StatusState;
   statusLabel: string;
 }
@@ -253,4 +255,13 @@ Leads, Media tabs locked. Documents and Invoices populated normally.
 - Accept rate == billable / delivered
 - Campaign accepted totals == the leads service `received` figure
 - Batch record counts == the data service `received` figures
+- Every batch carries a `sortKey`, and delivered batches all precede scheduled ones
 - No literal number in any `.tsx` file
+
+**Batches are authored grouped by service and displayed chronologically.**
+Array order is `idata` b1–b3 then `cleanrich` b1–b2, which is the right shape to
+write and the wrong one to read: the Data screen's timeline rendered it in array
+order and the dates ran 2 Jul, 18 Jul, 1 Aug, 5 Jul. `batchesByDate()` in
+`accounts.ts` is the single chronological view; Data and the programme report
+both read it, and the reconciliation gate asserts the sort keys exist and that no
+delivered batch post-dates a scheduled one.

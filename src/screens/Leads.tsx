@@ -170,7 +170,7 @@ export default function Leads() {
   const liveBillable = ls.billable + acceptedNow;
   const liveMetrics: MetricTile[] = [
     { label: 'Delivered', value: int(ls.delivered) },
-    { label: 'Billable', value: int(liveBillable) },
+    { label: 'Billable', value: int(liveBillable), primary: true },
     { label: 'Accept rate', value: pct(liveBillable, ls.delivered), positive: true },
     { label: 'Cost per lead', value: money(ls.costPerLead) },
   ];
@@ -257,9 +257,9 @@ export default function Leads() {
       >
         <TableHead>
           <Eyebrow className="flex-1">Contact</Eyebrow>
-          <Eyebrow className="w-[240px]">Campaign</Eyebrow>
-          <Eyebrow className="w-[100px]">Date</Eyebrow>
-          <Eyebrow className="w-[140px] text-right">Status</Eyebrow>
+          <Eyebrow className="w-[300px]">Campaign</Eyebrow>
+          <Eyebrow className="w-[140px] pl-[24px]">Date</Eyebrow>
+          <Eyebrow className="w-[180px] text-right">Status</Eyebrow>
         </TableHead>
         {rows.length === 0 ? (
           <div className="-mx-[26px] border-t border-hairline px-[26px]">
@@ -292,16 +292,16 @@ export default function Leads() {
                   title={reviewable ? 'Open to review this lead' : undefined}
                 >
                   <div className="min-w-0 flex-1">
-                    <p className="text-[15.5px] text-strong">{l.name}</p>
+                    <p className="max-w-[520px] text-[15.5px] text-strong">{l.name}</p>
                     <p className="mt-[4px] text-[14px] text-muted">
                       {l.title} · {l.company}
                     </p>
                   </div>
-                  <span className="w-[240px] text-[14.5px] text-secondary">
+                  <span className="w-[300px] text-[14.5px] text-secondary">
                     {campaignById.get(l.campaignId)?.name}
                   </span>
-                  <span className="w-[100px] text-[14.5px] text-muted">{l.date}</span>
-                  <span className="w-[140px] text-right">
+                  <span className="w-[140px] pl-[24px] text-[14.5px] text-muted">{l.date}</span>
+                  <span className="w-[180px] text-right">
                     {status === 'accepted' ? (
                       <StatusPill state="good">Accepted</StatusPill>
                     ) : (

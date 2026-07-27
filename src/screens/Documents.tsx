@@ -69,9 +69,9 @@ export default function Documents() {
       <Section title="All documents">
         <TableHead>
           <Eyebrow className="flex-1">Document</Eyebrow>
-          <Eyebrow className="w-[130px]">Value</Eyebrow>
-          <Eyebrow className="w-[100px]">Date</Eyebrow>
-          <Eyebrow className="w-[160px] text-right">Status</Eyebrow>
+          <Eyebrow className="w-[180px] text-right">Value</Eyebrow>
+          <Eyebrow className="w-[150px] pl-[24px]">Date</Eyebrow>
+          <Eyebrow className="w-[200px] text-right">Status</Eyebrow>
         </TableHead>
         {account.documents.map((d) => {
           const status = rowStatus(d);
@@ -85,7 +85,7 @@ export default function Documents() {
                 title="Show workflow status"
               >
                 <div className="min-w-0 flex-1">
-                  <p className="flex items-center gap-[7px] text-[15.5px] text-strong">
+                  <p className="flex max-w-[620px] items-center gap-[7px] text-[15.5px] text-strong">
                     {d.id === 'MSA' ? d.title : `${d.id} · ${d.title}`}
                     <IconChevronDown
                       size={14}
@@ -95,11 +95,13 @@ export default function Documents() {
                   </p>
                   <p className="mt-[4px] text-[14px] text-muted">{d.kindDetail ?? d.kind}</p>
                 </div>
-                <span className={`w-[130px] text-[14.5px] ${d.value === null ? 'text-muted' : 'text-secondary'}`}>
+                <span
+                  className={`w-[180px] text-right text-[14.5px] ${d.value === null ? 'text-muted' : 'text-secondary'}`}
+                >
                   {d.value === null ? '—' : money(d.value)}
                 </span>
-                <span className="w-[100px] text-[14.5px] text-muted">{d.date}</span>
-                <span className="w-[160px] text-right">
+                <span className="w-[150px] pl-[24px] text-[14.5px] text-muted">{d.date}</span>
+                <span className="w-[200px] text-right">
                   <StatusPill state={status.state}>{status.label}</StatusPill>
                 </span>
               </button>

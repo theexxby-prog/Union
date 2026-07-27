@@ -6,9 +6,10 @@
 //
 // Reconciliation is enforced by scripts/check-consistency.ts (run in `npm run verify`).
 
-import { int, money, pct } from './format';
+import { int, money, pct, words } from './format';
 import type {
   Account,
+  Batch,
   Campaign,
   DailyDelivery,
   DeliveryDrop,
@@ -35,6 +36,12 @@ export const ACCOUNT_NAMES = {
 // ---------------------------------------------------------------------------
 
 const sum = (ns: number[]): number => ns.reduce((a, b) => a + b, 0);
+
+/** Fixtures group batches by service, which is right for authoring and wrong for
+ *  reading: in array order the dates run 2 Jul, 18 Jul, 1 Aug, 5 Jul. Every
+ *  screen that shows batches reads this chronological view instead. */
+export const batchesByDate = (batches: Batch[]): Batch[] =>
+  [...batches].sort((x, y) => x.sortKey - y.sortKey);
 
 /** Invoice total is summed from its lines — never stored (docs/04). */
 export const invoiceTotal = (inv: Invoice): number => sum(inv.lines.map((l) => l.amount));
@@ -327,11 +334,11 @@ function buildAcme(): Account {
       { id: 'l5', name: 'Tom Alderidge', title: 'Ops Manager', company: 'Fenwick Supply', campaignId: 'dp', date: '20 Jul', status: 'accepted' },
     ],
     batches: [
-      { id: 'b1', serviceId: 'idata', name: 'Account universe — batch 1', records: 20000, date: '2 Jul', status: 'good', statusLabel: 'Delivered' },
-      { id: 'b2', serviceId: 'idata', name: 'Account universe — batch 2', records: 18400, date: '18 Jul', status: 'good', statusLabel: 'Delivered' },
-      { id: 'b3', serviceId: 'idata', name: 'Account universe — batch 3', records: 11600, date: '1 Aug', status: 'neutral', statusLabel: 'Scheduled' },
-      { id: 'b4', serviceId: 'cleanrich', name: 'Enrichment pass — batch 1', records: 25000, date: '5 Jul', status: 'good', statusLabel: 'Delivered' },
-      { id: 'b5', serviceId: 'cleanrich', name: 'Enrichment pass — batch 2', records: 22200, date: '19 Jul', status: 'good', statusLabel: 'Delivered' },
+      { id: 'b1', serviceId: 'idata', name: 'Account universe — batch 1', records: 20000, date: '2 Jul', sortKey: 20260702, status: 'good', statusLabel: 'Delivered' },
+      { id: 'b2', serviceId: 'idata', name: 'Account universe — batch 2', records: 18400, date: '18 Jul', sortKey: 20260718, status: 'good', statusLabel: 'Delivered' },
+      { id: 'b3', serviceId: 'idata', name: 'Account universe — batch 3', records: 11600, date: '1 Aug', sortKey: 20260801, status: 'neutral', statusLabel: 'Scheduled' },
+      { id: 'b4', serviceId: 'cleanrich', name: 'Enrichment pass — batch 1', records: 25000, date: '5 Jul', sortKey: 20260705, status: 'good', statusLabel: 'Delivered' },
+      { id: 'b5', serviceId: 'cleanrich', name: 'Enrichment pass — batch 2', records: 22200, date: '19 Jul', sortKey: 20260719, status: 'good', statusLabel: 'Delivered' },
     ],
     media: buildMedia(impressions, spend, budget),
     documents: [
@@ -378,13 +385,16 @@ function buildAcme(): Account {
           { label: '4 batches delivered', kind: 'pill' },
         ],
       },
+      // The subhead deliberately does NOT restate spend, budget or pace: the
+      // metric strip and the pacing card both carry those within one screenful,
+      // and saying a number three ways gives the eye nowhere to land.
       media: {
         eyebrow: 'Programmatic · Q3 2026',
         headline: `${int(impressions)} impressions delivered`,
-        subhead: `${money(spend)} of ${money(budget)} invested, flight ${pct(spend, budget)} complete and on pace.`,
+        subhead: `Running against your enriched account universe across ${words(MEDIA_CHANNELS.length)} channels. Flight closes 30 September.`,
         actions: [
           { label: 'View media report', kind: 'cta', to: 'report' },
-          { label: '1,840 accounts engaged', kind: 'pill' },
+          { label: 'See the leads it produced', kind: 'pill', to: 'leads' },
         ],
       },
       leads: {
@@ -644,11 +654,11 @@ function buildCalderwood(): Account {
     deliveryTimeline: [],
     leads: [],
     batches: [
-      { id: 'b1', serviceId: 'idata', name: 'Q3 universe build — batch 1', records: 12000, date: '10 Jul', status: 'good', statusLabel: 'Delivered' },
-      { id: 'b2', serviceId: 'idata', name: 'Q3 universe build — batch 2', records: 12000, date: '24 Jul', status: 'good', statusLabel: 'Delivered' },
-      { id: 'b3', serviceId: 'idata', name: 'Q3 universe build — batch 3', records: 6000, date: '4 Aug', status: 'neutral', statusLabel: 'Scheduled' },
-      { id: 'b4', serviceId: 'cleanrich', name: 'Enrichment pass — batch 1', records: 14500, date: '12 Jul', status: 'good', statusLabel: 'Delivered' },
-      { id: 'b5', serviceId: 'cleanrich', name: 'Enrichment pass — batch 2', records: 14000, date: '24 Jul', status: 'good', statusLabel: 'Delivered' },
+      { id: 'b1', serviceId: 'idata', name: 'Q3 universe build — batch 1', records: 12000, date: '10 Jul', sortKey: 20260710, status: 'good', statusLabel: 'Delivered' },
+      { id: 'b2', serviceId: 'idata', name: 'Q3 universe build — batch 2', records: 12000, date: '24 Jul', sortKey: 20260724, status: 'good', statusLabel: 'Delivered' },
+      { id: 'b3', serviceId: 'idata', name: 'Q3 universe build — batch 3', records: 6000, date: '4 Aug', sortKey: 20260804, status: 'neutral', statusLabel: 'Scheduled' },
+      { id: 'b4', serviceId: 'cleanrich', name: 'Enrichment pass — batch 1', records: 14500, date: '12 Jul', sortKey: 20260712, status: 'good', statusLabel: 'Delivered' },
+      { id: 'b5', serviceId: 'cleanrich', name: 'Enrichment pass — batch 2', records: 14000, date: '24 Jul', sortKey: 20260724, status: 'good', statusLabel: 'Delivered' },
     ],
     faWorkstreams: [
       { id: 'f1', name: 'AP invoice processing', detail: '1,240 invoices processed this quarter · 3-way match', status: 'neutral', statusLabel: 'Active' },
@@ -1001,11 +1011,11 @@ function buildHarbor(): Account {
       { id: 'l5', name: 'Dev Sharma', title: 'IT Procurement', company: 'Cascade Manufacturing', campaignId: 'mi', date: '19 Jul', status: 'review' },
     ],
     batches: [
-      { id: 'b1', serviceId: 'idata', name: 'Account universe — batch 1', records: 9000, date: '8 Jul', status: 'good', statusLabel: 'Delivered' },
-      { id: 'b2', serviceId: 'idata', name: 'Account universe — batch 2', records: 9000, date: '22 Jul', status: 'good', statusLabel: 'Delivered' },
-      { id: 'b3', serviceId: 'idata', name: 'Account universe — batch 3', records: 6000, date: '5 Aug', status: 'neutral', statusLabel: 'Scheduled' },
-      { id: 'b4', serviceId: 'cleanrich', name: 'Enrichment pass — batch 1', records: 11000, date: '10 Jul', status: 'good', statusLabel: 'Delivered' },
-      { id: 'b5', serviceId: 'cleanrich', name: 'Enrichment pass — batch 2', records: 10000, date: '24 Jul', status: 'good', statusLabel: 'Delivered' },
+      { id: 'b1', serviceId: 'idata', name: 'Account universe — batch 1', records: 9000, date: '8 Jul', sortKey: 20260708, status: 'good', statusLabel: 'Delivered' },
+      { id: 'b2', serviceId: 'idata', name: 'Account universe — batch 2', records: 9000, date: '22 Jul', sortKey: 20260722, status: 'good', statusLabel: 'Delivered' },
+      { id: 'b3', serviceId: 'idata', name: 'Account universe — batch 3', records: 6000, date: '5 Aug', sortKey: 20260805, status: 'neutral', statusLabel: 'Scheduled' },
+      { id: 'b4', serviceId: 'cleanrich', name: 'Enrichment pass — batch 1', records: 11000, date: '10 Jul', sortKey: 20260710, status: 'good', statusLabel: 'Delivered' },
+      { id: 'b5', serviceId: 'cleanrich', name: 'Enrichment pass — batch 2', records: 10000, date: '24 Jul', sortKey: 20260724, status: 'good', statusLabel: 'Delivered' },
     ],
     studies: [
       { id: 's1', name: 'Manufacturing buyer sentiment', geo: 'NAM', method: 'Online survey · n=320', stage: 3, detail: '320 respondents · 91% completion', due: 'Delivered 30 Jun' },

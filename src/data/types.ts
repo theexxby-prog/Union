@@ -64,6 +64,9 @@ export interface MetricTile {
   value: string;
   /** Renders in the positive/teal colour (e.g. accept rate). */
   positive?: boolean;
+  /** The one tile the screen is about — takes a tinted ground and a larger
+   *  number so the strip has a rank instead of four equal shouts. */
+  primary?: boolean;
 }
 
 /** Client-facing campaign state. Internal pipeline stages never surface (docs/02). */
@@ -125,6 +128,9 @@ export interface Batch {
   name: string;
   records: number;
   date: string;
+  /** Sort key (e.g. 20260702) — the timeline is chronological across services,
+   *  so it cannot rely on the fixture's service-grouped array order. */
+  sortKey: number;
   /** 'good' = Delivered (counts toward received) · 'neutral' = Scheduled (future). */
   status: StatusState;
   statusLabel: string;

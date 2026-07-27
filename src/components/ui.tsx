@@ -143,17 +143,27 @@ export function Hero({ hero }: { hero: HeroData }) {
 }
 
 /* ---- Service card (shared by Overview + Data) ------------------------- */
-export function ServiceCard({ s, className = '' }: { s: Service; className?: string }) {
+/* The header row is a FIXED height. Some cards carry a status pill there and
+   some do not; without a reserved height the pill pushes its card's big number
+   down and the row of numbers stops sharing a baseline.
+   The percentage sits with the rule it describes rather than in the header, so
+   the bar reads as a value rather than as decoration. */
+export function ServiceCard({
+  s,
+  showQuality = true,
+  className = '',
+}: {
+  s: Service;
+  /** Off where the screen already carries the quality figures in their own strip. */
+  showQuality?: boolean;
+  className?: string;
+}) {
   const pace = pctValue(s.received, s.target);
   return (
     <div className={`bg-white px-[24px] py-[22px] ${className}`}>
-      <div className="mb-[14px] flex items-center justify-between gap-[10px]">
+      <div className="mb-[14px] flex h-[30px] items-center justify-between gap-[10px]">
         <span className="text-[15px] font-medium text-strong">{s.name}</span>
-        {s.status ? (
-          <StatusPill state={s.status}>{s.statusLabel}</StatusPill>
-        ) : (
-          <span className="text-[14px] text-muted">{pace}%</span>
-        )}
+        {s.status && <StatusPill state={s.status}>{s.statusLabel}</StatusPill>}
       </div>
       <p className="font-display text-[33px] font-bold leading-[1.05] text-strong">
         {s.headline ?? int(s.received)}
@@ -161,8 +171,13 @@ export function ServiceCard({ s, className = '' }: { s: Service; className?: str
       <p className="mb-[16px] mt-[6px] text-[14px] text-muted">
         {s.subline ?? `of ${int(s.target)} ${s.unit}`}
       </p>
-      <ProgressRule value={pace} />
-      <p className="mt-[14px] text-[14px] text-secondary">{s.qualityLine}</p>
+      <div className="flex items-center gap-[12px]">
+        <span className="flex-1">
+          <ProgressRule value={pace} />
+        </span>
+        <span className="text-[13.5px] tabular-nums text-secondary">{pace}%</span>
+      </div>
+      {showQuality && <p className="mt-[14px] text-[14px] text-secondary">{s.qualityLine}</p>}
     </div>
   );
 }
@@ -189,7 +204,9 @@ export function PaceBars({
   );
 }
 
-/* ---- Progress rule ---------------------------------------------------- */
+/* ---- Progress rule — QUANTITY ("how full") ---------------------------- */
+/* A single continuous 3px track. Deliberately the thinnest mark in the product:
+   the number it sits under is the point, not the bar. */
 export function ProgressRule({ value }: { value: number }) {
   return (
     <div className="h-[3px] w-full rounded-full bg-hairline">
@@ -201,7 +218,12 @@ export function ProgressRule({ value }: { value: number }) {
   );
 }
 
-/* ---- Phase strip (workflow stages in the progress-rule slot) ---------- */
+/* ---- Phase strip — SEQUENCE ("which stage") --------------------------- */
+/* Must not read as a progress rule: it answers a different question. So it is
+   chunky 7px capsules with wide gaps, where the rule is a thin continuous
+   track. Completed stages take the positive teal — a finished stage is a good
+   state, not a quantity — leaving accent blue to mean "in progress" and red to
+   mean "waiting on you". */
 export function PhaseStrip({
   phase,
   needsClient,
@@ -212,28 +234,28 @@ export function PhaseStrip({
   labels?: readonly string[];
 }) {
   return (
-    <div className="flex gap-[8px]">
+    <div className="flex gap-[14px]">
       {labels.map((label, i) => {
         const done = i < phase;
         const current = i === phase;
         const currentIsAction = current && needsClient;
         const bar = done
-          ? 'bg-accent'
+          ? 'bg-positive'
           : currentIsAction
             ? 'bg-cta'
             : current
               ? 'bg-accent'
               : 'bg-hairline';
         const text = done
-          ? 'text-strong'
+          ? 'text-secondary'
           : currentIsAction
             ? 'text-cta font-semibold'
             : current
-              ? 'text-strong'
+              ? 'font-medium text-strong'
               : 'text-muted';
         return (
           <div key={label} className="flex-1">
-            <div className={`mb-[10px] h-[3px] rounded-full ${bar}`} />
+            <div className={`mb-[10px] h-[7px] rounded-full ${bar}`} />
             <span className={`text-[13.5px] ${text}`}>{label}</span>
           </div>
         );
@@ -267,16 +289,19 @@ export function Cell({ className = '', children }: { className?: string; childre
 }
 
 /* ---- Metric strip ----------------------------------------------------- */
+/* A tile flagged `primary` takes the hero fill and a larger number, so the strip
+   has a rank. Without one, four tiles at identical weight all shout equally and
+   the eye has nowhere to land first. */
 export function MetricStrip({ metrics }: { metrics: MetricTile[] }) {
   return (
     <HairGrid cols={metrics.length}>
       {metrics.map((m) => (
-        <div key={m.label} className="bg-white px-[24px] py-[20px]">
+        <div key={m.label} className={`px-[24px] py-[20px] ${m.primary ? 'bg-hero-fill' : 'bg-white'}`}>
           <Eyebrow>{m.label}</Eyebrow>
           <p
-            className={`font-display mt-[10px] text-[34px] font-bold leading-none ${
-              m.positive ? 'text-positive' : 'text-strong'
-            }`}
+            className={`font-display mt-[10px] font-bold leading-none ${
+              m.primary ? 'text-[40px]' : 'text-[34px]'
+            } ${m.positive ? 'text-positive' : 'text-strong'}`}
           >
             {m.value}
           </p>
@@ -287,17 +312,20 @@ export function MetricStrip({ metrics }: { metrics: MetricTile[] }) {
 }
 
 /* ---- Data table row helpers ------------------------------------------ */
-/** The column header is a grey band flush to the top of the Section card, not
- *  a line of small text floating above the first row. Same logic as the canvas:
- *  grey is chrome, white is content — so the header reads as a different kind of
- *  thing at a glance. Labels darken to `secondary` for contrast on the fill.
+/** The column header is a filled band flush to the top of the Section card, not
+ *  a line of small text floating above the first row.
+ *
+ *  The fill is `table-head` (#e3e9f3), which is darker than BOTH the canvas and
+ *  the row hover tint. It has to be: the band meets the card's top edge, so a
+ *  fill at canvas value would vanish into the grey immediately outside the card.
+ *  Labels darken to `secondary` for contrast on it.
  *
  *  Assumes it is the FIRST child of a Section body — the negative top margin
  *  cancels the card's padding so the band sits against the card edge. No bottom
  *  border: the first row's own `border-t` supplies that rule. */
 export function TableHead({ children }: { children: React.ReactNode }) {
   return (
-    <div className="-mx-[26px] -mt-[22px] flex items-center rounded-t-[15px] bg-page px-[26px] py-[13px] [&_p]:text-secondary">
+    <div className="-mx-[26px] -mt-[22px] flex items-center rounded-t-[15px] bg-table-head px-[26px] py-[13px] [&_p]:text-secondary">
       {children}
     </div>
   );

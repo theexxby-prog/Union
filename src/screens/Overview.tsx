@@ -2,7 +2,14 @@
 // a services grid (full programme / data only) or a campaigns list (syndication).
 // Below the fold: what needs the client, and the approve-a-campaign moment.
 import { Link } from 'react-router-dom';
-import { IconChevronRight } from '@tabler/icons-react';
+import {
+  IconChevronRight,
+  IconFileText,
+  IconHeadset,
+  IconReceipt,
+  IconSpeakerphone,
+  IconUserCheck,
+} from '@tabler/icons-react';
 import { useAccount } from '@/components/AppLayout';
 import StatusPill from '@/components/StatusPill';
 import {
@@ -19,6 +26,7 @@ import { cadenceLine, campaignStatusMeta, effectiveStatus } from '@/lib/campaign
 import { demoKey, useDemoState } from '@/lib/demo-state';
 import { noticesFor } from '@/lib/notices';
 import { path } from '@/lib/nav';
+import type { NoticeKind } from '@/lib/notices';
 import type { Account, Campaign, ServiceId } from '@/data/types';
 
 /** The chain argument, phrased per entitlement (docs/01) — shown when the account
@@ -112,27 +120,47 @@ function ApprovalsBlock({ account }: { account: Account }) {
 }
 
 /** Everything currently waiting on the client, in one strip. Derived from the
- *  same source as the notification bell, so the two always agree. */
+ *  same source as the notification bell, so the two always agree.
+ *  The leading icon lets the list be parsed without reading every row — four
+ *  identical lines of text with a pill at the far right could not be. */
+const NOTICE_ICON: Record<NoticeKind, typeof IconFileText> = {
+  document: IconFileText,
+  invoice: IconReceipt,
+  campaign: IconSpeakerphone,
+  lead: IconUserCheck,
+  support: IconHeadset,
+};
+
 function AttentionStrip({ account }: { account: Account }) {
   const notices = noticesFor(account);
   if (notices.length === 0) return null;
   return (
     <Section title="Needs your attention">
-      {notices.map((n) => (
-        <Link
-          key={n.id}
-          to={path(account.id, n.segment)}
-          className="group -mx-[26px] flex items-center gap-[14px] border-t border-hairline px-[26px] py-[16px] transition-colors duration-150 ease-standard first:border-t-0 hover:bg-row-hover"
-        >
-          <span className="min-w-0 flex-1 text-[15.5px] !text-body">{n.label}</span>
-          <StatusPill state={n.state}>{n.state === 'action' ? 'Action' : 'Needs you'}</StatusPill>
-          <IconChevronRight
-            size={17}
-            stroke={2}
-            className="text-muted transition-transform duration-150 ease-standard group-hover:translate-x-[2px] group-hover:text-accent"
-          />
-        </Link>
-      ))}
+      {notices.map((n) => {
+        const Icon = NOTICE_ICON[n.kind];
+        return (
+          <Link
+            key={n.id}
+            to={path(account.id, n.segment)}
+            className="group -mx-[26px] flex items-center gap-[16px] border-t border-hairline px-[26px] py-[16px] transition-colors duration-150 ease-standard first:border-t-0 hover:bg-row-hover"
+          >
+            <span
+              className={`flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full ${
+                n.state === 'action' ? 'bg-act-bg text-act-fg' : 'bg-need-bg text-need-fg'
+              }`}
+            >
+              <Icon size={18} stroke={2} />
+            </span>
+            <span className="min-w-0 flex-1 text-[15.5px] !text-body">{n.label}</span>
+            <StatusPill state={n.state}>{n.state === 'action' ? 'Action' : 'Needs you'}</StatusPill>
+            <IconChevronRight
+              size={17}
+              stroke={2}
+              className="text-muted transition-transform duration-150 ease-standard group-hover:translate-x-[2px] group-hover:text-accent"
+            />
+          </Link>
+        );
+      })}
     </Section>
   );
 }

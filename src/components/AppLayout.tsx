@@ -175,7 +175,11 @@ function Tabs({ account }: { account: Account }) {
   const navigate = useNavigate();
   return (
     <nav className={`${SHELL} flex gap-[40px] pt-[6px]`}>
-      {TABS.map((tab) => {
+      {/* Locked tabs sort to the end: they are the upsell surface, and sitting
+          mid-row they interrupted the scan across available destinations. */}
+      {[...TABS]
+        .sort((x, y) => Number(isEntitled(y, account)) - Number(isEntitled(x, account)))
+        .map((tab) => {
         const entitled = isEntitled(tab, account);
         if (!entitled) {
           return (
@@ -236,7 +240,7 @@ function SiteFooter() {
               href={CORP_URL}
               target="_blank"
               rel="noreferrer"
-              className="text-[13px] !text-muted hover:!text-accent"
+              className="text-[13px] !text-accent hover:!text-accent-strong hover:underline"
             >
               {label}
             </a>

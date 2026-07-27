@@ -22,3 +22,11 @@ export const pctValue = (received: number, target: number): number =>
 /** 2148300 → "2.1M" (compact, for the programmatic headline) */
 export const compact = (n: number): string =>
   new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 }).format(n);
+
+/** Small integers spelled out — the house voice writes "Four services running",
+ *  not "4 services running". Falls back to digits above twelve. */
+const WORDS = [
+  'zero', 'one', 'two', 'three', 'four', 'five', 'six',
+  'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve',
+];
+export const words = (n: number): string => WORDS[n] ?? int(n);

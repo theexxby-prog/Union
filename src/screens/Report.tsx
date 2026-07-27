@@ -6,7 +6,7 @@ import { IconArrowLeft, IconPrinter } from '@tabler/icons-react';
 import { useAccount } from '@/components/AppLayout';
 import StatusPill from '@/components/StatusPill';
 import { Eyebrow, MetricStrip, Row, Section, ServiceCard, TableHead } from '@/components/ui';
-import { invoiceTotal } from '@/data/accounts';
+import { batchesByDate, invoiceTotal } from '@/data/accounts';
 import { int, money, pctValue } from '@/data/format';
 import { campaignAccept, cadenceLine } from '@/lib/campaign';
 import { hasService, path } from '@/lib/nav';
@@ -72,8 +72,8 @@ export default function Report() {
         <Section title="Lead generation · campaigns">
           <TableHead>
             <Eyebrow className="flex-1">Campaign</Eyebrow>
-            <Eyebrow className="w-[120px] text-right">Budget</Eyebrow>
-            <Eyebrow className="w-[80px] text-right">Pace</Eyebrow>
+            <Eyebrow className="w-[180px] text-right">Budget</Eyebrow>
+            <Eyebrow className="w-[120px] text-right">Pace</Eyebrow>
           </TableHead>
           {account.campaigns.map((c) => (
             <Row key={c.id} className="gap-[16px]">
@@ -86,8 +86,8 @@ export default function Report() {
                   {campaignAccept(c)} accept · {cadenceLine(c)}
                 </p>
               </div>
-              <span className="w-[120px] text-right text-[14.5px] text-secondary">{money(c.budget)}</span>
-              <span className="w-[80px] text-right text-[14.5px] text-secondary">
+              <span className="w-[180px] text-right text-[14.5px] text-secondary">{money(c.budget)}</span>
+              <span className="w-[120px] text-right text-[14.5px] tabular-nums text-secondary">
                 {pctValue(c.accepted, c.target)}%
               </span>
             </Row>
@@ -112,17 +112,19 @@ export default function Report() {
         <Section title="Data · batch deliveries">
           <TableHead>
             <Eyebrow className="flex-1">Batch</Eyebrow>
-            <Eyebrow className="w-[130px] text-right">Records</Eyebrow>
-            <Eyebrow className="w-[100px] pl-[20px]">Date</Eyebrow>
-            <Eyebrow className="w-[140px] text-right">Status</Eyebrow>
+            <Eyebrow className="w-[200px] text-right">Records</Eyebrow>
+            <Eyebrow className="w-[160px] pl-[24px]">Date</Eyebrow>
+            <Eyebrow className="w-[200px] text-right">Status</Eyebrow>
           </TableHead>
-          {account.batches.map((b) => (
+          {batchesByDate(account.batches).map((b) => (
             <Row key={b.id}>
               <span className="min-w-0 flex-1 text-[15.5px] text-strong">{b.name}</span>
-              <span className="w-[130px] text-right text-[14.5px] text-secondary">{int(b.records)}</span>
-              <span className="w-[100px] pl-[20px] text-[14.5px] text-muted">{b.date}</span>
-              <span className="w-[140px] text-right">
-                <StatusPill state={b.status}>{b.statusLabel}</StatusPill>
+              <span className="w-[200px] text-right text-[14.5px] text-secondary">{int(b.records)}</span>
+              <span className="w-[160px] pl-[24px] text-[14.5px] text-muted">{b.date}</span>
+              <span className="w-[200px] text-right">
+                <StatusPill state={b.status} quiet={b.status === 'good'}>
+                  {b.statusLabel}
+                </StatusPill>
               </span>
             </Row>
           ))}
@@ -132,16 +134,16 @@ export default function Report() {
       <Section title="Invoices">
         <TableHead>
           <Eyebrow className="flex-1">Invoice</Eyebrow>
-          <Eyebrow className="w-[130px] text-right">Total</Eyebrow>
-          <Eyebrow className="w-[140px] text-right">Status</Eyebrow>
+          <Eyebrow className="w-[200px] text-right">Total</Eyebrow>
+          <Eyebrow className="w-[200px] text-right">Status</Eyebrow>
         </TableHead>
         {account.invoices.map((inv) => (
           <Row key={inv.id}>
             <span className="min-w-0 flex-1 text-[15.5px] text-secondary">
               {inv.id} · {inv.period}
             </span>
-            <span className="w-[130px] text-right text-[15px] text-strong">{money(invoiceTotal(inv))}</span>
-            <span className="w-[140px] text-right">
+            <span className="w-[200px] text-right text-[15px] text-strong">{money(invoiceTotal(inv))}</span>
+            <span className="w-[200px] text-right">
               {inv.status === 'paid' ? (
                 <StatusPill state="good">Paid</StatusPill>
               ) : inv.status === 'overdue' ? (

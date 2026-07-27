@@ -5,12 +5,17 @@ import { invoiceTotal } from '@/data/accounts';
 import { int, money } from '@/data/format';
 import type { Account, StatusState } from '@/data/types';
 
+/** What kind of thing needs the client — drives the leading icon on the
+ *  attention strip, so the list can be parsed without reading every row. */
+export type NoticeKind = 'document' | 'invoice' | 'campaign' | 'lead' | 'support';
+
 export interface Notice {
   id: string;
   label: string;
   /** Route segment under /:accountId (may carry a query). Empty = Overview. */
   segment: string;
   state: StatusState;
+  kind: NoticeKind;
 }
 
 export function noticesFor(account: Account): Notice[] {
@@ -23,6 +28,7 @@ export function noticesFor(account: Account): Notice[] {
         label: `${d.id} is awaiting your signature`,
         segment: 'documents',
         state: 'action',
+        kind: 'document',
       });
     }
   }
@@ -34,6 +40,7 @@ export function noticesFor(account: Account): Notice[] {
         label: `${inv.id} is overdue — ${money(invoiceTotal(inv))} due`,
         segment: 'invoices',
         state: 'action',
+        kind: 'invoice',
       });
     } else if (inv.status === 'open') {
       out.push({
@@ -41,6 +48,7 @@ export function noticesFor(account: Account): Notice[] {
         label: `${inv.id} is open — due ${inv.due}`,
         segment: 'invoices',
         state: 'needsYou',
+        kind: 'invoice',
       });
     }
   }
@@ -52,6 +60,7 @@ export function noticesFor(account: Account): Notice[] {
         label: `${c.name} is awaiting your approval`,
         segment: '',
         state: 'needsYou',
+        kind: 'campaign',
       });
     }
   }
@@ -62,6 +71,7 @@ export function noticesFor(account: Account): Notice[] {
       label: `${int(account.leadsInReview)} leads are awaiting your review`,
       segment: 'leads?review=1',
       state: 'needsYou',
+      kind: 'lead',
     });
   }
 
@@ -72,6 +82,7 @@ export function noticesFor(account: Account): Notice[] {
         label: `Support · ${t.subject}`,
         segment: 'support',
         state: 'needsYou',
+        kind: 'support',
       });
     }
   }

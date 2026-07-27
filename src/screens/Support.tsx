@@ -24,8 +24,8 @@ export default function Support() {
       <Section title="Requests">
         <TableHead>
           <Eyebrow className="flex-1">Subject</Eyebrow>
-          <Eyebrow className="w-[130px]">Opened</Eyebrow>
-          <Eyebrow className="w-[180px] text-right">Status</Eyebrow>
+          <Eyebrow className="w-[180px] pl-[24px]">Opened</Eyebrow>
+          <Eyebrow className="w-[220px] text-right">Status</Eyebrow>
         </TableHead>
         {account.tickets.length === 0 ? (
           <EmptyLine>Requests you raise will appear here with their status.</EmptyLine>
@@ -48,8 +48,8 @@ export default function Support() {
                       className={`text-muted transition-transform duration-150 ease-standard ${isOpen ? 'rotate-180' : ''}`}
                     />
                   </span>
-                  <span className="w-[130px] text-[14.5px] text-muted">{t.opened}</span>
-                  <span className="w-[180px] text-right">
+                  <span className="w-[180px] pl-[24px] text-[14.5px] text-muted">{t.opened}</span>
+                  <span className="w-[220px] text-right">
                     <StatusPill state={t.status}>{t.statusLabel}</StatusPill>
                   </span>
                 </button>

@@ -92,7 +92,7 @@ export default function CampaignDetail() {
       <Section bare>
         <MetricStrip
           metrics={[
-            { label: 'Accepted', value: int(campaign.accepted) },
+            { label: 'Accepted', value: int(campaign.accepted), primary: true },
             { label: 'Target', value: int(campaign.target) },
             { label: 'Delivered', value: int(campaign.delivered) },
             { label: 'Accept rate', value: campaignAccept(campaign), positive: true },
@@ -129,7 +129,9 @@ export default function CampaignDetail() {
                 <span className="w-[90px] text-[14.5px] text-muted">{d.date}</span>
                 <span className="min-w-0 flex-1 text-[14.5px] text-secondary">{int(d.leads)} leads</span>
                 {d.status === 'delivered' ? (
-                  <StatusPill state="good">Delivered</StatusPill>
+                  <StatusPill state="good" quiet>
+                    Delivered
+                  </StatusPill>
                 ) : (
                   <StatusPill state="neutral">Upcoming</StatusPill>
                 )}
@@ -146,19 +148,19 @@ export default function CampaignDetail() {
           <>
             <TableHead>
               <Eyebrow className="flex-1">Contact</Eyebrow>
-              <Eyebrow className="w-[100px]">Date</Eyebrow>
-              <Eyebrow className="w-[140px] text-right">Status</Eyebrow>
+              <Eyebrow className="w-[160px] pl-[24px]">Date</Eyebrow>
+              <Eyebrow className="w-[180px] text-right">Status</Eyebrow>
             </TableHead>
             {leads.map((l) => (
               <Row key={l.id}>
                 <div className="min-w-0 flex-1">
-                  <p className="text-[15.5px] text-strong">{l.name}</p>
+                  <p className="max-w-[520px] text-[15.5px] text-strong">{l.name}</p>
                   <p className="mt-[4px] text-[14px] text-muted">
                     {l.title} · {l.company}
                   </p>
                 </div>
-                <span className="w-[100px] text-[14.5px] text-muted">{l.date}</span>
-                <span className="w-[140px] text-right">
+                <span className="w-[160px] pl-[24px] text-[14.5px] text-muted">{l.date}</span>
+                <span className="w-[180px] text-right">
                   {statusFor(l) === 'accepted' ? (
                     <StatusPill state="good">Accepted</StatusPill>
                   ) : (
