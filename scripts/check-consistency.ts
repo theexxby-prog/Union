@@ -68,10 +68,20 @@ for (const acc of accounts) {
     check(`${sid} delivered batches = received (${svc.received})`, delivered === svc.received, `${delivered}`);
   }
 
-  // Media placements sum to the impression total.
+  // Media: daily rows and channel rows must both reconcile to the headline
+  // figures — the same guarantee the live reporting API will have to meet.
   if (acc.media) {
-    check('placements sum = impressions', sum(acc.media.placements.map((p) => p.impressions)) === acc.media.impressions, `${acc.media.impressions}`);
-    check('weekly bars count = 12', acc.media.weeklyBars.length === 12);
+    const m = acc.media;
+    check('daily impressions sum = impressions', sum(m.daily.map((d) => d.impressions)) === m.impressions, `${m.impressions}`);
+    check('daily spend sum = media investment', sum(m.daily.map((d) => d.spend)) === m.investment, `${m.investment}`);
+    check('channel impressions sum = impressions', sum(m.channels.map((c) => c.impressions)) === m.impressions, `${sum(m.channels.map((c) => c.impressions))}`);
+    check('accounts engaged <= reached', m.accountsEngaged <= m.accountsReached, `${m.accountsEngaged}/${m.accountsReached}`);
+    check('investment <= budget', m.investment <= m.budget, `${m.investment}/${m.budget}`);
+    check('daily rows are date-ordered', m.daily.every((d, i) => i === 0 || d.sortKey > m.daily[i - 1].sortKey));
+    // Every account flagged as converted must exist in the leads table.
+    const leadCompanies = new Set(acc.leads.map((l) => l.company));
+    const stray = m.engagedAccounts.find((a) => a.becameLead && !leadCompanies.has(a.name));
+    check('converted accounts appear in leads', stray === undefined, stray?.name ?? '');
   }
 
   // Every invoice line references an entitled service.

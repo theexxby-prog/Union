@@ -102,9 +102,9 @@ export default function Report() {
             <MetricStrip
               metrics={[
                 { label: 'Impressions', value: int(account.media.impressions) },
-                { label: 'Spend', value: money(account.media.spend) },
-                { label: 'Budget', value: money(account.media.budget) },
-                { label: 'Flight complete', value: `${pctValue(account.media.spend, account.media.budget)}%` },
+                { label: 'Media investment', value: money(account.media.investment) },
+                { label: 'Accounts engaged', value: int(account.media.accountsEngaged) },
+                { label: 'Flight complete', value: `${pctValue(account.media.investment, account.media.budget)}%` },
               ]}
             />
           </div>

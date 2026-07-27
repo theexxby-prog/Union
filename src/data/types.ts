@@ -210,20 +210,65 @@ export interface TeamMember {
   role: string;
 }
 
-export interface Placement {
+/* ---------------------------------------------------------------------------
+   Programmatic media — shaped to the delivery API that will eventually back it
+   (see docs/06). The reporting endpoints return daily rows by channel, account
+   engagement, and asset performance, so the fixtures mirror those shapes: when
+   the live integration lands it is an adapter swap, not a screen rewrite.
+   --------------------------------------------------------------------------- */
+
+/** One day of delivery. Mirrors the daily spend report, aggregated per day. */
+export interface DailyDelivery {
+  date: string; // '12 Jul'
+  sortKey: number; // 20260712 — deterministic ordering without Date parsing
+  impressions: number;
+  spend: number;
+}
+
+/** Delivery by ad channel. Impressions and share only — rates stay internal. */
+export interface MediaChannel {
   name: string;
   impressions: number;
-  ctr: string;
+}
+
+export type EngagementLevel = 'high' | 'medium' | 'low';
+
+/** A target account that the media reached, and how warm it is. */
+export interface EngagedAccount {
+  name: string;
+  industry: string;
+  impressions: number;
+  level: EngagementLevel;
+  lastActivity: string;
+  /** True when this account has since produced a lead — proves the chain. */
+  becameLead?: boolean;
+}
+
+/** Creative performance, from the asset analytics report. */
+export interface CreativeAsset {
+  name: string;
+  format: string;
+  impressions: number;
+  engagementRate: string;
 }
 
 export interface MediaData {
+  /** Derived from `daily` — never stored twice. */
   impressions: number;
-  spend: number;
+  /** Client-facing media investment to date (what DBSL bills, not raw rates). */
+  investment: number;
   budget: number;
-  metrics: MetricTile[];
-  /** 12 weekly bars as percentage heights; the last is in-progress. */
-  weeklyBars: number[];
-  placements: Placement[];
+  /** Pre-formatted; confirm the source metric with the media partner. */
+  viewability: string;
+  accountsReached: number;
+  accountsEngaged: number;
+  flightStart: string;
+  flightEnd: string;
+  pacing: { state: StatusState; label: string };
+  daily: DailyDelivery[];
+  channels: MediaChannel[];
+  engagedAccounts: EngagedAccount[];
+  assets: CreativeAsset[];
 }
 
 /** Derived leads figures, computed once from campaigns / the leads service. */

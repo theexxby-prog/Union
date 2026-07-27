@@ -10,10 +10,13 @@ import { int, money, pct } from './format';
 import type {
   Account,
   Campaign,
+  DailyDelivery,
   DeliveryDrop,
   DeliveryTimelineEntry,
   Invoice,
   LeadsSummary,
+  MediaChannel,
+  MediaData,
   Service,
   StatusState,
 } from './types';
@@ -42,6 +45,89 @@ const investedOf = (invoices: Invoice[]): number => sum(invoices.map(invoiceTota
 /** Amount currently payable = sum of open/overdue invoice totals. */
 const dueOf = (invoices: Invoice[]): number =>
   sum(invoices.filter((i) => i.status !== 'paid').map(invoiceTotal));
+
+/** Split a total across weights so the parts sum to the total exactly.
+ *  Used for media delivery: daily and channel rows must reconcile to the
+ *  headline impression and investment figures with no rounding drift. */
+const distribute = (total: number, weights: number[]): number[] => {
+  const totalWeight = sum(weights);
+  const parts = weights.map((w) => Math.floor((total * w) / totalWeight));
+  let remainder = total - sum(parts);
+  for (let i = 0; remainder > 0; i = (i + 1) % parts.length, remainder--) parts[i] += 1;
+  return parts;
+};
+
+/* ---------------------------------------------------------------------------
+   Programmatic media fixture builder.
+
+   Channel names are shown to the client verbatim — clients expect to know which
+   platforms carry their spend, and hiding it reads as evasive. The one exception
+   is the display network, which is labelled generically rather than by supplier.
+   Channel rows carry impressions only: mix is client-facing, rates are not.
+   --------------------------------------------------------------------------- */
+
+/** 1–28 July 2026. Weekday/weekend shape with a ramp as the flight scales. */
+const MEDIA_DAY_WEIGHTS = [
+  92, 95, 88, 52, 48, 98, 102, 105, 99, 94, 55, 50, 108, 112,
+  115, 110, 104, 58, 54, 118, 122, 125, 120, 114, 62, 58, 128, 130,
+];
+const MEDIA_MONTH = 'Jul';
+const MEDIA_CHANNELS = [
+  { name: 'LinkedIn', weight: 28 },
+  { name: 'Programmatic display network', weight: 26 },
+  { name: 'Meta', weight: 20 },
+  { name: 'Google', weight: 16 },
+  { name: 'Connected TV', weight: 10 },
+];
+
+function buildMedia(impressions: number, investment: number, budget: number): MediaData {
+  const dailyImpressions = distribute(impressions, MEDIA_DAY_WEIGHTS);
+  const dailySpend = distribute(investment, MEDIA_DAY_WEIGHTS);
+  const daily: DailyDelivery[] = MEDIA_DAY_WEIGHTS.map((_, i) => ({
+    date: `${i + 1} ${MEDIA_MONTH}`,
+    sortKey: 20260700 + i + 1,
+    impressions: dailyImpressions[i],
+    spend: dailySpend[i],
+  }));
+
+  const channelImpressions = distribute(impressions, MEDIA_CHANNELS.map((c) => c.weight));
+  const channels: MediaChannel[] = MEDIA_CHANNELS.map((c, i) => ({
+    name: c.name,
+    impressions: channelImpressions[i],
+  }));
+
+  return {
+    impressions,
+    investment,
+    budget,
+    viewability: '68%',
+    accountsReached: 31200,
+    accountsEngaged: 1840,
+    flightStart: '1 Jul 2026',
+    flightEnd: '30 Sep 2026',
+    pacing: { state: 'good', label: 'On pace' },
+    daily,
+    channels,
+    // Accounts the media reached. Those marked becameLead later appear in the
+    // leads table — the join that proves the chain end to end.
+    engagedAccounts: [
+      { name: 'Halden Logistics', industry: 'Transport & logistics', impressions: 8420, level: 'high', lastActivity: '22 Jul', becameLead: true },
+      { name: 'Meridian Health', industry: 'Healthcare', impressions: 7260, level: 'high', lastActivity: '21 Jul', becameLead: true },
+      { name: 'Corvus Retail Group', industry: 'Retail', impressions: 6890, level: 'high', lastActivity: '22 Jul', becameLead: true },
+      { name: 'Ardent Systems', industry: 'Technology', impressions: 5940, level: 'medium', lastActivity: '20 Jul' },
+      { name: 'Brightwater Utilities', industry: 'Energy & utilities', impressions: 5310, level: 'medium', lastActivity: '19 Jul' },
+      { name: 'Kestrel Analytics', industry: 'Technology', impressions: 4780, level: 'medium', lastActivity: '18 Jul' },
+      { name: 'Talligo Foods', industry: 'Manufacturing', impressions: 3960, level: 'low', lastActivity: '16 Jul' },
+    ],
+    assets: [
+      { name: 'Cloud security — buyer guide', format: 'Display 300×250', impressions: 684200, engagementRate: '0.41%' },
+      { name: 'Zero-trust webinar promo', format: 'Display 728×90', impressions: 512700, engagementRate: '0.37%' },
+      { name: 'Platform overview — 30s', format: 'Video / CTV', impressions: 421900, engagementRate: '0.29%' },
+      { name: 'Infrastructure benchmark', format: 'Native', impressions: 318400, engagementRate: '0.31%' },
+      { name: 'Customer story — Halden', format: 'Display 160×600', impressions: 211100, engagementRate: '0.22%' },
+    ],
+  };
+}
 
 /** Concise delivery-drop constructor. */
 const drop = (
@@ -247,25 +333,7 @@ function buildAcme(): Account {
       { id: 'b4', serviceId: 'cleanrich', name: 'Enrichment pass — batch 1', records: 25000, date: '5 Jul', status: 'good', statusLabel: 'Delivered' },
       { id: 'b5', serviceId: 'cleanrich', name: 'Enrichment pass — batch 2', records: 22200, date: '19 Jul', status: 'good', statusLabel: 'Delivered' },
     ],
-    media: {
-      impressions,
-      spend,
-      budget,
-      metrics: [
-        { label: 'Viewability', value: '68%' },
-        { label: 'CTR', value: '0.34%' },
-        { label: 'Accounts reached', value: '31.2k' },
-        { label: 'Brand safe', value: '99.4%', positive: true },
-      ],
-      weeklyBars: [38, 52, 47, 66, 71, 58, 80, 74, 91, 86, 100, 64],
-      placements: [
-        { name: 'Enterprise technology sites', impressions: 612400, ctr: '0.41%' },
-        { name: 'Cloud & infrastructure', impressions: 498100, ctr: '0.37%' },
-        { name: 'IT decision-maker network', impressions: 421900, ctr: '0.29%' },
-        { name: 'Business & finance', impressions: 342500, ctr: '0.31%' },
-        { name: 'Manufacturing & logistics', impressions: 273400, ctr: '0.22%' },
-      ],
-    },
+    media: buildMedia(impressions, spend, budget),
     documents: [
       { id: 'JC-2841', title: 'Cloud security, NAM', kind: 'Job card', type: 'client_signature', value: 8100, date: '18 Jul', phase: 3, scopeSummary: '180 leads at $45 · $8,100 · scope agreed 18 July' },
       { id: 'JC-2798', title: 'Data platform guide, EMEA', kind: 'Job card', type: 'client_signature', value: 6300, date: '2 Jul', phase: 4 },
@@ -312,11 +380,11 @@ function buildAcme(): Account {
       },
       media: {
         eyebrow: 'Programmatic · Q3 2026',
-        headline: `${int(impressions)} impressions`,
-        subhead: `${money(spend)} of ${money(budget)} spent, flight ${pct(spend, budget)} complete.`,
+        headline: `${int(impressions)} impressions delivered`,
+        subhead: `${money(spend)} of ${money(budget)} invested, flight ${pct(spend, budget)} complete and on pace.`,
         actions: [
           { label: 'View media report', kind: 'cta', to: 'report' },
-          { label: 'Brand safe 99.4%', kind: 'pill' },
+          { label: '1,840 accounts engaged', kind: 'pill' },
         ],
       },
       leads: {
