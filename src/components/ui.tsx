@@ -287,8 +287,20 @@ export function MetricStrip({ metrics }: { metrics: MetricTile[] }) {
 }
 
 /* ---- Data table row helpers ------------------------------------------ */
+/** The column header is a grey band flush to the top of the Section card, not
+ *  a line of small text floating above the first row. Same logic as the canvas:
+ *  grey is chrome, white is content — so the header reads as a different kind of
+ *  thing at a glance. Labels darken to `secondary` for contrast on the fill.
+ *
+ *  Assumes it is the FIRST child of a Section body — the negative top margin
+ *  cancels the card's padding so the band sits against the card edge. No bottom
+ *  border: the first row's own `border-t` supplies that rule. */
 export function TableHead({ children }: { children: React.ReactNode }) {
-  return <div className="flex items-center pb-[14px]">{children}</div>;
+  return (
+    <div className="-mx-[26px] -mt-[22px] flex items-center rounded-t-[15px] bg-page px-[26px] py-[13px] [&_p]:text-secondary">
+      {children}
+    </div>
+  );
 }
 
 /** Every table row lights up under the pointer. On clickable rows this is the

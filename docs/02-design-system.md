@@ -131,6 +131,21 @@ Two-column composition uses `Cols` (a 3-track grid; the primary child takes
 `lg:col-span-2`). It is `items-start`, so a short side card sits at its natural
 height rather than stretching to match a tall neighbour.
 
+### Table header
+
+`TableHead` is a **grey band flush to the top of the Section card** — Soft Grey
+`#F4F7FB` fill, `padding 13px 26px`, top corners rounded to the card. The same
+logic as the canvas: grey is chrome, white is content, so the header reads as a
+different kind of thing without a heavier rule. Column labels darken from
+`muted` to `secondary` for contrast on the fill.
+
+It carries no bottom border — the first row's own `border-t` supplies that. It
+assumes it is the first child of a Section body; its negative top margin cancels
+the card's padding.
+
+The band is lighter than the row hover tint (`#eaeef6`), so a header never reads
+as a hovered row.
+
 ## Layout primitives
 
 ### Hero card
