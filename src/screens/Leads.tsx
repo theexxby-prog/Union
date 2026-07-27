@@ -30,7 +30,7 @@ function CampaignRow({ c, accountId, approved }: { c: Campaign; accountId: strin
   const status = campaignStatusMeta[effectiveStatus(c, approved)];
   const pending = effectiveStatus(c, approved) === 'pendingApproval';
   return (
-    <div className="border-t border-hairline py-[18px] first:border-t-0">
+    <div className="-mx-[26px] border-t border-hairline px-[26px] py-[18px] transition-colors duration-150 ease-standard first:border-t-0 hover:bg-row-hover">
       <div className="flex items-start justify-between gap-[14px]">
         <div className="min-w-0 flex-1">
           <Link
@@ -241,7 +241,7 @@ export default function Leads() {
                           setFilter(c.id);
                           setOpen(false);
                         }}
-                        className={`block w-full px-[16px] py-[9px] text-left text-[14.5px] transition-colors duration-150 ease-standard hover:bg-page ${
+                        className={`block w-full px-[16px] py-[9px] text-left text-[14.5px] transition-colors duration-150 ease-standard hover:bg-row-hover ${
                           c.id === filter ? 'text-strong' : 'text-secondary'
                         }`}
                       >
@@ -262,7 +262,7 @@ export default function Leads() {
           <Eyebrow className="w-[140px] text-right">Status</Eyebrow>
         </TableHead>
         {rows.length === 0 ? (
-          <div className="border-t border-hairline">
+          <div className="-mx-[26px] border-t border-hairline px-[26px]">
             <EmptyLine>{emptyCopy()}</EmptyLine>
           </div>
         ) : (
@@ -271,7 +271,7 @@ export default function Leads() {
             const reviewable = status === 'review';
             const expanded = expandedId === l.id;
             return (
-              <div key={l.id} className="border-t border-hairline">
+              <div key={l.id} className="-mx-[26px] border-t border-hairline">
                 <div
                   role={reviewable ? 'button' : undefined}
                   tabIndex={reviewable ? 0 : undefined}
@@ -286,10 +286,8 @@ export default function Leads() {
                         }
                       : undefined
                   }
-                  className={`flex items-center py-[16px] ${
-                    reviewable
-                      ? 'cursor-pointer transition-colors duration-150 ease-standard hover:bg-[#fafbfd]'
-                      : ''
+                  className={`flex items-center px-[26px] py-[16px] transition-colors duration-150 ease-standard hover:bg-row-hover ${
+                    reviewable ? 'cursor-pointer' : ''
                   }`}
                   title={reviewable ? 'Open to review this lead' : undefined}
                 >
@@ -312,7 +310,7 @@ export default function Leads() {
                   </span>
                 </div>
                 {expanded && reviewable && (
-                  <div className="mb-[14px] rounded-card border border-hairline bg-page px-[20px] py-[18px]">
+                  <div className="mx-[26px] mb-[14px] rounded-card border border-hairline bg-page px-[20px] py-[18px]">
                     <p className="m-0 text-[14.5px] text-secondary">
                       {l.title} at {l.company}, delivered {l.date} from {campaignById.get(l.campaignId)?.name}.
                       Accepting adds this lead to your billable count.

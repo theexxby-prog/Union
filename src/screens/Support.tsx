@@ -33,11 +33,11 @@ export default function Support() {
           account.tickets.map((t) => {
             const isOpen = expanded === t.id;
             return (
-              <div key={t.id} className="border-t border-hairline">
+              <div key={t.id} className="-mx-[26px] border-t border-hairline">
                 <button
                   onClick={() => setExpanded(isOpen ? null : t.id)}
                   aria-expanded={isOpen}
-                  className="flex w-full items-center py-[16px] text-left transition-colors duration-150 ease-standard hover:bg-[#fafbfd]"
+                  className="flex w-full items-center px-[26px] py-[16px] text-left transition-colors duration-150 ease-standard hover:bg-row-hover"
                   title="Show the latest reply"
                 >
                   <span className="flex min-w-0 flex-1 items-center gap-[7px] text-[15.5px] text-strong">
@@ -54,7 +54,7 @@ export default function Support() {
                   </span>
                 </button>
                 {isOpen && t.lastMessage && (
-                  <div className="mb-[16px] rounded-card border border-hairline bg-page px-[20px] py-[18px]">
+                  <div className="mx-[26px] mb-[16px] rounded-card border border-hairline bg-page px-[20px] py-[18px]">
                     <p className="m-0 text-[14.5px] leading-[1.55] text-secondary">{t.lastMessage}</p>
                     {t.status === 'needsYou' && (
                       <button className="mt-[14px] rounded-full bg-cta px-[18px] py-[8px] text-[14px] font-semibold text-white transition-[filter] duration-150 ease-standard hover:brightness-[1.08]">

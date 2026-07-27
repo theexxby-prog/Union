@@ -77,11 +77,11 @@ export default function Documents() {
           const status = rowStatus(d);
           const isOpen = expanded === d.id;
           return (
-            <div key={d.id} className="border-t border-hairline">
+            <div key={d.id} className="-mx-[26px] border-t border-hairline">
               <button
                 onClick={() => setExpanded(isOpen ? null : d.id)}
                 aria-expanded={isOpen}
-                className="flex w-full items-center py-[16px] text-left transition-colors duration-150 ease-standard hover:bg-[#fafbfd]"
+                className="flex w-full items-center px-[26px] py-[16px] text-left transition-colors duration-150 ease-standard hover:bg-row-hover"
                 title="Show workflow status"
               >
                 <div className="min-w-0 flex-1">
@@ -104,7 +104,7 @@ export default function Documents() {
                 </span>
               </button>
               {isOpen && (
-                <div className="mb-[16px] rounded-card border border-hairline bg-page px-[20px] py-[18px]">
+                <div className="mx-[26px] mb-[16px] rounded-card border border-hairline bg-page px-[20px] py-[18px]">
                   {d.scopeSummary && <p className="mb-[16px] mt-0 text-[14.5px] text-secondary">{d.scopeSummary}</p>}
                   <PhaseStrip
                     phase={isAwaiting(d) ? d.phase : PHASES.length}

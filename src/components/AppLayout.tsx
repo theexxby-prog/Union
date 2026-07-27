@@ -75,7 +75,7 @@ function AccountSwitcher({ account }: { account: Account }) {
                   // switching accounts mid-screen is the comparison move.
                   navigate(switchTarget(a.id, location.pathname, a));
                 }}
-                className={`flex w-full flex-col items-start px-[18px] py-[11px] text-left transition-colors duration-150 ease-standard hover:bg-page ${
+                className={`flex w-full flex-col items-start px-[18px] py-[11px] text-left transition-colors duration-150 ease-standard hover:bg-row-hover ${
                   a.id === account.id ? 'bg-page' : ''
                 }`}
               >
@@ -134,7 +134,7 @@ function NotificationBell({ account }: { account: Account }) {
                   setOpen(false);
                   navigate(path(account.id, n.segment));
                 }}
-                className="flex w-full items-center gap-[12px] border-t border-hairline px-[18px] py-[13px] text-left transition-colors duration-150 ease-standard hover:bg-page"
+                className="flex w-full items-center gap-[12px] border-t border-hairline px-[18px] py-[13px] text-left transition-colors duration-150 ease-standard hover:bg-row-hover"
               >
                 <span className="min-w-0 flex-1 text-[14px] leading-[1.4] text-body">{n.label}</span>
                 <StatusPill state={n.state}>{n.state === 'action' ? 'Action' : 'Needs you'}</StatusPill>

@@ -214,10 +214,25 @@ style in `#8a96a6`. Right-aligned numeric columns with fixed widths.
 Tabler Icons, outline only, 2px stroke — mandated by the playbook.
 `npm i @tabler/icons-react`. No emoji. No other icon set.
 
+## Hover
+
+One tint, `#eaeef6` (`bg-row-hover`), on every pointer-over surface: table rows,
+expandable rows, menu items, the account picker, linked service cards. It is a
+clear step down from white — enough to say "this is the record you are about to
+act on" from across a room.
+
+Row hover is **full-bleed to the card edge**. Rows carry `-mx-[26px] px-[26px]`,
+cancelling the Section card's padding, so the tint and the divider run edge to
+edge while the content box stays put. Read-only tables get it too — at 1560px it
+is what keeps the eye on one record across the width.
+
+Secondary surfaces (white pill buttons) hover to the page tint `#f4f7fb`
+(`bg-page`), one step lighter, so a button never competes with a row.
+
 ## Motion
 
 Fades and short slides, 120–320ms, `cubic-bezier(.2,0,.2,1)`. No bounce, no spring.
-Used sparingly — tab changes and account switches only. Respect
+Used for tab changes, account switches, and hover tints. Respect
 `prefers-reduced-motion`.
 
 ## Voice

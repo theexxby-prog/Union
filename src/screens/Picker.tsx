@@ -43,7 +43,7 @@ export default function Picker() {
             <Link
               key={a.id}
               to={`/${a.id}`}
-              className={`group flex items-center gap-[16px] px-[26px] py-[22px] transition-colors duration-150 ease-standard hover:bg-page ${
+              className={`group flex items-center gap-[16px] px-[26px] py-[22px] transition-colors duration-150 ease-standard hover:bg-row-hover ${
                 i > 0 ? 'border-t border-hairline' : ''
               }`}
             >

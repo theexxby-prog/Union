@@ -62,6 +62,9 @@ export function Section({
       )}
       <div
         className={
+          // The 22px vertical padding keeps a full-bleed row hover clear of the
+          // 16px corner radius, so the card needs no overflow clip — which would
+          // otherwise cut the focus ring off a full-bleed row.
           bare ? bodyClassName : `rounded-[16px] border border-hairline bg-white px-[26px] py-[22px] ${bodyClassName}`
         }
       >
@@ -288,14 +291,29 @@ export function TableHead({ children }: { children: React.ReactNode }) {
   return <div className="flex items-center pb-[14px]">{children}</div>;
 }
 
+/** Every table row lights up under the pointer. On clickable rows this is the
+ *  "about to be selected" affordance; on read-only ones it keeps the eye on a
+ *  single record across a 1560px canvas. Pass `hover={false}` to opt out. */
 export function Row({
   className = '',
+  hover = true,
   children,
 }: {
   className?: string;
+  hover?: boolean;
   children: React.ReactNode;
 }) {
-  return <div className={`flex items-center border-t border-hairline py-[16px] ${className}`}>{children}</div>;
+  // -mx/px cancel the Section card's padding so the tint and the divider reach
+  // the card edge, while the content box stays exactly where it was.
+  return (
+    <div
+      className={`-mx-[26px] flex items-center border-t border-hairline px-[26px] py-[16px] ${
+        hover ? 'transition-colors duration-150 ease-standard hover:bg-row-hover' : ''
+      } ${className}`}
+    >
+      {children}
+    </div>
+  );
 }
 
 /* ---- Locked-services upsell line (one line, never a banner) ---------- */

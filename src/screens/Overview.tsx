@@ -122,7 +122,7 @@ function AttentionStrip({ account }: { account: Account }) {
         <Link
           key={n.id}
           to={path(account.id, n.segment)}
-          className="group flex items-center gap-[14px] border-t border-hairline py-[16px] transition-colors duration-150 ease-standard first:border-t-0 hover:bg-[#fafbfd]"
+          className="group -mx-[26px] flex items-center gap-[14px] border-t border-hairline px-[26px] py-[16px] transition-colors duration-150 ease-standard first:border-t-0 hover:bg-row-hover"
         >
           <span className="min-w-0 flex-1 text-[15.5px] !text-body">{n.label}</span>
           <StatusPill state={n.state}>{n.state === 'action' ? 'Action' : 'Needs you'}</StatusPill>
@@ -185,7 +185,7 @@ export default function Overview() {
               <Link key={s.id} to={path(account.id, target)} className="group block !text-body" title={`Open ${s.name}`}>
                 <ServiceCard
                   s={s}
-                  className="h-full transition-colors duration-150 ease-standard group-hover:bg-[#fafbfd]"
+                  className="h-full transition-colors duration-150 ease-standard group-hover:bg-row-hover"
                 />
               </Link>
             );

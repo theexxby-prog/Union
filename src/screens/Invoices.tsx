@@ -125,11 +125,11 @@ export default function Invoices() {
           history.map((inv) => {
             const isOpen = expanded === inv.id;
             return (
-              <div key={inv.id} className="border-t border-hairline first:border-t-0">
+              <div key={inv.id} className="-mx-[26px] border-t border-hairline first:border-t-0">
                 <button
                   onClick={() => setExpanded(isOpen ? null : inv.id)}
                   aria-expanded={isOpen}
-                  className="flex w-full items-center py-[16px] text-left transition-colors duration-150 ease-standard hover:bg-[#fafbfd]"
+                  className="flex w-full items-center px-[26px] py-[16px] text-left transition-colors duration-150 ease-standard hover:bg-row-hover"
                   title="Show line items"
                 >
                   <span className="flex min-w-0 flex-1 items-center gap-[7px] text-[15.5px] text-strong">
@@ -146,7 +146,7 @@ export default function Invoices() {
                   </span>
                 </button>
                 {isOpen && (
-                  <div className="mb-[16px] rounded-card border border-hairline bg-page px-[20px] pb-[20px] pt-[6px]">
+                  <div className="mx-[26px] mb-[16px] rounded-card border border-hairline bg-page px-[26px] pb-[20px] pt-[6px]">
                     <p className="mb-[4px] mt-[12px] text-[14px] text-muted">
                       Issued {inv.issued} · Due {inv.due} · {inv.terms}
                     </p>

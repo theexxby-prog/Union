@@ -32,10 +32,11 @@
   --font-body: 'Sora Variable', 'Sora', system-ui, sans-serif;
 
   /* Product surfaces */
-  --u-page: #ffffff;              /* portal page background is white, not soft grey */
+  --u-page: #f4f7fb;              /* Soft Grey canvas; content sits on white cards */
   --u-hairline: var(--grey-100);  /* #e7edf5 — divider everywhere */
   --u-hero-fill: #eaf0f9;         /* hero card fill (product-specific) */
   --u-hero-border: #dbe4f0;       /* hero card border (product-specific) */
+  --u-row-hover: #eaeef6;         /* pointer-over tint on rows and menu items */
 
   /* Product text ramp */
   --u-text-strong: var(--dbsl-navy);  /* #07111F — headlines / primary */
@@ -68,10 +69,13 @@
    bg-hero, border-hairline, font-display, etc.). No tailwind.config.js exists.
    --------------------------------------------------------------------------- */
 @theme {
-  --color-page: #ffffff;
+  --color-page: #f4f7fb;
   --color-hairline: #e7edf5;
   --color-hero-fill: #eaf0f9;
   --color-hero-border: #dbe4f0;
+  /* One hover tint for every pointer-over surface — rows, menu items, cards.
+     It is a clear step down from white; the old #fafbfd was invisible. */
+  --color-row-hover: #eaeef6;
 
   --color-navy: #07111F;
   --color-strong: #07111F;
