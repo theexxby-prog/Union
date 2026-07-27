@@ -1,14 +1,16 @@
 // Invoices — one bill, one line per service. The line basis is where billable-vs-
 // delivered appears in commercial form. The total row carries the only non-hairline
 // rule in the product, used once to close the invoice (docs/03). History rows
-// expand to their line items; billing history renders as pace bars.
+// expand to their line items. The side panel answers "where does the money go",
+// which nothing else in the product does — a bar per invoice period only restated
+// the History table underneath it, three near-equal columns saying nothing.
 import { useState } from 'react';
 import { IconChevronDown } from '@tabler/icons-react';
 import { useAccount } from '@/components/AppLayout';
 import StatusPill from '@/components/StatusPill';
-import { Cols, EmptyLine, Hero, PaceBars, Row, Section } from '@/components/ui';
+import { Cols, EmptyLine, Hero, ProgressRule, Row, Section } from '@/components/ui';
 import { invoiceTotal } from '@/data/accounts';
-import { money } from '@/data/format';
+import { money, pctValue } from '@/data/format';
 import type { Invoice } from '@/data/types';
 
 function currentPill(status: Invoice['status']) {
@@ -28,11 +30,22 @@ const historyLabel: Record<Invoice['status'], string> = {
   open: 'Open',
 };
 
-/** 'June 2026' → 'Jun' · 'Q3 2026' → 'Q3' — a short axis label for the bars. */
-const shortPeriod = (period: string): string => {
-  const head = period.split(' ')[0];
-  return head.length > 3 ? head.slice(0, 3) : head;
-};
+/** Total billed per service across every invoice, largest first. Reconciles to
+ *  `invested` by construction — the same line amounts, summed a different way.
+ *  The service name is the head of the line description ("iData · records
+ *  delivered"), so it can never drift from what the invoice itself says. */
+function spendByService(invoices: Invoice[]): { name: string; amount: number }[] {
+  const totals = new Map<string, { name: string; amount: number }>();
+  for (const inv of invoices) {
+    for (const line of inv.lines) {
+      const name = line.description.split(' · ')[0];
+      const at = totals.get(line.serviceId);
+      if (at) at.amount += line.amount;
+      else totals.set(line.serviceId, { name, amount: line.amount });
+    }
+  }
+  return [...totals.values()].sort((a, b) => b.amount - a.amount);
+}
 
 function InvoiceLines({ inv }: { inv: Invoice }) {
   const total = invoiceTotal(inv);
@@ -65,8 +78,11 @@ export default function Invoices() {
   const current =
     account.invoices.find((i) => i.status !== 'paid') ?? account.invoices[account.invoices.length - 1];
   const history = account.invoices.filter((i) => i.id !== current.id).reverse();
-  const maxTotal = Math.max(...account.invoices.map(invoiceTotal));
   const multiple = account.invoices.length > 1;
+
+  const byService = spendByService(account.invoices);
+  const topService = byService[0];
+  const paid = account.invested - account.dueNow;
 
   const currentSection = (
     <Section
@@ -93,25 +109,44 @@ export default function Invoices() {
       {multiple ? (
         <Cols className="mb-[28px]">
           <div className="lg:col-span-2">{currentSection}</div>
-          <Section title="Billing history" className="mb-0 lg:mb-0">
-            <PaceBars
-              height={140}
-              bars={account.invoices.map((inv) => ({
-                height: (invoiceTotal(inv) / maxTotal) * 100,
-                muted: inv.status !== 'paid',
-                title: `${inv.id} · ${inv.period} · ${money(invoiceTotal(inv))}`,
-              }))}
-            />
-            <div className="mt-[12px] flex gap-[6px]">
-              {account.invoices.map((inv) => (
-                <span key={inv.id} className="flex-1 text-center text-[13.5px] text-muted">
-                  {shortPeriod(inv.period)}
+          <Section title="Where your spend goes" className="mb-0 lg:mb-0">
+            <p className="font-display text-[34px] font-bold leading-none text-strong">
+              {money(account.invested)}
+            </p>
+            <p className="mt-[8px] text-[14px] text-muted">
+              billed across {account.invoices.length} invoices
+            </p>
+            <div className="mt-[16px] flex items-center gap-[16px] border-t border-hairline pt-[16px] text-[14.5px]">
+              <span className="flex-1 text-secondary">
+                <span className="text-positive">{money(paid)}</span> paid
+              </span>
+              {account.dueNow > 0 && (
+                <span className="text-secondary">
+                  <span className="font-semibold text-cta">{money(account.dueNow)}</span> outstanding
                 </span>
+              )}
+            </div>
+
+            <div className="mt-[6px]">
+              {byService.map((sv) => (
+                <div key={sv.name} className="border-t border-hairline py-[14px]">
+                  <div className="flex items-baseline justify-between gap-[12px]">
+                    <span className="min-w-0 truncate text-[14.5px] text-strong">{sv.name}</span>
+                    <span className="text-[14.5px] tabular-nums text-secondary">{money(sv.amount)}</span>
+                  </div>
+                  <div className="mt-[10px] flex items-center gap-[12px]">
+                    <span className="flex-1">
+                      {/* Bar is share of the LARGEST service, so the shape is
+                          readable; the number beside it is share of total. */}
+                      <ProgressRule value={pctValue(sv.amount, topService.amount)} />
+                    </span>
+                    <span className="w-[42px] text-right text-[13.5px] tabular-nums text-muted">
+                      {pctValue(sv.amount, account.invested)}%
+                    </span>
+                  </div>
+                </div>
               ))}
             </div>
-            <p className="mt-[16px] border-t border-hairline pt-[14px] text-[14px] text-muted">
-              {account.invoices.length} invoices to date · largest {money(maxTotal)}
-            </p>
           </Section>
         </Cols>
       ) : (

@@ -68,6 +68,15 @@ for (const acc of accounts) {
     check(`${sid} delivered batches = received (${svc.received})`, delivered === svc.received, `${delivered}`);
   }
 
+  // The Invoices side panel bills a per-service breakdown. It is the same line
+  // amounts summed a different way, so it must land back on invested exactly.
+  const perService = new Map<string, number>();
+  for (const inv of acc.invoices)
+    for (const line of inv.lines)
+      perService.set(line.serviceId, (perService.get(line.serviceId) ?? 0) + line.amount);
+  const spendTotal = sum([...perService.values()]);
+  check('spend by service = invested', spendTotal === acc.invested, `${spendTotal}`);
+
   // Every batch carries a sortKey, and a delivered batch never post-dates a
   // scheduled one. The Data timeline sorts on this: fixtures group batches by
   // service, so array order is not chronological and reading it as a timeline

@@ -297,6 +297,11 @@ Used for tab changes, account switches, and hover tints. Respect
 The most common legibility failure in this product is not density, it is
 repetition. A hero that states a number, a metric strip that restates it, and a
 card that restates it again give the eye three equal candidates and no answer.
+A chart is not exempt: a bar per invoice period on the Invoices screen was the
+History table underneath it, drawn — and since the periods bill similar amounts,
+it drew three near-equal columns that said nothing. It was replaced with a
+per-service spend breakdown, which is the one commercial question no other screen
+answers.
 
 The hero carries the **sentence**. Everything below it carries facts the sentence
 does not. Concretely: the Media hero no longer restates spend, budget or pace —
