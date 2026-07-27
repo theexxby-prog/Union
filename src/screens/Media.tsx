@@ -11,7 +11,18 @@ import { Link, Navigate } from 'react-router-dom';
 import { IconChevronRight } from '@tabler/icons-react';
 import { useAccount } from '@/components/AppLayout';
 import StatusPill from '@/components/StatusPill';
-import { Eyebrow, EmptyLine, Hero, MetricStrip, PaceBars, Panel, ProgressRule } from '@/components/ui';
+import {
+  Cols,
+  Eyebrow,
+  EmptyLine,
+  Hero,
+  MetricStrip,
+  PaceBars,
+  ProgressRule,
+  Row,
+  Section,
+  TableHead,
+} from '@/components/ui';
 import { compact, int, money, pct, pctValue, rate } from '@/data/format';
 import { hasService, path } from '@/lib/nav';
 import type { EngagementLevel, StatusState } from '@/data/types';
@@ -27,6 +38,25 @@ const LEVEL: Record<EngagementLevel, { state: StatusState; label: string }> = {
   medium: { state: 'neutral', label: 'Medium' },
   low: { state: 'neutral', label: 'Low' },
 };
+
+function FunnelStep({
+  value,
+  label,
+  positive = false,
+}: {
+  value: string;
+  label: string;
+  positive?: boolean;
+}) {
+  return (
+    <div className="min-w-[170px] flex-1">
+      <p className={`font-display text-[34px] font-bold leading-none ${positive ? 'text-positive' : 'text-strong'}`}>
+        {value}
+      </p>
+      <p className="mt-[8px] text-[14px] text-muted">{label}</p>
+    </div>
+  );
+}
 
 export default function Media() {
   const account = useAccount();
@@ -50,7 +80,7 @@ export default function Media() {
     <>
       <Hero hero={account.heroes.media!} />
 
-      <div className="mb-[22px]">
+      <Section bare>
         <MetricStrip
           metrics={[
             { label: 'Impressions', value: compact(media.impressions) },
@@ -60,182 +90,167 @@ export default function Media() {
             { label: 'Accounts engaged', value: int(media.accountsEngaged), positive: true },
           ]}
         />
-      </div>
+      </Section>
 
-      {/* ---- Daily delivery ------------------------------------------- */}
-      <div className="mb-[12px] flex items-center justify-between">
-        <Eyebrow>Daily delivery</Eyebrow>
-        <div className="flex overflow-hidden rounded-full border border-hairline">
-          {RANGES.map((r) => (
-            <button
-              key={r.key}
-              onClick={() => setRange(r.key)}
-              className={`px-[13px] py-[5px] text-[11.5px] transition-colors duration-150 ease-standard ${
-                range === r.key ? 'bg-[#F4F7FB] font-semibold text-strong' : 'text-secondary hover:text-strong'
-              }`}
-            >
-              {r.label}
-            </button>
-          ))}
+      {/* Delivery chart and budget pacing sit side by side at desktop width. */}
+      <Cols className="mb-[28px]">
+        <div className="lg:col-span-2">
+          <Section
+            title="Daily delivery"
+            className="mb-0 lg:mb-0"
+            right={
+              <div className="flex overflow-hidden rounded-full border border-hairline">
+                {RANGES.map((r) => (
+                  <button
+                    key={r.key}
+                    onClick={() => setRange(r.key)}
+                    className={`px-[16px] py-[7px] text-[13.5px] transition-colors duration-150 ease-standard ${
+                      range === r.key
+                        ? 'bg-[#F4F7FB] font-semibold text-strong'
+                        : 'text-secondary hover:text-strong'
+                    }`}
+                  >
+                    {r.label}
+                  </button>
+                ))}
+              </div>
+            }
+          >
+            <PaceBars
+              height={176}
+              bars={days.map((d) => ({
+                height: (d.impressions / maxDay) * 100,
+                title: `${d.date} · ${int(d.impressions)} impressions · ${money(d.spend)}`,
+              }))}
+            />
+            <div className="mt-[12px] flex justify-between text-[13.5px] text-muted">
+              <span>{days[0].date}</span>
+              <span>{days[days.length - 1].date}</span>
+            </div>
+            <div className="mt-[16px] flex flex-wrap gap-x-[26px] gap-y-[6px] border-t border-hairline pt-[14px] text-[14px] text-secondary">
+              <span>
+                {int(rangeImpressions)} impressions in range · {money(rangeSpend)}
+              </span>
+              <span>Average CPM {rate(cpm)}</span>
+            </div>
+          </Section>
         </div>
-      </div>
-      <Panel className="mb-[22px]">
-        <PaceBars
-          bars={days.map((d) => ({
-            height: (d.impressions / maxDay) * 100,
-            title: `${d.date} · ${int(d.impressions)} impressions · ${money(d.spend)}`,
-          }))}
-        />
-        <div className="mt-[8px] flex justify-between text-[11.5px] text-muted">
-          <span>{days[0].date}</span>
-          <span>{days[days.length - 1].date}</span>
-        </div>
-        <div className="mt-[12px] flex flex-wrap gap-x-[18px] gap-y-[4px] border-t border-hairline pt-[10px] text-[11.5px] text-secondary">
-          <span>
-            {int(rangeImpressions)} impressions in range · {money(rangeSpend)}
-          </span>
-          <span>Average CPM {rate(cpm)}</span>
-          <span>
+
+        <Section title="Budget pacing" className="mb-0 lg:mb-0">
+          <div className="flex items-center justify-between gap-[12px]">
+            <p className="font-display text-[34px] font-bold leading-none text-strong">
+              {pct(media.investment, media.budget)}
+            </p>
+            <StatusPill state={media.pacing.state}>{media.pacing.label}</StatusPill>
+          </div>
+          <p className="mb-[16px] mt-[8px] text-[14px] text-muted">of budget invested</p>
+          <ProgressRule value={pctValue(media.investment, media.budget)} />
+          <p className="mt-[16px] text-[14.5px] text-secondary">
+            {money(media.investment)} of {money(media.budget)}
+          </p>
+          <p className="mt-[6px] text-[14px] text-muted">
             Flight {media.flightStart} – {media.flightEnd}
-          </span>
-        </div>
-      </Panel>
-
-      {/* ---- Budget pacing --------------------------------------------- */}
-      <Eyebrow className="mb-[10px]">Budget pacing</Eyebrow>
-      <Panel className="mb-[22px]">
-        <div className="flex items-center gap-[12px]">
-          <span className="flex-1">
-            <ProgressRule value={pctValue(media.investment, media.budget)} />
-          </span>
-          <StatusPill state={media.pacing.state}>{media.pacing.label}</StatusPill>
-        </div>
-        <p className="mt-[10px] text-[12px] text-secondary">
-          {money(media.investment)} of {money(media.budget)} invested ·{' '}
-          {pct(media.investment, media.budget)} of budget · flight ends {media.flightEnd}
-        </p>
-      </Panel>
+          </p>
+        </Section>
+      </Cols>
 
       {/* ---- Reach → engage → convert ---------------------------------- */}
-      <Eyebrow className="mb-[10px]">Reach to revenue</Eyebrow>
-      <Panel className="mb-[22px]">
-        <div className="flex flex-wrap items-center gap-y-[10px]">
-          <div className="min-w-[150px] flex-1">
-            <p className="font-display text-[22px] font-bold leading-none text-strong">
-              {int(media.accountsReached)}
-            </p>
-            <p className="mt-[4px] text-[11.5px] text-muted">accounts reached</p>
-          </div>
-          <IconChevronRight size={16} stroke={2} className="mx-[8px] text-muted" />
-          <div className="min-w-[150px] flex-1">
-            <p className="font-display text-[22px] font-bold leading-none text-strong">
-              {int(media.accountsEngaged)}
-            </p>
-            <p className="mt-[4px] text-[11.5px] text-muted">
-              engaged · {pct(media.accountsEngaged, media.accountsReached)} of reached
-            </p>
-          </div>
-          <IconChevronRight size={16} stroke={2} className="mx-[8px] text-muted" />
-          <div className="min-w-[150px] flex-1">
-            <p className="font-display text-[22px] font-bold leading-none text-strong">
-              {leads ? int(leads.delivered) : '—'}
-            </p>
-            <p className="mt-[4px] text-[11.5px] text-muted">leads delivered</p>
-          </div>
-          <IconChevronRight size={16} stroke={2} className="mx-[8px] text-muted" />
-          <div className="min-w-[150px] flex-1">
-            <p className="font-display text-[22px] font-bold leading-none text-positive">
-              {leads ? int(leads.billable) : '—'}
-            </p>
-            <p className="mt-[4px] text-[11.5px] text-muted">billable leads</p>
-          </div>
+      <Section title="Reach to revenue">
+        <div className="flex flex-wrap items-center gap-y-[18px]">
+          <FunnelStep value={int(media.accountsReached)} label="accounts reached" />
+          <IconChevronRight size={20} stroke={2} className="mx-[12px] text-muted" />
+          <FunnelStep
+            value={int(media.accountsEngaged)}
+            label={`engaged · ${pct(media.accountsEngaged, media.accountsReached)} of reached`}
+          />
+          <IconChevronRight size={20} stroke={2} className="mx-[12px] text-muted" />
+          <FunnelStep value={leads ? int(leads.delivered) : '—'} label="leads delivered" />
+          <IconChevronRight size={20} stroke={2} className="mx-[12px] text-muted" />
+          <FunnelStep value={leads ? int(leads.billable) : '—'} label="billable leads" positive />
         </div>
         {leads && (
-          <p className="mt-[12px] border-t border-hairline pt-[10px] text-[11.5px] text-muted">
+          <p className="mt-[20px] border-t border-hairline pt-[16px] text-[14.5px] text-muted">
             The accounts your media reached are the accounts your leads came from — one programme, end to end.{' '}
             <Link to={path(account.id, 'leads')} className="font-medium !text-accent">
               See the leads →
             </Link>
           </p>
         )}
-      </Panel>
+      </Section>
 
-      {/* ---- Channel mix ------------------------------------------------ */}
-      <Eyebrow className="mb-[2px]">Channel mix</Eyebrow>
-      <div className="mb-[22px]">
-        <div className="flex items-center py-[12px]">
-          <Eyebrow className="flex-1">Channel</Eyebrow>
-          <Eyebrow className="w-[170px]">Share of delivery</Eyebrow>
-          <Eyebrow className="w-[120px] text-right">Impressions</Eyebrow>
+      {/* Channel mix and creative performance pair up. */}
+      <Cols className="mb-[28px]">
+        <div className="lg:col-span-2">
+          <Section title="Channel mix" className="mb-0 lg:mb-0">
+            <TableHead>
+              <Eyebrow className="flex-1">Channel</Eyebrow>
+              <Eyebrow className="w-[220px]">Share of delivery</Eyebrow>
+              <Eyebrow className="w-[140px] text-right">Impressions</Eyebrow>
+            </TableHead>
+            {media.channels.map((c) => {
+              const share = pctValue(c.impressions, media.impressions);
+              const relative = pctValue(c.impressions, topChannel.impressions);
+              return (
+                <Row key={c.name}>
+                  <span className="min-w-0 flex-1 text-[15.5px] text-strong">{c.name}</span>
+                  <span className="flex w-[220px] items-center gap-[12px]">
+                    <span className="flex-1">
+                      <ProgressRule value={relative} />
+                    </span>
+                    <span className="w-[42px] text-right text-[13.5px] text-muted">{share}%</span>
+                  </span>
+                  <span className="w-[140px] text-right text-[14.5px] text-secondary">{int(c.impressions)}</span>
+                </Row>
+              );
+            })}
+          </Section>
         </div>
-        {media.channels.map((c) => {
-          const share = pctValue(c.impressions, media.impressions);
-          const relative = pctValue(c.impressions, topChannel.impressions);
-          return (
-            <div key={c.name} className="flex items-center border-t border-hairline py-[12px]">
-              <span className="min-w-0 flex-1 text-[13px] text-strong">{c.name}</span>
-              <span className="flex w-[170px] items-center gap-[8px]">
-                <span className="flex-1">
-                  <ProgressRule value={relative} />
-                </span>
-                <span className="w-[34px] text-right text-[11.5px] text-muted">{share}%</span>
+
+        <Section title="Creative performance" className="mb-0 lg:mb-0">
+          {media.assets.map((a) => (
+            <Row key={a.name} className="gap-[12px] first:border-t-0">
+              <div className="min-w-0 flex-1">
+                <p className="text-[14.5px] font-medium text-strong">{a.name}</p>
+                <p className="mt-[4px] text-[13px] text-muted">{a.format}</p>
+              </div>
+              <span className="text-right text-[14px] text-secondary">
+                {compact(a.impressions)}
+                <span className="ml-[10px] text-muted">{a.engagementRate}</span>
               </span>
-              <span className="w-[120px] text-right text-[12.5px] text-secondary">{int(c.impressions)}</span>
-            </div>
-          );
-        })}
-      </div>
+            </Row>
+          ))}
+        </Section>
+      </Cols>
 
       {/* ---- Account engagement ---------------------------------------- */}
-      <Eyebrow className="mb-[2px]">Account engagement</Eyebrow>
-      <div className="mb-[22px]">
-        <div className="flex items-center py-[12px]">
+      <Section title="Account engagement">
+        <TableHead>
           <Eyebrow className="flex-1">Account</Eyebrow>
-          <Eyebrow className="w-[120px] text-right">Impressions</Eyebrow>
-          <Eyebrow className="w-[90px] pl-[16px]">Last seen</Eyebrow>
-          <Eyebrow className="w-[130px] text-right">Engagement</Eyebrow>
-        </div>
+          <Eyebrow className="w-[150px] text-right">Impressions</Eyebrow>
+          <Eyebrow className="w-[120px] pl-[20px]">Last seen</Eyebrow>
+          <Eyebrow className="w-[150px] text-right">Engagement</Eyebrow>
+        </TableHead>
         {media.engagedAccounts.length === 0 ? (
           <EmptyLine>Engaged accounts will appear here as the flight delivers.</EmptyLine>
         ) : (
           media.engagedAccounts.map((a) => (
-            <div key={a.name} className="flex items-center border-t border-hairline py-[12px]">
+            <Row key={a.name}>
               <div className="min-w-0 flex-1">
-                <p className="text-[13px] text-strong">{a.name}</p>
-                <p className="mt-[3px] text-[12px] text-muted">
+                <p className="text-[15.5px] text-strong">{a.name}</p>
+                <p className="mt-[5px] text-[13.5px] text-muted">
                   {a.industry}
                   {a.becameLead && ' · became a lead'}
                 </p>
               </div>
-              <span className="w-[120px] text-right text-[12.5px] text-secondary">{int(a.impressions)}</span>
-              <span className="w-[90px] pl-[16px] text-[12.5px] text-muted">{a.lastActivity}</span>
-              <span className="w-[130px] text-right">
+              <span className="w-[150px] text-right text-[14.5px] text-secondary">{int(a.impressions)}</span>
+              <span className="w-[120px] pl-[20px] text-[14.5px] text-muted">{a.lastActivity}</span>
+              <span className="w-[150px] text-right">
                 <StatusPill state={LEVEL[a.level].state}>{LEVEL[a.level].label}</StatusPill>
               </span>
-            </div>
+            </Row>
           ))
         )}
-      </div>
-
-      {/* ---- Creative performance --------------------------------------- */}
-      <Eyebrow className="mb-[2px]">Creative performance</Eyebrow>
-      <div>
-        <div className="flex items-center py-[12px]">
-          <Eyebrow className="flex-1">Asset</Eyebrow>
-          <Eyebrow className="w-[130px] text-right">Impressions</Eyebrow>
-          <Eyebrow className="w-[110px] text-right">Engagement</Eyebrow>
-        </div>
-        {media.assets.map((a) => (
-          <div key={a.name} className="flex items-center border-t border-hairline py-[12px]">
-            <div className="min-w-0 flex-1">
-              <p className="text-[13px] text-strong">{a.name}</p>
-              <p className="mt-[3px] text-[12px] text-muted">{a.format}</p>
-            </div>
-            <span className="w-[130px] text-right text-[12.5px] text-secondary">{int(a.impressions)}</span>
-            <span className="w-[110px] text-right text-[12.5px] text-muted">{a.engagementRate}</span>
-          </div>
-        ))}
-      </div>
+      </Section>
     </>
   );
 }

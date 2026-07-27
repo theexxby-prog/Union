@@ -18,7 +18,7 @@ export default function StatusPill({
 }) {
   return (
     <span
-      className={`inline-flex items-center whitespace-nowrap rounded-full px-[10px] py-[3px] text-[11px] font-semibold ${STATES[state]}`}
+      className={`inline-flex items-center whitespace-nowrap rounded-full px-[13px] py-[5px] text-[12.5px] font-semibold ${STATES[state]}`}
     >
       {children}
     </span>

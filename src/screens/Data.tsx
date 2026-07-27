@@ -4,7 +4,7 @@
 import { Navigate } from 'react-router-dom';
 import { useAccount } from '@/components/AppLayout';
 import StatusPill from '@/components/StatusPill';
-import { Eyebrow, Hero, MetricStrip, Panel, ServiceCard } from '@/components/ui';
+import { Eyebrow, Hero, MetricStrip, Row, Section, ServiceCard, TableHead } from '@/components/ui';
 import { int } from '@/data/format';
 import { hasService, path } from '@/lib/nav';
 import type { MetricTile, Service } from '@/data/types';
@@ -31,62 +31,62 @@ export default function Data() {
     <>
       <Hero hero={account.heroes.data!} />
 
-      <Eyebrow className="mb-[12px]">Services</Eyebrow>
-      <div className="grid grid-cols-2 gap-px overflow-hidden rounded-card border border-hairline bg-hairline">
-        {dataServices.map((s) => (
-          <ServiceCard key={s.id} s={s} />
-        ))}
-      </div>
+      <Section title="Services" bare>
+        <div className="grid grid-cols-2 gap-px overflow-hidden rounded-[16px] border border-hairline bg-hairline">
+          {dataServices.map((s) => (
+            <ServiceCard key={s.id} s={s} />
+          ))}
+        </div>
+      </Section>
 
-      <Eyebrow className="mb-[12px] mt-[22px]">Quality</Eyebrow>
-      <MetricStrip metrics={qualityTiles(dataServices)} />
+      <Section title="Quality" bare>
+        <MetricStrip metrics={qualityTiles(dataServices)} />
+      </Section>
 
-      <Eyebrow className="mb-[12px] mt-[22px]">Batch timeline</Eyebrow>
-      <Panel>
-        <div className="flex gap-[7px]">
+      <Section title="Batch timeline">
+        <div className="flex gap-[10px]">
           {account.batches.map((b) => {
             const delivered = b.status === 'good';
             return (
               <div key={b.id} className="flex-1" title={`${b.name} · ${int(b.records)} records · ${b.statusLabel}`}>
-                <div className={`mb-[8px] h-[3px] ${delivered ? 'bg-accent' : 'bg-[#d6deea]'}`} />
-                <span className={`block text-[11.5px] ${delivered ? 'text-strong' : 'text-secondary'}`}>{b.date}</span>
-                <span className="block text-[11px] text-muted">{int(b.records)}</span>
+                <div className={`mb-[12px] h-[3px] rounded-full ${delivered ? 'bg-accent' : 'bg-[#d6deea]'}`} />
+                <span className={`block text-[14px] ${delivered ? 'text-strong' : 'text-secondary'}`}>{b.date}</span>
+                <span className="mt-[2px] block text-[13.5px] text-muted">{int(b.records)}</span>
               </div>
             );
           })}
         </div>
-      </Panel>
-      {nextBatch && (
-        <div className="mt-[14px] flex items-center gap-[10px] rounded-card border border-hairline bg-[#fafbfd] px-[16px] py-[11px]">
-          <StatusPill state="neutral">Scheduled</StatusPill>
-          <p className="m-0 flex-1 text-[12.5px] text-secondary">
-            Next batch — {nextBatch.name} · {int(nextBatch.records)} records · lands {nextBatch.date}.
-          </p>
-        </div>
-      )}
+        {nextBatch && (
+          <div className="mt-[22px] flex items-center gap-[12px] border-t border-hairline pt-[18px]">
+            <StatusPill state="neutral">Scheduled</StatusPill>
+            <p className="m-0 flex-1 text-[14.5px] text-secondary">
+              Next batch — {nextBatch.name} · {int(nextBatch.records)} records · lands {nextBatch.date}.
+            </p>
+          </div>
+        )}
+      </Section>
 
-      <Eyebrow className="mb-[2px] mt-[22px]">Batch deliveries</Eyebrow>
-      <div>
-        <div className="flex items-center py-[12px]">
+      <Section title="Batch deliveries">
+        <TableHead>
           <Eyebrow className="flex-1">Batch</Eyebrow>
-          <Eyebrow className="w-[110px] text-right">Records</Eyebrow>
-          <Eyebrow className="w-[80px] pl-[16px]">Date</Eyebrow>
-          <Eyebrow className="w-[110px] text-right">Status</Eyebrow>
-        </div>
+          <Eyebrow className="w-[140px] text-right">Records</Eyebrow>
+          <Eyebrow className="w-[100px] pl-[20px]">Date</Eyebrow>
+          <Eyebrow className="w-[140px] text-right">Status</Eyebrow>
+        </TableHead>
         {account.batches.map((b) => (
-          <div key={b.id} className="flex items-center border-t border-hairline py-[12px]">
+          <Row key={b.id}>
             <div className="min-w-0 flex-1">
-              <p className="text-[13px] text-strong">{b.name}</p>
-              <p className="mt-[3px] text-[12px] text-muted">{serviceName.get(b.serviceId)}</p>
+              <p className="text-[15.5px] text-strong">{b.name}</p>
+              <p className="mt-[4px] text-[14px] text-muted">{serviceName.get(b.serviceId)}</p>
             </div>
-            <span className="w-[110px] text-right text-[12.5px] text-secondary">{int(b.records)}</span>
-            <span className="w-[80px] pl-[16px] text-[12.5px] text-muted">{b.date}</span>
-            <span className="w-[110px] text-right">
+            <span className="w-[140px] text-right text-[14.5px] text-secondary">{int(b.records)}</span>
+            <span className="w-[100px] pl-[20px] text-[14.5px] text-muted">{b.date}</span>
+            <span className="w-[140px] text-right">
               <StatusPill state={b.status}>{b.statusLabel}</StatusPill>
             </span>
-          </div>
+          </Row>
         ))}
-      </div>
+      </Section>
     </>
   );
 }

@@ -3,7 +3,7 @@
 import { Navigate } from 'react-router-dom';
 import { useAccount } from '@/components/AppLayout';
 import StatusPill from '@/components/StatusPill';
-import { Eyebrow, EmptyLine, Hero, MetricStrip, PhaseStrip } from '@/components/ui';
+import { EmptyLine, Hero, MetricStrip, PhaseStrip, Section } from '@/components/ui';
 import { int } from '@/data/format';
 import { hasService, path } from '@/lib/nav';
 import { RESEARCH_STAGES } from '@/data/types';
@@ -21,8 +21,7 @@ export default function Research() {
     <>
       <Hero hero={account.heroes.research!} />
 
-      <Eyebrow className="mb-[12px]">Programme</Eyebrow>
-      <div className="mb-[22px]">
+      <Section title="Programme" bare>
         <MetricStrip
           metrics={[
             { label: 'Studies commissioned', value: int(studies.length) },
@@ -31,36 +30,46 @@ export default function Research() {
             { label: 'Quality', value: svc.qualityLine.split(' · ')[1] ?? svc.qualityLine, positive: true },
           ]}
         />
-      </div>
+      </Section>
 
-      <Eyebrow className="mb-[10px]">Studies</Eyebrow>
-      {studies.length === 0 ? (
-        <EmptyLine>Commissioned studies will appear here with their fieldwork status.</EmptyLine>
-      ) : (
-        studies.map((s) => {
-          const done = s.stage === 3;
-          return (
-            <div key={s.id} className="mb-[12px] rounded-card border border-hairline px-[18px] py-[15px]">
-              <div className="mb-[14px] flex items-start justify-between gap-[12px]">
-                <div className="min-w-0 flex-1">
-                  <p className="m-0 text-[13.5px] font-medium text-strong">
-                    {s.name} · {s.geo}
-                  </p>
-                  <p className="mb-0 mt-[3px] text-[12px] text-muted">
-                    {s.method} · {s.detail} · {s.due}
-                  </p>
+      <Section title="Studies" bare>
+        {studies.length === 0 ? (
+          <div className="rounded-[16px] border border-hairline bg-white px-[26px] py-[8px]">
+            <EmptyLine>Commissioned studies will appear here with their fieldwork status.</EmptyLine>
+          </div>
+        ) : (
+          studies.map((s) => {
+            const done = s.stage === 3;
+            return (
+              <div
+                key={s.id}
+                className="mb-[14px] rounded-[16px] border border-hairline bg-white px-[26px] py-[22px] last:mb-0"
+              >
+                <div className="mb-[20px] flex flex-wrap items-start justify-between gap-[14px]">
+                  <div className="min-w-0 flex-1">
+                    <p className="m-0 text-[17px] font-medium text-strong">
+                      {s.name} · {s.geo}
+                    </p>
+                    <p className="mb-0 mt-[5px] text-[14.5px] text-muted">
+                      {s.method} · {s.detail} · {s.due}
+                    </p>
+                  </div>
+                  {done ? (
+                    <StatusPill state="good">Delivered</StatusPill>
+                  ) : (
+                    <StatusPill state="neutral">{RESEARCH_STAGES[s.stage]}</StatusPill>
+                  )}
                 </div>
-                {done ? (
-                  <StatusPill state="good">Delivered</StatusPill>
-                ) : (
-                  <StatusPill state="neutral">{RESEARCH_STAGES[s.stage]}</StatusPill>
-                )}
+                <PhaseStrip
+                  phase={done ? RESEARCH_STAGES.length : s.stage}
+                  needsClient={false}
+                  labels={RESEARCH_STAGES}
+                />
               </div>
-              <PhaseStrip phase={done ? RESEARCH_STAGES.length : s.stage} needsClient={false} labels={RESEARCH_STAGES} />
-            </div>
-          );
-        })
-      )}
+            );
+          })
+        )}
+      </Section>
     </>
   );
 }

@@ -28,15 +28,18 @@ import type { Account } from '@/data/types';
 /** Screens read the resolved account from the router outlet. */
 export const useAccount = (): Account => useOutletContext<Account>();
 
+/** Chrome and content share one measure; the bars themselves run full-bleed. */
+const SHELL = 'mx-auto w-full max-w-[1560px] px-[32px]';
+
 const dropdownClass =
-  'absolute right-0 z-10 mt-[6px] overflow-hidden rounded-card border border-hairline bg-white py-[4px] shadow-[0_8px_24px_rgba(7,17,31,0.10)]';
+  'absolute right-0 z-20 mt-[8px] overflow-hidden rounded-[14px] border border-hairline bg-white py-[6px] shadow-[0_10px_30px_rgba(7,17,31,0.12)]';
 
 function Logo() {
   return (
     <div className="flex items-center gap-[8px]">
       {/* The official DBSL mark — used as-is, never redrawn (brand rules). */}
-      <DbslMark className="h-[28px] w-auto" />
-      <span className="font-display text-[15px] font-bold text-strong">Union</span>
+      <DbslMark className="h-[34px] w-auto" />
+      <span className="font-display text-[19px] font-bold text-strong">Union</span>
     </div>
   );
 }
@@ -51,15 +54,15 @@ function AccountSwitcher({ account }: { account: Account }) {
       <button
         onClick={() => setOpen((v) => !v)}
         onBlur={() => setTimeout(() => setOpen(false), 120)}
-        className="flex items-center gap-[6px] rounded-full border border-hairline px-[13px] py-[6px] text-[12.5px] text-body transition-colors duration-150 ease-standard hover:bg-page"
+        className="flex items-center gap-[8px] rounded-full border border-hairline px-[18px] py-[9px] text-[14.5px] font-medium text-body transition-colors duration-150 ease-standard hover:bg-page"
         aria-haspopup="listbox"
         aria-expanded={open}
       >
         {account.name}
-        <IconChevronDown size={12} className="text-muted" stroke={2} />
+        <IconChevronDown size={15} className="text-muted" stroke={2} />
       </button>
       {open && (
-        <ul role="listbox" className={`${dropdownClass} w-[260px]`}>
+        <ul role="listbox" className={`${dropdownClass} w-[320px]`}>
           {accounts.map((a) => (
             <li key={a.id}>
               <button
@@ -72,12 +75,12 @@ function AccountSwitcher({ account }: { account: Account }) {
                   // switching accounts mid-screen is the comparison move.
                   navigate(switchTarget(a.id, location.pathname, a));
                 }}
-                className={`flex w-full flex-col items-start px-[15px] py-[9px] text-left transition-colors duration-150 ease-standard hover:bg-page ${
+                className={`flex w-full flex-col items-start px-[18px] py-[11px] text-left transition-colors duration-150 ease-standard hover:bg-page ${
                   a.id === account.id ? 'bg-page' : ''
                 }`}
               >
-                <span className="text-[13px] text-strong">{a.name}</span>
-                <span className="mt-[2px] block text-[11.5px] text-muted">{a.descriptor}</span>
+                <span className="text-[15px] font-medium text-strong">{a.name}</span>
+                <span className="mt-[3px] block text-[13px] text-muted">{a.descriptor}</span>
               </button>
             </li>
           ))}
@@ -103,10 +106,10 @@ function NotificationBell({ account }: { account: Account }) {
         onBlur={() => setTimeout(() => setOpen(false), 120)}
         className="relative text-muted transition-colors duration-150 ease-standard hover:text-secondary"
       >
-        <IconBell size={17} stroke={2} />
+        <IconBell size={20} stroke={2} />
         {notices.length > 0 && (
           <span
-            className={`absolute -right-[2px] -top-[1px] h-[7px] w-[7px] rounded-full border border-white ${
+            className={`absolute -right-[2px] -top-[1px] h-[9px] w-[9px] rounded-full border-2 border-white ${
               hasAction ? 'bg-cta' : 'bg-accent'
             }`}
           />
@@ -114,11 +117,11 @@ function NotificationBell({ account }: { account: Account }) {
       </button>
       {open && (
         <div role="menu" className={`${dropdownClass} w-[320px]`}>
-          <p className="m-0 px-[15px] pb-[6px] pt-[8px] text-[11px] font-semibold uppercase tracking-[0.14em] text-muted">
+          <p className="m-0 px-[18px] pb-[8px] pt-[10px] text-[12px] font-semibold uppercase tracking-[0.12em] text-muted">
             Notifications
           </p>
           {notices.length === 0 ? (
-            <p className="m-0 px-[15px] pb-[12px] pt-[4px] text-[12.5px] text-muted">
+            <p className="m-0 px-[18px] pb-[14px] pt-[6px] text-[14px] text-muted">
               Nothing needs your attention right now.
             </p>
           ) : (
@@ -131,9 +134,9 @@ function NotificationBell({ account }: { account: Account }) {
                   setOpen(false);
                   navigate(path(account.id, n.segment));
                 }}
-                className="flex w-full items-center gap-[10px] border-t border-hairline px-[15px] py-[10px] text-left transition-colors duration-150 ease-standard hover:bg-page"
+                className="flex w-full items-center gap-[12px] border-t border-hairline px-[18px] py-[13px] text-left transition-colors duration-150 ease-standard hover:bg-page"
               >
-                <span className="min-w-0 flex-1 text-[12.5px] leading-[1.4] text-body">{n.label}</span>
+                <span className="min-w-0 flex-1 text-[14px] leading-[1.4] text-body">{n.label}</span>
                 <StatusPill state={n.state}>{n.state === 'action' ? 'Action' : 'Needs you'}</StatusPill>
               </button>
             ))
@@ -146,9 +149,9 @@ function NotificationBell({ account }: { account: Account }) {
 
 function Chrome({ account }: { account: Account }) {
   return (
-    <header className="flex items-center justify-between border-b border-hairline px-[28px] py-[14px]">
+    <header className={`${SHELL} flex items-center justify-between py-[16px]`}>
       <Logo />
-      <div className="flex items-center gap-[14px]">
+      <div className="flex items-center gap-[18px]">
         <AccountSwitcher account={account} />
         <NotificationBell account={account} />
         <NavLink
@@ -158,9 +161,9 @@ function Chrome({ account }: { account: Account }) {
             `transition-colors duration-150 ease-standard hover:text-secondary ${isActive ? 'text-accent' : 'text-muted'}`
           }
         >
-          <IconSettings size={17} stroke={2} />
+          <IconSettings size={20} stroke={2} />
         </NavLink>
-        <span className="flex h-[25px] w-[25px] items-center justify-center rounded-full bg-[#F4F7FB] text-[10.5px] font-semibold text-secondary">
+        <span className="flex h-[34px] w-[34px] items-center justify-center rounded-full bg-[#EEF2F8] text-[13px] font-semibold text-secondary">
           {account.user.initials}
         </span>
       </div>
@@ -171,7 +174,7 @@ function Chrome({ account }: { account: Account }) {
 function Tabs({ account }: { account: Account }) {
   const navigate = useNavigate();
   return (
-    <nav className="flex gap-[36px] border-b border-hairline px-[28px] pt-[15px]">
+    <nav className={`${SHELL} flex gap-[40px] pt-[6px]`}>
       {TABS.map((tab) => {
         const entitled = isEntitled(tab, account);
         if (!entitled) {
@@ -179,11 +182,11 @@ function Tabs({ account }: { account: Account }) {
             <button
               key={tab.key}
               onClick={() => navigate(path(account.id, ''))}
-              className="flex items-center gap-[5px] border-b-2 border-transparent pb-[13px] text-[13.5px] text-faint"
+              className="flex items-center gap-[6px] border-b-2 border-transparent pb-[16px] text-[16px] text-faint"
               title={`${tab.label} is available on your account — see Overview`}
             >
               {tab.label}
-              <IconLock size={12} stroke={2} />
+              <IconLock size={14} stroke={2} />
             </button>
           );
         }
@@ -193,7 +196,7 @@ function Tabs({ account }: { account: Account }) {
             to={path(account.id, tab.segment)}
             end={tab.segment === ''}
             className={({ isActive }) =>
-              `border-b-2 pb-[13px] text-[13.5px] transition-colors duration-150 ease-standard ${
+              `border-b-2 pb-[16px] text-[16px] transition-colors duration-150 ease-standard ${
                 isActive
                   ? 'border-accent font-semibold text-strong'
                   : 'border-transparent font-medium text-secondary hover:text-strong'
@@ -215,7 +218,7 @@ const CORP_LINKS = ['About', 'Services', 'Case Studies', 'Careers', 'Contact'];
 
 function SiteFooter() {
   return (
-    <footer className="border-t border-hairline px-[28px] py-[12px]">
+    <footer className={`${SHELL} py-[18px]`}>
       <div className="flex flex-wrap items-center justify-between gap-x-[16px] gap-y-[6px]">
         <div className="flex flex-wrap items-center gap-x-[14px] gap-y-[4px]">
           <a
@@ -225,7 +228,7 @@ function SiteFooter() {
             title="Datamatics Business Solutions"
             className="opacity-90 transition-opacity duration-150 ease-standard hover:opacity-100"
           >
-            <DbslLockup className="h-[26px] w-auto" />
+            <DbslLockup className="h-[30px] w-auto" />
           </a>
           {CORP_LINKS.map((label) => (
             <a
@@ -233,21 +236,21 @@ function SiteFooter() {
               href={CORP_URL}
               target="_blank"
               rel="noreferrer"
-              className="text-[11px] !text-muted hover:!text-accent"
+              className="text-[13px] !text-muted hover:!text-accent"
             >
               {label}
             </a>
           ))}
         </div>
-        <span className="text-[11px] text-muted">
+        <span className="text-[13px] text-muted">
           146 West 29th Street, Ste 10W, New York, NY 10001 · +1-213-647-8029
         </span>
       </div>
-      <div className="mt-[6px] flex flex-wrap items-center justify-between gap-x-[16px] gap-y-[4px]">
-        <span className="text-[11px] text-faint">
+      <div className="mt-[8px] flex flex-wrap items-center justify-between gap-x-[16px] gap-y-[4px]">
+        <span className="text-[13px] text-faint">
           © 2026 Datamatics Business Solutions Limited. All rights reserved.
         </span>
-        <span className="text-[11px] text-faint">Union · Internal demo</span>
+        <span className="text-[13px] text-faint">Union · Internal demo</span>
       </div>
     </footer>
   );
@@ -278,17 +281,21 @@ export default function AppLayout() {
 
   return (
     <DemoStateProvider>
-      <div className="min-h-full bg-[#f6f8fb]">
-        <div className="mx-auto max-w-[1200px] px-[24px] py-[40px]">
-          <div className="overflow-hidden rounded-[16px] border border-hairline bg-white">
-            <Chrome account={account} />
-            <Tabs account={account} />
-            {/* Keyed by account+tab so switching either fades the screen in. */}
-            <div key={screenKey} className="animate-screen px-[28px] py-[26px]">
-              <Outlet context={account} />
-            </div>
-            <SiteFooter />
+      {/* Chrome and tabs run edge to edge and stay pinned, so the app owns the
+          viewport instead of floating as a card in the middle of it. */}
+      <div className="min-h-full">
+        <div className="sticky top-0 z-30 border-b border-hairline bg-white">
+          <Chrome account={account} />
+          <Tabs account={account} />
+        </div>
+        <main className={`${SHELL} py-[32px]`}>
+          {/* Keyed by account+tab so switching either fades the screen in. */}
+          <div key={screenKey} className="animate-screen">
+            <Outlet context={account} />
           </div>
+        </main>
+        <div className="border-t border-hairline bg-white">
+          <SiteFooter />
         </div>
       </div>
     </DemoStateProvider>

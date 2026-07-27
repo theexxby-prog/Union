@@ -114,10 +114,13 @@
 
   body {
     margin: 0;
-    background: #f6f8fb; /* the frame around the app card */
+    /* Brand Soft Grey canvas — content sits on white cards above it. */
+    background: #f4f7fb;
     color: var(--u-text-body);
     font-family: var(--font-body);
-    font-size: 13px;
+    /* Presentation-first scale: these screens are walked through on a large
+       display, so the base steps up from the 13px the 1200px canvas used. */
+    font-size: 15px;
     line-height: 1.5;
     /* Numeric columns align — docs/02 typography. */
     font-variant-numeric: tabular-nums;

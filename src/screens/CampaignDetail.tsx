@@ -5,7 +5,17 @@ import { Link, Navigate, useParams } from 'react-router-dom';
 import { IconArrowLeft } from '@tabler/icons-react';
 import { useAccount } from '@/components/AppLayout';
 import StatusPill from '@/components/StatusPill';
-import { Eyebrow, EmptyLine, MetricStrip, PaceBars, Panel, ProgressRule } from '@/components/ui';
+import {
+  Cols,
+  Eyebrow,
+  EmptyLine,
+  MetricStrip,
+  PaceBars,
+  ProgressRule,
+  Row,
+  Section,
+  TableHead,
+} from '@/components/ui';
 import { int, money, pctValue } from '@/data/format';
 import { campaignAccept, cadenceLine, campaignStatusMeta, effectiveStatus } from '@/lib/campaign';
 import { demoKey, useDemoState } from '@/lib/demo-state';
@@ -41,43 +51,45 @@ export default function CampaignDetail() {
     <>
       <Link
         to={path(account.id, 'leads')}
-        className="mb-[16px] inline-flex items-center gap-[6px] text-[12.5px] !text-muted hover:!text-accent"
+        className="mb-[16px] inline-flex items-center gap-[7px] text-[14.5px] !text-muted hover:!text-accent"
       >
-        <IconArrowLeft size={14} stroke={2} />
+        <IconArrowLeft size={15} stroke={2} />
         All campaigns
       </Link>
 
-      <div className="mb-[6px] flex items-start justify-between gap-[14px]">
-        <div>
-          <Eyebrow tone="blue">Lead generation · Campaign</Eyebrow>
-          <h1 className="font-display mt-[8px] text-[25px] font-bold leading-[1.15] text-strong">
-            {campaign.name} · {campaign.geo}
-          </h1>
-          <p className="mb-0 mt-[6px] text-[12.5px] text-secondary">
-            {money(campaign.budget)} · {campaign.startDate} – {campaign.endDate} · {cadenceLine(campaign)}
-          </p>
+      {/* The drill-down keeps the hero shape so it reads as a page, not a modal. */}
+      <section className="mb-[28px] rounded-[18px] border border-hero-border bg-hero-fill px-[34px] py-[30px]">
+        <div className="flex flex-wrap items-start justify-between gap-[16px]">
+          <div className="min-w-0">
+            <Eyebrow tone="blue">Lead generation · Campaign</Eyebrow>
+            <h1 className="font-display mt-[12px] text-[40px] font-bold leading-[1.12] text-strong">
+              {campaign.name} · {campaign.geo}
+            </h1>
+            <p className="mb-0 mt-[10px] text-[16px] text-secondary">
+              {money(campaign.budget)} · {campaign.startDate} – {campaign.endDate} · {cadenceLine(campaign)}
+            </p>
+          </div>
+          <div className="flex items-center gap-[10px] pt-[6px]">
+            {pending && (
+              <Link
+                to={path(account.id, 'documents')}
+                className="rounded-full border border-hero-border bg-white px-[16px] py-[8px] text-[14px] !text-accent transition-colors duration-150 ease-standard hover:bg-page"
+              >
+                Review scope
+              </Link>
+            )}
+            <StatusPill state={status.state}>{status.label}</StatusPill>
+          </div>
         </div>
-        <div className="flex items-center gap-[8px] pt-[4px]">
-          {pending && (
-            <Link
-              to={path(account.id, 'documents')}
-              className="rounded-full border border-hairline bg-white px-[12px] py-[5px] text-[11.5px] !text-accent transition-colors duration-150 ease-standard hover:bg-page"
-            >
-              Review scope
-            </Link>
-          )}
-          <StatusPill state={status.state}>{status.label}</StatusPill>
+        <div className="mt-[24px] flex items-center gap-[14px]">
+          <span className="flex-1">
+            <ProgressRule value={pace} />
+          </span>
+          <span className="text-[14.5px] text-secondary">{pace}% of target</span>
         </div>
-      </div>
+      </section>
 
-      <div className="mb-[10px] mt-[14px] flex items-center gap-[10px]">
-        <span className="flex-1">
-          <ProgressRule value={pace} />
-        </span>
-        <span className="text-[12px] text-secondary">{pace}% of target</span>
-      </div>
-
-      <div className="mb-[22px] mt-[18px]">
+      <Section bare>
         <MetricStrip
           metrics={[
             { label: 'Accepted', value: int(campaign.accepted) },
@@ -86,72 +98,78 @@ export default function CampaignDetail() {
             { label: 'Accept rate', value: campaignAccept(campaign), positive: true },
           ]}
         />
-      </div>
+      </Section>
 
-      <Eyebrow className="mb-[14px]">Delivery schedule</Eyebrow>
       {campaign.schedule.length === 0 ? (
-        <EmptyLine>Drops will be scheduled once the campaign starts delivering.</EmptyLine>
+        <Section title="Delivery schedule">
+          <EmptyLine>Drops will be scheduled once the campaign starts delivering.</EmptyLine>
+        </Section>
       ) : (
-        <>
-          <Panel>
-            <PaceBars
-              bars={campaign.schedule.map((d) => ({
-                height: (d.leads / maxLeads) * 100,
-                muted: d.status === 'upcoming',
-                title: `${d.date} · ${int(d.leads)} leads`,
-              }))}
-              height={72}
-            />
-            <div className="mt-[8px] flex justify-between text-[11.5px] text-muted">
-              <span>{campaign.schedule[0].date}</span>
-              <span>{campaign.schedule[campaign.schedule.length - 1].date}</span>
-            </div>
-          </Panel>
-          <div className="mb-[22px] mt-[10px]">
-            {campaign.schedule.map((d, i) => (
-              <div key={i} className="flex items-center border-t border-hairline py-[11px]">
-                <span className="w-[80px] text-[12.5px] text-muted">{d.date}</span>
-                <span className="min-w-0 flex-1 text-[12.5px] text-secondary">
-                  {int(d.leads)} leads
-                </span>
-                <span className="w-[110px] text-right">
-                  {d.status === 'delivered' ? (
-                    <StatusPill state="good">Delivered</StatusPill>
-                  ) : (
-                    <StatusPill state="neutral">Upcoming</StatusPill>
-                  )}
-                </span>
+        <Cols className="mb-[28px]">
+          <div className="lg:col-span-2">
+            <Section title="Delivery schedule" className="mb-0 lg:mb-0">
+              <PaceBars
+                height={168}
+                bars={campaign.schedule.map((d) => ({
+                  height: (d.leads / maxLeads) * 100,
+                  muted: d.status === 'upcoming',
+                  title: `${d.date} · ${int(d.leads)} leads`,
+                }))}
+              />
+              <div className="mt-[12px] flex justify-between text-[13.5px] text-muted">
+                <span>{campaign.schedule[0].date}</span>
+                <span>{campaign.schedule[campaign.schedule.length - 1].date}</span>
               </div>
-            ))}
+            </Section>
           </div>
-        </>
+
+          <Section title="Drops" className="mb-0 lg:mb-0">
+            {campaign.schedule.map((d, i) => (
+              <Row key={i} className="gap-[12px] first:border-t-0">
+                <span className="w-[90px] text-[14.5px] text-muted">{d.date}</span>
+                <span className="min-w-0 flex-1 text-[14.5px] text-secondary">{int(d.leads)} leads</span>
+                {d.status === 'delivered' ? (
+                  <StatusPill state="good">Delivered</StatusPill>
+                ) : (
+                  <StatusPill state="neutral">Upcoming</StatusPill>
+                )}
+              </Row>
+            ))}
+          </Section>
+        </Cols>
       )}
 
-      <Eyebrow className="mb-[2px]">Leads from this campaign</Eyebrow>
-      <div>
+      <Section title="Leads from this campaign">
         {leads.length === 0 ? (
           <EmptyLine>Leads will appear here as drops are delivered.</EmptyLine>
         ) : (
-          leads.map((l) => (
-            <div key={l.id} className="flex items-center border-t border-hairline py-[12px]">
-              <div className="min-w-0 flex-1">
-                <p className="text-[13px] text-strong">{l.name}</p>
-                <p className="mt-[3px] text-[12px] text-muted">
-                  {l.title} · {l.company}
-                </p>
-              </div>
-              <span className="w-[80px] text-[12.5px] text-muted">{l.date}</span>
-              <span className="w-[110px] text-right">
-                {statusFor(l) === 'accepted' ? (
-                  <StatusPill state="good">Accepted</StatusPill>
-                ) : (
-                  <StatusPill state="needsYou">Your review</StatusPill>
-                )}
-              </span>
-            </div>
-          ))
+          <>
+            <TableHead>
+              <Eyebrow className="flex-1">Contact</Eyebrow>
+              <Eyebrow className="w-[100px]">Date</Eyebrow>
+              <Eyebrow className="w-[140px] text-right">Status</Eyebrow>
+            </TableHead>
+            {leads.map((l) => (
+              <Row key={l.id}>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[15.5px] text-strong">{l.name}</p>
+                  <p className="mt-[4px] text-[14px] text-muted">
+                    {l.title} · {l.company}
+                  </p>
+                </div>
+                <span className="w-[100px] text-[14.5px] text-muted">{l.date}</span>
+                <span className="w-[140px] text-right">
+                  {statusFor(l) === 'accepted' ? (
+                    <StatusPill state="good">Accepted</StatusPill>
+                  ) : (
+                    <StatusPill state="needsYou">Your review</StatusPill>
+                  )}
+                </span>
+              </Row>
+            ))}
+          </>
         )}
-      </div>
+      </Section>
     </>
   );
 }

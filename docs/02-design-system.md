@@ -53,18 +53,28 @@ If red appears anywhere it does not mean "act," the CTA loses its meaning.
 
 ## Typography
 
+The scale below is the **presentation-first** revision, amended 27 Jul 2026. The
+original column was set for a 1200px content canvas; the app now runs on a
+1560px canvas (see *Layout canvas*) and is read across a room during a walkthrough,
+not at arm's length. Every role moved up roughly 25%.
+
 | Role | Face | Weight | Size | Tracking |
 |---|---|---|---|---|
-| Hero headline | Montserrat | 700 | 26px | -0.02em |
-| Sub-page headline | Montserrat | 700 | 25px | -0.02em |
-| Large number | Montserrat | 700 | 24px | -0.02em |
-| Metric number | Montserrat | 700 | 20px | -0.02em |
-| Wordmark | Montserrat | 700 | 14px | -0.02em |
-| Eyebrow | Sora | 600 | 11px | 0.14em, uppercase |
-| Hero subhead | Sora | 400 | 13px | — |
-| Body / row primary | Sora | 400–500 | 12.5px | — |
-| Row secondary / caption | Sora | 400 | 11.5px | — |
-| Status pill | Sora | 600 | 11px | — |
+| Hero headline | Montserrat | 700 | 40px | -0.02em |
+| Sub-page headline | Montserrat | 700 | 34px | -0.02em |
+| Large number | Montserrat | 700 | 34px | -0.02em |
+| Metric number | Montserrat | 700 | 34px | -0.02em |
+| Service card number | Montserrat | 700 | 33px | -0.02em |
+| Wordmark | Montserrat | 700 | 18px | -0.02em |
+| Section title | Sora | 600 | 13px | 0.12em, uppercase |
+| Eyebrow | Sora | 600 | 12px | 0.12em, uppercase |
+| Hero subhead | Sora | 400 | 16px | — |
+| Tab | Sora | 400–600 | 16px | — |
+| Body / row primary | Sora | 400–500 | 15.5px | — |
+| Row secondary / caption | Sora | 400 | 14px | — |
+| Status pill | Sora | 600 | 13px | — |
+
+Base `font-size` on `body` is **15px** (was 12.5px).
 
 **Montserrat is for numbers and headlines only.** Everything else is Sora.
 Sentence case everywhere except eyebrows, which are uppercase.
@@ -90,10 +100,36 @@ Nothing else in the app renders a pill-shaped status.
 
 ## Shape
 
-- Cards / hero: `border-radius: 14px` (hero), `12px` (card grids)
+- Cards / hero: `border-radius: 18px` (hero), `16px` (section cards and card grids)
 - Buttons, chips, pills: `border-radius: 999px` — always fully rounded
 - Borders: `1px solid #e7edf5` — hairline everywhere
 - No rounded corners on single-sided borders
+
+## Layout canvas
+
+Amended 27 Jul 2026, replacing the original 1200px centred column.
+
+- **Chrome and tabs are full-bleed** and sticky: white bar, hairline underneath,
+  spanning the whole viewport. Tabs sit at 16px with 40px gaps so the nav reads as
+  a row of destinations rather than a cluster.
+- **Content runs to `max-width: 1560px`** with 32px side padding, centred. On a
+  1680px display this leaves a thin gutter instead of the dead third the old
+  1200px column produced.
+- **The canvas behind the content is Soft Grey `#F4F7FB`.** This is the approved
+  "Option A" treatment. Content does not sit on the grey — every section is a
+  white card on it.
+
+### Section — the unit of a screen
+
+Each screen is a stack of `Section`s: an uppercase title (13px, optional
+right-hand slot for a control or pill) above a **white card**, `radius 16px`,
+hairline border, `padding 22px 26px`. Tables, charts and row-lists all live inside
+one. A `bare` section skips the white card for children that already carry their
+own surface — a hairline grid, a metric strip, a tinted approval card.
+
+Two-column composition uses `Cols` (a 3-track grid; the primary child takes
+`lg:col-span-2`). It is `items-start`, so a short side card sits at its natural
+height rather than stretching to match a tall neighbour.
 
 ## Layout primitives
 
@@ -104,11 +140,11 @@ On every page. The anchor of the screen.
 ```
 ┌──────────────────────────────────────────────┐
 │ EYEBROW · CONTEXT              (blue #146EF5)│
-│ Headline sentence with the one number        │  Montserrat 700 26px navy
-│ Supporting sentence.                         │  Sora 13px #4a5563
+│ Headline sentence with the one number        │  Montserrat 700 40px navy
+│ Supporting sentence.                         │  Sora 16px #4a5563
 │ [Red CTA]  [white pill]  [white pill]        │
 └──────────────────────────────────────────────┘
-  bg #eaf0f9 · border #dbe4f0 · radius 14 · padding 18px 20px
+  bg #eaf0f9 · border #dbe4f0 · radius 18 · padding 30px 34px
 ```
 
 **The headline is always a sentence containing the one number that matters on that

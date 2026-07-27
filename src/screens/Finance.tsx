@@ -3,7 +3,7 @@
 import { Navigate } from 'react-router-dom';
 import { useAccount } from '@/components/AppLayout';
 import StatusPill from '@/components/StatusPill';
-import { Eyebrow, EmptyLine, Hero, MetricStrip, ProgressRule } from '@/components/ui';
+import { EmptyLine, Hero, MetricStrip, ProgressRule, Row, Section } from '@/components/ui';
 import { int, pctValue } from '@/data/format';
 import { hasService, path } from '@/lib/nav';
 
@@ -23,8 +23,7 @@ export default function Finance() {
     <>
       <Hero hero={account.heroes.finance!} />
 
-      <Eyebrow className="mb-[12px]">This quarter</Eyebrow>
-      <div className="mb-[22px]">
+      <Section title="This quarter" bare>
         <MetricStrip
           metrics={[
             { label: 'Invoices processed', value: int(fa.received) },
@@ -32,31 +31,35 @@ export default function Finance() {
             ...qualityTiles,
           ]}
         />
-      </div>
+      </Section>
 
-      <div className="mb-[22px] flex items-center gap-[10px]">
-        <span className="flex-1">
-          <ProgressRule value={pace} />
-        </span>
-        <span className="text-[12px] text-secondary">{pace}% of quarterly scope</span>
-      </div>
+      <Section title="Progress against scope">
+        <div className="flex items-center gap-[16px]">
+          <span className="flex-1">
+            <ProgressRule value={pace} />
+          </span>
+          <span className="text-[14.5px] text-secondary">{pace}% of quarterly scope</span>
+        </div>
+        <p className="mt-[16px] border-t border-hairline pt-[14px] text-[14px] text-muted">
+          {int(fa.received)} of {int(fa.target)} {fa.unit} this quarter · {fa.qualityLine}
+        </p>
+      </Section>
 
-      <Eyebrow className="mb-[2px]">Workstreams</Eyebrow>
-      <div>
+      <Section title="Workstreams">
         {!account.faWorkstreams || account.faWorkstreams.length === 0 ? (
           <EmptyLine>Workstreams will appear here as they are set up.</EmptyLine>
         ) : (
           account.faWorkstreams.map((w) => (
-            <div key={w.id} className="flex items-center gap-[12px] border-t border-hairline py-[12px]">
+            <Row key={w.id} className="gap-[14px] first:border-t-0">
               <div className="min-w-0 flex-1">
-                <p className="text-[13px] text-strong">{w.name}</p>
-                <p className="mt-[3px] text-[12px] text-muted">{w.detail}</p>
+                <p className="text-[16px] font-medium text-strong">{w.name}</p>
+                <p className="mt-[5px] text-[14px] text-muted">{w.detail}</p>
               </div>
               <StatusPill state={w.status}>{w.statusLabel}</StatusPill>
-            </div>
+            </Row>
           ))
         )}
-      </div>
+      </Section>
     </>
   );
 }

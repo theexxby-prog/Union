@@ -82,13 +82,21 @@ alt text. Tests. Storybook. A component library.
 
 Do not add these. If a screen would be better with one, note it and move on.
 
-## Queued for next build (user-approved, do not start unprompted)
+## Layout revision — shipped 27 Jul 2026
 
-**Surface treatment "Option A — soft grey canvas", approved 24 Jul 2026:**
-apply across ALL screens: the main content area inside the app card moves from
-white to brand Soft Grey `#F4F7FB` (`--dbsl-grey-soft`); content sections sit on
-white surfaces — the services/hairline grids keep white cells, and loose
-row-lists (attention strip, tables like recent leads / documents / batch
-deliveries) get wrapped in white rounded-card containers so white reads as
-"content", not "background". Hero card, navy total rule, pills, and all other
-tokens unchanged. Chrome/tabs stay white (navy chrome Option B was NOT chosen).
+Two user-approved changes are now in the build. Do not undo them.
+
+**"Option A — soft grey canvas"** (approved 24 Jul): the content canvas is brand
+Soft Grey `#F4F7FB`; every section sits on a white rounded card over it, so white
+reads as "content", not "background". Chrome and tabs stay white (navy chrome
+Option B was NOT chosen). Hero card, navy total rule, and pills unchanged.
+
+**"Keep top tabs, widen + enlarge"** with **"+25%, presentation-first" type**
+(approved 27 Jul): chrome and tabs are full-bleed and sticky; content runs to
+`max-width: 1560px` with 32px side padding; the whole type scale moved up ~25%
+(body 15px). See the *Layout canvas* and *Typography* sections of
+`docs/02-design-system.md` for the recorded values.
+
+Screens compose from `Section` / `Cols` / `Row` / `TableHead` in
+`src/components/ui.tsx`. Do not reintroduce loose row-lists sitting directly on
+the grey canvas — they must be wrapped in a `Section`.
