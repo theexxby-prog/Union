@@ -6,22 +6,51 @@ Prose describes intent; the HTML shows the answer. When they disagree, the HTML 
 
 ## What this is
 
-**Union** is a client-facing portal for **Datamatics Business Solutions (DBSL)**.
-A client logs in and sees everything they are running with DBSL in one place —
-data services, programmatic media, lead generation, documents, invoices.
+**Union** is the client-facing portal for **Datamatics Business Solutions (DBSL)**.
+A client sees everything they are running with DBSL in one place — data services,
+programmatic media, lead generation, documents, invoices.
 
-This is an **internal demo artifact**. It exists to be walked through in a room with
-the Unit CEO and the product team so they can react to it. It is not a production
-system and is not on a path to becoming one.
+## Trajectory — read before proposing architecture
 
-**Therefore:**
+Union is intended to become **the successor to the existing Pulse platform**, not a
+second front end alongside it. Pulse is frozen: it is now client-visible and takes
+no further feature work. Over time Union absorbs what Pulse does — including the
+ops-facing side (campaign setup, delivery operations, admin) — and Pulse retires.
+
+Two partner integrations land in Union on the way there: **Relish** (contact and
+company enrichment) and **Propensity** (programmatic advertising reporting). Both
+are read via partner APIs. The September epics describe that work.
+
+**Current phase is still demo.** The constraints below are real and binding *now*,
+but they are phase-scoped, not permanent. Do not quietly break them because the
+trajectory implies they will change one day — but do say so when a request has
+crossed the line, so they can be retired deliberately rather than eroded.
+
+### Phase-scoped constraints (binding in the current phase)
 
 - All data is mock. Fixtures in the repo. No backend, no database, no API calls.
-- No authentication. No login form. No user accounts. No sessions.
+- No authentication. No login form. No user accounts. No sessions. Audience and
+  account selection are "viewing as" devices, not sign-in.
 - No environment variables. No API keys. No secrets. If you find yourself wanting
-  a `.env`, you have misunderstood the scope.
+  a `.env`, you have misunderstood the current scope.
 - No analytics, no telemetry, no error reporting services.
 - It must build with `npm run build` and deploy as a static site with zero config.
+
+### What will have to change when the phase does
+
+Recorded so the eventual change is a decision rather than a surprise:
+
+- **Writes.** Everything today is read-only presentation over derived fixtures.
+  Campaign setup and ops workflows mean mutation — which brings validation,
+  permissions, and audit, none of which exist.
+- **Hard rule 4** (one fixtures module) is what makes every screen reconcile. It
+  works because nothing changes. It does not survive real mutable state, and the
+  reconciliation gate will need rethinking at the same time.
+- **Auth.** The account picker is the seam where a real session eventually goes,
+  and the entitlement gating on tabs is already the shape role gating will need.
+- **The Propensity API key** must never reach client-side code — query-parameter
+  auth means it would land in logs and referrers. Server-side only, whenever a
+  server appears.
 
 ## Hard rules
 
