@@ -330,3 +330,64 @@ export interface Account {
   invested: number;
   dueNow: number;
 }
+
+/* ---------------------------------------------------------------------------
+   Ops side — the internal audience.
+
+   Union is succeeding Pulse, which carries five internal roles alongside the
+   client. The roles and their permissions are ported verbatim; the screens are
+   rebuilt in Union's own language (CLAUDE.md hard rule 2).
+   --------------------------------------------------------------------------- */
+
+export type OpsRoleId =
+  | 'ops_manager'      // runs operations — sees every client, every campaign
+  | 'campaign_manager' // owns delivery for assigned clients
+  | 'campaign_backup'  // covers a campaign manager's clients
+  | 'account_manager'  // sales side — brings in the scope, confirms job cards
+  | 'accounts';        // finance — validates invoice amounts before they are sent
+
+/** Which ops destination a screen sits under. */
+export type OpsScreenKey =
+  | 'overview'
+  | 'campaigns'
+  | 'approvals'
+  | 'leads'
+  | 'jobcards'
+  | 'invoices'
+  | 'admin';
+
+/** One demo user per role. Names are fictional; the roles and the permissions
+ *  behind them are real. Client-facing roles reuse the DBSL contacts the client
+ *  already sees on their Support screen — the campaign manager in ops is the
+ *  same person the client is told to call. */
+export interface OpsUser {
+  id: OpsRoleId;
+  name: string;
+  initials: string;
+  /** Job title as shown to the client, where the role is client-facing. */
+  roleLabel: string;
+  /** One line on what this role does — shown on the role picker. */
+  detail: string;
+  /** Accounts this user works on. Empty = every account. */
+  assignedAccountIds: string[];
+}
+
+/** A campaign created in ops during the session. Carries the shared key that
+ *  ties it to partner reporting — the thing the September epics need and do not
+ *  currently have (docs/07). */
+export interface DraftCampaign {
+  id: string;
+  accountId: string;
+  name: string;
+  geo: string;
+  target: number;
+  budget: number;
+  startDate: string;
+  endDate: string;
+  cadence: string;
+  perDrop: number;
+  /** Issued at creation, carried through to partner platforms as an external
+   *  reference so reporting can be joined back without name matching. */
+  externalKey: string;
+  createdBy: OpsRoleId;
+}

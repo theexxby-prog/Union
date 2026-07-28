@@ -22,7 +22,12 @@ import {
   ServiceCard,
 } from '@/components/ui';
 import { int, money, pctValue } from '@/data/format';
-import { cadenceLine, campaignStatusMeta, effectiveStatus } from '@/lib/campaign';
+import {
+  cadenceLine,
+  campaignStatusMeta,
+  campaignsWithDrafts,
+  effectiveStatus,
+} from '@/lib/campaign';
 import { demoKey, useDemoState } from '@/lib/demo-state';
 import { noticesFor } from '@/lib/notices';
 import { path } from '@/lib/nav';
@@ -73,8 +78,9 @@ function CampaignRow({ c, approved }: { c: Campaign; approved: boolean }) {
 
 /** Campaigns pending the client's approval — the second live interaction. */
 function ApprovalsBlock({ account }: { account: Account }) {
-  const { approvedCampaigns, approveCampaign } = useDemoState();
-  const pending = account.campaigns.filter(
+  const { approvedCampaigns, approveCampaign, createdCampaigns } = useDemoState();
+  // Includes campaigns ops set up this session — that is the handover moment.
+  const pending = campaignsWithDrafts(account.id, account.campaigns, createdCampaigns).filter(
     (c) => c.status === 'pendingApproval' && !approvedCampaigns.has(demoKey(account.id, c.id)),
   );
   if (pending.length === 0) return null;
@@ -167,7 +173,8 @@ function AttentionStrip({ account }: { account: Account }) {
 
 export default function Overview() {
   const account = useAccount();
-  const { approvedCampaigns } = useDemoState();
+  const { approvedCampaigns, createdCampaigns } = useDemoState();
+  const campaigns = campaignsWithDrafts(account.id, account.campaigns, createdCampaigns);
 
   if (account.overviewKind === 'campaigns') {
     return (
@@ -179,7 +186,7 @@ export default function Overview() {
           </Section>
         )}
         <Section title="Campaigns">
-          {account.campaigns.map((c) => (
+          {campaigns.map((c) => (
             <CampaignRow key={c.id} c={c} approved={approvedCampaigns.has(demoKey(account.id, c.id))} />
           ))}
         </Section>

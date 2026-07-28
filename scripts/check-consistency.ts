@@ -2,7 +2,9 @@
 // Bundled + run by scripts/verify.sh (npm run verify). Exits non-zero on any failure.
 
 import { accounts, getAccount, invoiceTotal } from '../src/data/accounts';
+import { accountsFor, opsTotals, opsUsers } from '../src/data/ops';
 import { pctValue } from '../src/data/format';
+import { opsTabsFor } from '../src/lib/ops-nav';
 import type { Account, ServiceId } from '../src/data/types';
 
 let failures = 0;
@@ -142,6 +144,55 @@ check('getAccount("nope") is undefined', getAccount('nope') === undefined);
 const acme = getAccount('acme') as Account;
 const prog = acme.services.find((s) => s.id === 'programmatic')!;
 check('programmatic pace = 52%', pctValue(prog.received, prog.target) === 52, `${pctValue(prog.received, prog.target)}%`);
+
+// ─── Ops side ────────────────────────────────────────────────────────────────
+// The ops screens are a transverse view of the SAME fixtures the client screens
+// read — every campaign across every client, rather than one account at a time.
+// If those two ever disagree the demo's central claim ("switch sides, same
+// numbers") is dead, so the roll-up is asserted against the per-account figures.
+
+const opsAll = opsTotals(accounts);
+check(
+  '\nops campaign count = sum of per-account campaigns',
+  opsAll.campaigns === sum(accounts.map((a) => a.campaigns.length)),
+  `${opsAll.campaigns}`,
+);
+check(
+  'ops billable = sum of per-account billable',
+  opsAll.accepted === sum(accounts.map((a) => sum(a.campaigns.map((c) => c.accepted)))),
+  `${opsAll.accepted}`,
+);
+check(
+  'ops delivered = sum of per-account delivered',
+  opsAll.delivered === sum(accounts.map((a) => sum(a.campaigns.map((c) => c.delivered)))),
+  `${opsAll.delivered}`,
+);
+check('ops invested = sum of per-account invested', opsAll.invested === sum(accounts.map((a) => a.invested)), `${opsAll.invested}`);
+check('ops due now = sum of per-account due now', opsAll.dueNow === sum(accounts.map((a) => a.dueNow)), `${opsAll.dueNow}`);
+
+// An ops user's client list is derived from the Support contacts the client is
+// shown, so the campaign manager in ops is the one the client is told to call.
+for (const u of opsUsers) {
+  const assigned = accountsFor(u);
+  if (u.assignedAccountIds.length === 0) {
+    check(`${u.id} sees every client`, assigned.length === accounts.length, `${assigned.length}`);
+  } else {
+    const listed = accounts.filter((a) => a.contacts.some((c) => c.name === u.name));
+    check(
+      `${u.id} (${u.name}) assignment matches client-facing contacts`,
+      assigned.length === listed.length && assigned.every((a) => listed.includes(a)),
+      `${assigned.map((a) => a.id).join(', ')}`,
+    );
+    check(`${u.id} carries at least one client`, assigned.length > 0, `${assigned.length}`);
+  }
+}
+
+// Every role must be able to reach somewhere that actually exists, or picking it
+// on the role picker lands on an empty app.
+for (const u of opsUsers) {
+  const built = opsTabsFor(u).filter((t) => t.built);
+  check(`${u.id} has a built destination`, built.length > 0, `${built.map((t) => t.key).join(', ')}`);
+}
 
 console.log(`\n${failures === 0 ? 'ALL CHECKS PASSED' : `${failures} CHECK(S) FAILED`}`);
 process.exit(failures === 0 ? 0 : 1);

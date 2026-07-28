@@ -865,7 +865,7 @@ function buildVantage(): Account {
     ],
     contacts: [
       { name: 'Laura Beckett', role: 'Account manager' },
-      { name: 'Sanjay Rao', role: 'Campaign manager' },
+      { name: 'Marcus Cole', role: 'Campaign manager' },
     ],
     team: [
       { name: 'Priya Anand', email: 'priya.anand@vantage.example', role: 'Owner' },

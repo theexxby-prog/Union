@@ -57,9 +57,13 @@ Recorded so the eventual change is a decision rather than a surprise:
 1. **Never write "Datamatics" alone.** It is "Datamatics Business Solutions" or
    "DBSL". This is a binding brand rule from the client's playbook. Applies to UI
    copy, comments, README, everything.
-2. **Do not touch or reference the existing Pulse app.** Different product,
-   different repo, different design language. Union is built fresh. Do not import
-   Pulse components, do not copy its patterns, do not mention it in the codebase.
+2. **Take function from Pulse, never form.** Union succeeds Pulse, so what the
+   ops side must *do* — the roles, the permissions, the workflow stages — is
+   studied from Pulse and ported deliberately. What it *looks like* is not: no
+   Pulse components, no Pulse markup, no Pulse design language, and no reference
+   to it in UI copy. Union's ops screens use the same tokens, `Section` cards and
+   primitives as the client screens, because it is one product with two
+   audiences. When porting behaviour, say so in a comment; do not paste code.
 3. **Typefaces are Montserrat and Sora only.** Never Inter, Roboto, Arial, Poppins,
    or system-ui as a primary. Self-host via `@fontsource-variable/montserrat` and
    `@fontsource-variable/sora`. No Google Fonts `<link>` at runtime.
@@ -129,3 +133,32 @@ Option B was NOT chosen). Hero card, navy total rule, and pills unchanged.
 Screens compose from `Section` / `Cols` / `Row` / `TableHead` in
 `src/components/ui.tsx`. Do not reintroduce loose row-lists sitting directly on
 the grey canvas — they must be wrapped in a `Section`.
+
+## Two audiences — shipped 28 Jul 2026
+
+Union has a client side and an ops side, forked at `/`.
+
+- `/clients` → the account picker, then `/:accountId/*` (unchanged).
+- `/ops` → the role picker, then `/ops/:roleId/*`.
+
+Five internal roles, ported from Pulse with fictional names: operations manager,
+campaign manager, campaign backup, account manager, finance. Permissions live in
+`src/lib/ops-nav.ts`. A destination a role cannot reach is **hidden**; one it can
+reach that is not built yet renders **locked**, the same device the client side
+uses for unentitled services.
+
+**Ops is a derivation, not a second dataset.** `src/data/ops.ts` reads the same
+fixtures the client screens read and views them transversally — every campaign
+across every client. Hard rule 4 therefore still holds, and `npm run verify`
+asserts that the ops roll-up equals the sum of the per-account figures. If those
+two ever diverge, the demo's central claim dies.
+
+Ops users' client lists are derived from the DBSL contacts the client already
+sees on their Support screen, so the campaign manager in ops is the person the
+client is told to call.
+
+`DemoStateProvider` sits in `App.tsx`, above both shells: a campaign created in
+ops appears on the client side without a reload. That crossing is the point.
+
+Still to build on the ops side: approvals, lead uploads, job cards (the eight
+internal stages behind the client's five phases), invoices, admin.

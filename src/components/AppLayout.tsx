@@ -20,7 +20,6 @@ import {
 import { DbslLockup, DbslMark } from '@/components/BrandLogo';
 import StatusPill from '@/components/StatusPill';
 import { accounts, getAccount } from '@/data/accounts';
-import { DemoStateProvider } from '@/lib/demo-state';
 import { noticesFor } from '@/lib/notices';
 import { currentSegment, isEntitled, path, switchTarget, TABS } from '@/lib/nav';
 import type { Account } from '@/data/types';
@@ -220,7 +219,7 @@ function Tabs({ account }: { account: Account }) {
 const CORP_URL = 'https://www.datamaticsbpm.com';
 const CORP_LINKS = ['About', 'Services', 'Case Studies', 'Careers', 'Contact'];
 
-function SiteFooter() {
+export function SiteFooter() {
   return (
     <footer className={`${SHELL} py-[18px]`}>
       <div className="flex flex-wrap items-center justify-between gap-x-[16px] gap-y-[6px]">
@@ -278,13 +277,13 @@ export default function AppLayout() {
     document.title = `${label} · ${account.name} · Union`;
   }, [account, location.pathname]);
 
-  // Unknown account slug → back to the picker.
-  if (!account) return <Navigate to="/" replace />;
+  // Unknown account slug → back to the client picker.
+  if (!account) return <Navigate to="/clients" replace />;
 
   const screenKey = `${account.id}/${currentSegment(location.pathname)}`;
 
   return (
-    <DemoStateProvider>
+    <>
       {/* Chrome and tabs run edge to edge and stay pinned, so the app owns the
           viewport instead of floating as a card in the middle of it. */}
       <div className="min-h-full">
@@ -302,6 +301,6 @@ export default function AppLayout() {
           <SiteFooter />
         </div>
       </div>
-    </DemoStateProvider>
+    </>
   );
 }

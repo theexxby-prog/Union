@@ -20,7 +20,13 @@ import {
   TableHead,
 } from '@/components/ui';
 import { int, money, pct, pctValue } from '@/data/format';
-import { campaignAccept, cadenceLine, campaignStatusMeta, effectiveStatus } from '@/lib/campaign';
+import {
+  campaignAccept,
+  cadenceLine,
+  campaignStatusMeta,
+  campaignsWithDrafts,
+  effectiveStatus,
+} from '@/lib/campaign';
 import { demoKey, useDemoState } from '@/lib/demo-state';
 import { hasService, path } from '@/lib/nav';
 import type { Campaign, Lead, MetricTile } from '@/data/types';
@@ -144,17 +150,20 @@ function DeliverySchedule({ filter }: { filter: string }) {
 
 export default function Leads() {
   const account = useAccount();
-  const { acceptedLeads, acceptLead, approvedCampaigns } = useDemoState();
+  const { acceptedLeads, acceptLead, approvedCampaigns, createdCampaigns } = useDemoState();
   const [searchParams, setSearchParams] = useSearchParams();
   const reviewOnly = searchParams.get('review') === '1';
   const [filter, setFilter] = useState<string>('all');
   const [open, setOpen] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  const campaignById = useMemo(
-    () => new Map(account.campaigns.map((c) => [c.id, c])),
-    [account.campaigns],
+  // Fixtures plus anything ops created this session, so a campaign set up on the
+  // other side of the product turns up here without a reload.
+  const campaigns = useMemo(
+    () => campaignsWithDrafts(account.id, account.campaigns, createdCampaigns),
+    [account.id, account.campaigns, createdCampaigns],
   );
+  const campaignById = useMemo(() => new Map(campaigns.map((c) => [c.id, c])), [campaigns]);
 
   // Locked service reached by direct URL → back to Overview.
   if (!hasService(account, 'leads')) return <Navigate to={path(account.id, '')} replace />;
@@ -198,7 +207,7 @@ export default function Leads() {
       </Section>
 
       <Section title="Campaigns">
-        {account.campaigns.map((c) => (
+        {campaigns.map((c) => (
           <CampaignRow
             key={c.id}
             c={c}
@@ -233,7 +242,7 @@ export default function Leads() {
               </button>
               {open && (
                 <ul className="absolute right-0 z-10 mt-[6px] w-[260px] overflow-hidden rounded-card border border-hairline bg-white py-[4px] shadow-[0_8px_24px_rgba(7,17,31,0.10)]">
-                  {[{ id: 'all', name: 'All campaigns' }, ...account.campaigns].map((c) => (
+                  {[{ id: 'all', name: 'All campaigns' }, ...campaigns].map((c) => (
                     <li key={c.id}>
                       <button
                         onMouseDown={(e) => {

@@ -30,3 +30,6 @@ const WORDS = [
   'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve',
 ];
 export const words = (n: number): string => WORDS[n] ?? int(n);
+
+/** Naive singular/plural for counted nouns — "1 service", "3 services". */
+export const plural = (n: number, word: string): string => (n === 1 ? word : `${word}s`);
